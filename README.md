@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AURA ✨
+## Luxury Women's Fashion E-Commerce Website
 
-## Getting Started
+AURA is a premium modern fashion e-commerce experience built for a women's fashion brand.
+The project focuses on elegant design, smooth interactions, responsive layouts, and a luxury shopping experience across all devices.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Project Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+AURA is designed to deliver a high-end fashion website experience inspired by modern luxury fashion houses.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The website includes:
+- Premium hero experience
+- Elegant product showcase
+- Luxury brand storytelling
+- Smooth animations
+- Responsive mobile-first design
+- Modern shopping experience
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🚀 Features
 
-To learn more about Next.js, take a look at the following resources:
+### 🖤 Premium UI / UX
+- Luxury fashion inspired design
+- Modern editorial layouts
+- Elegant typography system
+- Fully responsive experience
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🛍️ E-Commerce Experience
+- Product browsing
+- Product cards
+- Wishlist system
+- Shopping cart
+- Search experience
+- Order tracking
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🎨 Design System
+- Premium color palette
+- Custom brand identity
+- Modern icon system
+- Smooth hover interactions
+- Micro animations
 
-## Deploy on Vercel
+### 📱 Responsive Design
+Optimized for:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Mobile devices
+- Tablets
+- Desktop screens
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tested on:
+- 320px
+- 375px
+- 414px
+- Large desktop screens
+
+---
+
+## ⚡ Performance Optimization
+
+The project includes production-level optimizations:
+
+- Optimized React rendering
+- Reduced unnecessary re-renders
+- Lazy loading components
+- Optimized images
+- Responsive image loading
+- Smooth 60fps animations
+- Improved Core Web Vitals
+
+---
+
+## 🎬 Animations
+
+Built with modern animation techniques:
+
+- Hero cinematic animations
+- Scroll reveal effects
+- Smooth transitions
+- Hover interactions
+- Premium micro animations
+
+Powered by:
+
+- Framer Motion
+
+---
+
+## 🧩 Tech Stack
+
+### Frontend
+
+- React
+- Next.js
+- TypeScript
+- Tailwind CSS
+
+### UI & Animation
+
+- Framer Motion
+- React Icons / Lucide Icons
+
+### State Management
+
+- Context API / Custom Store
+
+### Development Tools
+
+- ESLint
+- TypeScript
+- Git
+
+---
+
+## 📂 Project Structure

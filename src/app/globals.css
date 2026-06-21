@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Typography Mappings */
+  --font-sans: var(--font-alexandria), sans-serif;
+  --font-display: var(--font-el-messiri), serif;
+  --font-serif: var(--font-el-messiri), serif;
+  --font-english: var(--font-inter), sans-serif;
+
+  /* Custom Brand Luxury Colors */
+  --color-background-primary: #FAF8F5;
+  --color-background-secondary: #FFFFFF;
+  --color-text-primary: #1E1512;
+  --color-text-secondary: #7A6A62;
+  --color-accent: #9A7355;
+  --color-brand-border: #EAE3D9;
+}
+
+:root {
+  --background: #FAF8F5;
+  --foreground: #1E1512;
+}
+
+body {
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif), var(--font-sans), serif !important;
+  font-weight: 400 !important;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}
+
+/* Custom Editorial Animation keyframes & details */
+.campaign-text-hover {
+  position: relative;
+}
+
+.campaign-text-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.campaign-text-hover:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Scroll Snap Campaign Slider details */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.scroll-snap-align-start {
+  scroll-snap-align: start;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ══════════════════════════════════════════
+   LUXURY CUSTOM SCROLLBAR — AURA Brand
+══════════════════════════════════════════ */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF8F5;
+  border-left: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    #D4C5B8 0%,
+    #9A7355 50%,
+    #D4C5B8 100%
+  );
+  border-radius: 100px;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    #9A7355 0%,
+    #7A5835 50%,
+    #9A7355 100%
+  );
+}
+
+::-webkit-scrollbar-corner {
+  background: #FAF8F5;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #9A7355 #FAF8F5;
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 100" fill="currentColor">
+  <g transform="translate(10, 10)">
+    <circle cx="40" cy="40" r="38" stroke="#D4AF37" strokeWidth="1" fill="none" />
+    <path d="M 40,15 L 20,65 M 40,15 L 60,65 M 28,50 L 52,50" stroke="#D4AF37" strokeWidth="1.5" fill="none" />
+    <path d="M 40,65 L 20,15 M 40,65 L 60,15" stroke="currentColor" strokeWidth="1.5" fill="none" />
+  </g>
+  <g transform="translate(110, 0)">
+    <path d="M 59,15 L 20,85 H 22 L 61,15 Z M 59,15 L 80,85 H 94 L 73,15 Z M 35,60 H 83 V 62 H 35 Z M 50,15 H 80 V 17 H 50 Z M 10,85 H 35 V 87 H 10 Z M 70,85 H 105 V 87 H 70 Z" />
+    <path d="M 150,15 H 164 V 68 H 150 Z M 206,15 H 208 V 68 H 206 Z M 150,68 C 150,88 170,88 185,88 C 200,88 208,80 208,68 H 206 C 206,78 198,86 185,86 C 172,86 164,78 164,68 Z M 140,15 H 174 V 17 H 140 Z M 196,15 H 218 V 17 H 196 Z" />
+    <path d="M 270,15 H 284 V 85 H 270 Z M 284,15 H 315 C 345,15 345,50 315,50 H 284 V 48 H 315 C 332,48 332,17 315,17 H 284 Z M 290,50 C 300,50 310,85 325,85 H 339 C 322,85 312,50 304,50 Z M 260,15 H 294 V 17 H 260 Z M 260,85 H 294 V 87 H 260 Z M 315,85 H 349 V 87 H 315 Z" />
+    <path d="M 419,15 L 380,85 H 382 L 421,15 Z M 419,15 L 440,85 H 454 L 433,15 Z M 395,60 H 443 V 62 H 395 Z M 410,15 H 440 V 17 H 410 Z M 370,85 H 395 V 87 H 370 Z M 430,85 H 465 V 87 H 430 Z" />
+  </g>
+</svg>

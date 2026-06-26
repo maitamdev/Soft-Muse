@@ -8,12 +8,13 @@
   --font-english: var(--font-inter), sans-serif;
 
   /* Custom Brand Luxury Colors */
-  --color-background-primary: #FAF8F5;
-  --color-background-secondary: #FFFFFF;
-  --color-text-primary: #1E1512;
-  --color-text-secondary: #7A6A62;
-  --color-accent: #9A7355;
-  --color-brand-border: #EAE3D9;
+  --color-background-primary: #FAF8F5; /* Ivory */
+  --color-background-secondary: #FFFFFF; /* Off White */
+  --color-background-tertiary: #E8E4DC; /* Warm Beige */
+  --color-text-primary: #1C1C1B; /* Graphite / Black */
+  --color-text-secondary: #5C5A56; /* Charcoal / Muted Grey */
+  --color-accent: #C5A880; /* Muted Gold */
+  --color-brand-border: #E5E0D8;
 }
 
 :root {
@@ -108,9 +109,9 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(
     180deg,
-    #D4C5B8 0%,
-    #9A7355 50%,
-    #D4C5B8 100%
+    #E5E0D8 0%,
+    #C5A880 50%,
+    #E5E0D8 100%
   );
   border-radius: 100px;
   border: none;
@@ -120,9 +121,9 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(
     180deg,
-    #9A7355 0%,
-    #7A5835 50%,
-    #9A7355 100%
+    #C5A880 0%,
+    #B89C72 50%,
+    #C5A880 100%
   );
 }
 
@@ -133,5 +134,5 @@ h1, h2, h3, h4, h5, h6 {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #9A7355 #FAF8F5;
+  scrollbar-color: #C5A880 #FAF8F5;
 }

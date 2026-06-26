@@ -88,7 +88,7 @@ export default function ProfilePage() {
                   <div className="flex gap-4 items-center">
                   <div className="relative w-12 h-16 shrink-0 bg-background-primary">
                     <Image
-                      src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=300&auto=format&fit=crop"
+                      src="/images/products/product_evening_gown.png"
                       alt=""
                       fill
                       sizes="48px"

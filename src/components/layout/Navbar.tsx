@@ -322,7 +322,7 @@ export default function Navbar() {
                 {/* Brand Info */}
                 <div className="flex flex-col gap-2 text-[11px] font-sans text-text-secondary font-light">
                   <p className="font-medium text-text-primary">أتيلييه أورا الرئيسي</p>
-                  <p>سان ستيفانو، الإسكندرية، مصر</p>
+                  <p>المهندسين، الجيزة، مصر</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -687,7 +687,7 @@ export default function Navbar() {
             setMobileMenuOpen(false);
           }}
           className={`flex flex-col items-center justify-center gap-1 w-12 text-center transition-colors relative ${
-            isCartOpen ? "text-[#9A7355]" : "text-[#A89888] hover:text-[#9A7355]"
+            isCartOpen ? "text-[#C5A880]" : "text-text-secondary hover:text-[#C5A880]"
           }`}
         >
           <PiHandbagThin className="w-6 h-6" />
@@ -697,7 +697,7 @@ export default function Navbar() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 20 }}
-              className="absolute top-0.5 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9A7355] text-[8px] font-bold text-white"
+              className="absolute top-0.5 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#C5A880] text-[8px] font-bold text-white"
             >
               {cartCount}
             </motion.span>

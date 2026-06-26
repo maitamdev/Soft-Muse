@@ -11,6 +11,7 @@ export interface Product {
   image: string;
   hoverImage?: string;
   collection: string;
+  season: "summer" | "winter";
   badge?: string;
   description: string;
   details: string[];
@@ -23,380 +24,2323 @@ export interface Product {
 
 export const mockProducts: Product[] = [
   {
-    id: "1",
-    title: "فستان أورا من الحرير بفتحة كتف راقية",
-    price: 3400,
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800&auto=format&fit=crop",
-    collection: "مجموعة المساء الكوتور",
-    badge: "إصدار محدود",
-    description: "صُمم هذا الفستان الأيقوني ليعكس فخامة دار أورا الراقية. قُص الفستان بأسلوب غير متناظر بفتحة كتف ناعمة وتفاصيل درابيه يدوية تنساب بجمال فائق على الجسم، منسوج من الحرير الطبيعي الخالص 100%.",
-    details: [
-      "حرير طبيعي خام 100%",
-      "درابيه ملفوف يدوياً بسلسلة ذهبية رفيعة عند الخصر",
-      "سحاب جانبي مخفي للملاءمة التامة",
-      "خياطة يدوية دقيقة في أتيلييه الإسكندرية، مصر"
+    "id": "1",
+    "title": "تيشيرت AURA من القطن العضوي الفاخر — صيف ٢٠٢٧",
+    "price": 1200,
+    "image": "/images/campaign/campaign_2.png",
+    "hoverImage": "/images/campaign/campaign_5.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "تيشيرت كلاسيكي فاخر من كولكشن صيف ٢٠٢٧. منسوج من القطن العضوي المصري 100% لتأمين أقصى درجات النعومة والانتعاش اليومي. قصة هندسية مريحة مع تفاصيل درزات مخفية عند الياقة والأطراف.",
+    "details": [
+      "المادة: قطن مصري نقي طويل التيلة 100%",
+      "القصة: قصة كلاسيكية مريحة بياقة دائرية محبوكة",
+      "التفاصيل: درزات جانبية مخفية وتطريز ناعم بشعار أورا",
+      "الصنع: خياطة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: غسيل بماء بارد ومنظف لطيف. تجفيف في الظل."
     ],
-    fabric: "حرير إيطالي طبيعي خالص 100% تم فحصه وانتقاؤه يدوياً.",
-    packaging: "يُسلم بصندوق أورا المخملي الفاخر وحامل الملابس الحريري الخاص. شحن سريع لجميع محافظات مصر.",
-    colors: ["أسود", "عاجي", "برونزي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
+    "fabric": "قطن مصري نقي 100% ناعم ومعالج ضد الانكماش.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "أسود",
-        value: "#111111",
-        images: [
-          "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_5.png"
         ]
       },
       {
-        color: "عاجي",
-        value: "#FAF8F5",
-        images: [
-          "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
         ]
       },
       {
-        color: "برونزي",
-        value: "#8E6B4B",
-        images: [
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop"
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/campaign/campaign_2.png"
         ]
       }
     ]
   },
   {
-    id: "2",
-    title: "طقم الأناقة من قطعتين كتان فاخر بيج",
-    price: 2899,
-    image: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop",
-    collection: "أطقم قطعتين",
-    badge: "صنع بالطلب",
-    description: "طقم الأناقة العصري من قطعتين منسوج من خيوط الكتان البلجيكي الطبيعي المعالج بنعومة الكشمير. خطوط هندسية واسعة تمنحكِ هيبة الحضور وراحة التحرك.",
-    details: [
-      "كتان طبيعي معالج بنعومة الكشمير",
-      "قصة بنطلون مستقيمة واسعة بجيوب مخفية",
-      "قميص منسدل بتطريز برونزي هادئ عند المعصم",
-      "أزرار صدفية طبيعية 100%"
+    "id": "2",
+    "title": "تيشيرت بياقة دائرية وقصة هندسية — صيف ٢٠٢٧",
+    "price": 1150,
+    "image": "/images/products/product_silk_blouse.png",
+    "hoverImage": "/images/flatlay/flatlay_2.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "تيشيرت كلاسيكي فاخر من كولكشن صيف ٢٠٢٧. منسوج من القطن العضوي المصري 100% لتأمين أقصى درجات النعومة والانتعاش اليومي. قصة هندسية مريحة مع تفاصيل درزات مخفية عند الياقة والأطراف.",
+    "details": [
+      "المادة: قطن مصري نقي طويل التيلة 100%",
+      "القصة: قصة كلاسيكية مريحة بياقة دائرية محبوكة",
+      "التفاصيل: درزات جانبية مخفية وتطريز ناعم بشعار أورا",
+      "الصنع: خياطة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: غسيل بماء بارد ومنظف لطيف. تجفيف في الظل."
     ],
-    fabric: "كتان بلجيكي معالج بنسبة 100% ليوفر الملمس الناعم والهيبة الهيكلية.",
-    packaging: "يُسلم بصندوق أورا المخملي المبطن بالقطيفة وحامل الملابس الحريري الفخم.",
-    colors: ["بيج", "أسود", "برونزي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
+    "fabric": "قطن مصري نقي 100% ناعم ومعالج ضد الانكماش.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "بيج",
-        value: "#E1D7C6",
-        images: [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/flatlay/flatlay_2.png"
         ]
       },
       {
-        color: "أسود",
-        value: "#111111",
-        images: [
-          "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/campaign/campaign_1.png"
         ]
       },
       {
-        color: "برونزي",
-        value: "#8E6B4B",
-        images: [
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop"
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/products/product_silk_blouse.png"
         ]
       }
     ]
   },
   {
-    id: "3",
-    title: "بلوزة حريرية مطرزة بياقة كلاسيكية ملوكية",
-    price: 1499,
-    image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
-    collection: "بلوزات",
-    badge: "إصدار خاص",
-    description: "بلوزة حريرية مترهلة ومطرزة يدوياً بخيوط برونزية ناعمة عند الياقة الملوكية الكلاسيكية. تفاصيل فريدة لعملاء أورا الأكثر تميزاً.",
-    details: [
-      "حرير طبيعي 100% خفيف الوزن",
-      "تطريز يدوي برونزي ناعم",
-      "ياقة كلاسيكية ملوكية مرتفعة",
-      "أكمام واسعة تنتهي بأساور مطرزة"
+    "id": "3",
+    "title": "تيشيرت واسع الأكمام من القطن المصري — صيف ٢٠٢٧",
+    "price": 1250,
+    "image": "/images/campaign/campaign_4.png",
+    "hoverImage": "/images/products/product_evening_gown.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "تيشيرت كلاسيكي فاخر من كولكشن صيف ٢٠٢٧. منسوج من القطن العضوي المصري 100% لتأمين أقصى درجات النعومة والانتعاش اليومي. قصة هندسية مريحة مع تفاصيل درزات مخفية عند الياقة والأطراف.",
+    "details": [
+      "المادة: قطن مصري نقي طويل التيلة 100%",
+      "القصة: قصة كلاسيكية مريحة بياقة دائرية محبوكة",
+      "التفاصيل: درزات جانبية مخفية وتطريز ناعم بشعار أورا",
+      "الصنع: خياطة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: غسيل بماء بارد ومنظف لطيف. تجفيف في الظل."
     ],
-    fabric: "حرير طبيعي 100% خفيف الوزن ذو لمعان مطفأ فاخر.",
-    packaging: "يُسلم بصندوق أورا المخملي المبطن بالقطيفة وحامل الملابس الحريري الفخم.",
-    colors: ["عاجي", "برونزي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
+    "fabric": "قطن مصري نقي 100% ناعم ومعالج ضد الانكماش.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "عاجي",
-        value: "#FAF8F5",
-        images: [
-          "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/products/product_evening_gown.png"
         ]
       },
       {
-        color: "برونزي",
-        value: "#8E6B4B",
-        images: [
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop"
-        ]
-      }
-    ]
-  },
-  {
-    id: "4",
-    title: "فستان ميدي كاجوال من خيوط الفيسكوز الإيطالية",
-    price: 2299,
-    image: "https://images.unsplash.com/photo-1596783074918-c84cb06531ca?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-    collection: "فساتين كاجوال",
-    badge: "إصدار مرقم",
-    description: "فستان ميدي ناعم وقريب من الجسم من خيوط الفيسكوز والحرير الإيطالي. قصة مضلعة تبرز تفاصيل القوام برقّة وخطوط هندسية عصرية بسيطة.",
-    details: [
-      "مزيج حرير وفيسكوز 100% مطاطي هادئ",
-      "ياقة دائرية ناعمة وفتحة ظهر هندسية",
-      "طول ميدي يناسب جميع بوتيكات الصيف",
-      "درزة مخفية عند الأطراف"
-    ],
-    fabric: "فيسكوز وحرير طبيعي إيطالي معالج ومطاطي ناعم.",
-    packaging: "يُسلم بصندوق أورا المخملي المبطن بالقطيفة وحامل الملابس الحريري الفخم.",
-    colors: ["أسود", "برونزي", "بيج"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
-      {
-        color: "أسود",
-        value: "#111111",
-        images: [
-          "https://images.unsplash.com/photo-1596783074918-c84cb06531ca?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop"
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_2.png"
         ]
       },
       {
-        color: "برونزي",
-        value: "#8E6B4B",
-        images: [
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop"
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "title": "تيشيرت أورا الكلاسيكي المضلع — صيف ٢٠٢٧",
+    "price": 1100,
+    "image": "/images/campaign/campaign_5.png",
+    "hoverImage": "/images/products/product_linen_set.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "تيشيرت كلاسيكي فاخر من كولكشن صيف ٢٠٢٧. منسوج من القطن العضوي المصري 100% لتأمين أقصى درجات النعومة والانتعاش اليومي. قصة هندسية مريحة مع تفاصيل درزات مخفية عند الياقة والأطراف.",
+    "details": [
+      "المادة: قطن مصري نقي طويل التيلة 100%",
+      "القصة: قصة كلاسيكية مريحة بياقة دائرية محبوكة",
+      "التفاصيل: درزات جانبية مخفية وتطريز ناعم بشعار أورا",
+      "الصنع: خياطة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: غسيل بماء بارد ومنظف لطيف. تجفيف في الظل."
+    ],
+    "fabric": "قطن مصري نقي 100% ناعم ومعالج ضد الانكماش.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
         ]
       },
       {
-        color: "بيج",
-        value: "#E1D7C6",
-        images: [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
-        ]
-      }
-    ]
-  },
-  {
-    id: "5",
-    title: "قميص أورجانزا راقٍ بنقوش أوراق الذهب البارزة",
-    price: 1799,
-    image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?q=80&w=800&auto=format&fit=crop",
-    collection: "قمصان",
-    badge: "طلب مسبق",
-    description: "قميص أورجانزا شفاف من الحرير والأورجانزا الفرنسية، مطرز يدوياً بنقوش بارزة من أوراق البرونز والذهب اللطيفة لتعكس أشعة الشمس بخفة.",
-    details: [
-      "أورجانزا حريرية فرنسية فاخرة وخفيفة الوزن جداً.",
-      "نقوش بارزة برونزية وذهبية مطفأة",
-      "قصة واسعة فضفاضة بأكتاف منسدلة",
-      "ياقة عريضة كلاسيكية وأزرار مخفية"
-    ],
-    fabric: "أورجانزا حريرية فرنسية فاخرة وخفيفة الوزن جداً.",
-    packaging: "يُسلم بصندوق أورا المخملي المبطن بالقطيفة وحامل الملابس الحريري الفخم.",
-    colors: ["ذهبى", "عاجي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
-      {
-        color: "ذهبى",
-        value: "#D4AF37",
-        images: [
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop"
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/products/product_silk_blouse.png"
         ]
       },
       {
-        color: "عاجي",
-        value: "#FAF8F5",
-        images: [
-          "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/campaign/campaign_5.png"
         ]
       }
     ]
   },
   {
-    id: "6",
-    title: "بنطلون كريب أسود بقصة مستقيمة ومحيط خصر عريض",
-    price: 1299,
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-    collection: "بنطلونات",
-    badge: "مخيط يدوياً",
-    description: "بنطلون كريب أسود فاخر ذو وزن مثالي يسقط باستقامة تامة. مصمم بمحيط خصر عريض مشدود يبرز رشاقة ونحافة الخصر وقوة الحضور.",
-    details: [
-      "كريب إيطالي ثقيل الوزن متماسك",
-      "محيط خصر عريض بحياكة مشدودة مبطنة",
-      "قصة أرجل مستقيمة مع فتحة أمامية صغيرة مخفية",
-      "جيوب جانبية ناعمة متداخلة"
+    "id": "5",
+    "title": "قميص Linen الكلاسيكي الفضفاض — صيف ٢٠٢٧",
+    "price": 1850,
+    "image": "/images/flatlay/flatlay_2.png",
+    "hoverImage": "/images/campaign/campaign_1.png",
+    "collection": "قمصان",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "قميص كلاسيكي فضفاض من خيوط الكتان أو القطن الممتاز لكولكشن صيف ٢٠٢٧. تصميم يدمج بين الفخامة والعملية اليومية بياقة عريضة وأزرار صدفية طبيعية ممتازة.",
+    "details": [
+      "المادة: كتان بلجيكي معالج بنعومة الكشمير 100% (أو قطن معالج)",
+      "القصة: قصة واسعة مريحة بأكمام طويلة قابلة للطي",
+      "التفاصيل: ياقة عريضة كلاسيكية وأزرار صدفية طبيعية",
+      "الصنع: صنع يدوي بأيدي خياطي دار أورا بالمهندسين",
+      "العناية: غسيل يدوي بارد أو تنظيف جاف لطيف."
     ],
-    fabric: "كريب إيطالي مزدوج الحياكة ذو جودة استثنائية وسقوط مثالي.",
-    packaging: "يُسلم بصندوق أورا المخملي المبطن بالقطيفة وحامل الملابس الحريري الفخم.",
-    colors: ["أسود", "برونزي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
+    "fabric": "كتان بلجيكي نقي معالج للحصول على سقوط مثالي وملمس مريح.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "أسود",
-        value: "#111111",
-        images: [
-          "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/campaign/campaign_1.png"
         ]
       },
       {
-        color: "برونزي",
-        value: "#8E6B4B",
-        images: [
-          "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop"
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/flatlay/flatlay_2.png"
         ]
       }
     ]
   },
   {
-    id: "7",
-    title: "معطف شتوي من الكشمير الفاخر",
-    price: 6500,
-    image: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
-    collection: "أزياء الشتاء",
-    badge: "جديد",
-    description: "معطف شتوي يجمع بين الدفء الاستثنائي والأناقة، مصنوع من الكشمير الخالص المنسوج بحرفية عالية.",
-    details: [
-      "كشمير طبيعي 100%",
-      "بطانة حريرية ناعمة",
-      "حزام خصر عريض لضبط المقاس",
-      "تصميم طويل يمنحكِ الهيبة والدفء"
+    "id": "6",
+    "title": "قميص صيفي من الكتان الطبيعي بأزرار صدفية — صيف ٢٠٢٧",
+    "price": 1950,
+    "image": "/images/products/product_evening_gown.png",
+    "hoverImage": "/images/campaign/campaign_2.png",
+    "collection": "قمصان",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "قميص كلاسيكي فضفاض من خيوط الكتان أو القطن الممتاز لكولكشن صيف ٢٠٢٧. تصميم يدمج بين الفخامة والعملية اليومية بياقة عريضة وأزرار صدفية طبيعية ممتازة.",
+    "details": [
+      "المادة: كتان بلجيكي معالج بنعومة الكشمير 100% (أو قطن معالج)",
+      "القصة: قصة واسعة مريحة بأكمام طويلة قابلة للطي",
+      "التفاصيل: ياقة عريضة كلاسيكية وأزرار صدفية طبيعية",
+      "الصنع: صنع يدوي بأيدي خياطي دار أورا بالمهندسين",
+      "العناية: غسيل يدوي بارد أو تنظيف جاف لطيف."
     ],
-    fabric: "كشمير إيطالي نقي يوفر دفئاً فائقاً بوزن خفيف.",
-    packaging: "يُسلم بغلاف مقاوم للعوامل الجوية داخل صندوق أورا المخملي.",
-    colors: ["جملي", "أسود", "رمادي"],
-    sizes: ["S", "M", "L", "XL"],
-    variants: [
+    "fabric": "كتان بلجيكي نقي معالج للحصول على سقوط مثالي وملمس مريح.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "جملي",
-        value: "#C19A6B",
-        images: ["https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?q=80&w=800&auto=format&fit=crop"]
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_evening_gown.png"
+        ]
       }
     ]
   },
   {
-    id: "8",
-    title: "فستان صيفي خفيف من القطن والكتان",
-    price: 2100,
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800&auto=format&fit=crop",
-    collection: "أزياء الصيف",
-    badge: "الأكثر مبيعاً",
-    description: "فستان صيفي يتميز بنعومة فائقة وتصميم يتيح حرية الحركة وانتعاشاً في أيام الصيف الحارة.",
-    details: [
-      "مزيج قطن وكتان ناعم ومسامي",
-      "تصميم بكسرات انسيابية",
-      "ياقة V ناعمة",
-      "مثالي لأوقات النهار والمساء"
+    "id": "7",
+    "title": "قميص قطن إيطالي بياقة كلاسيكية واسعة — صيف ٢٠٢٧",
+    "price": 1750,
+    "image": "/images/products/product_linen_set.png",
+    "hoverImage": "/images/products/product_silk_blouse.png",
+    "collection": "قمصان",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "قميص كلاسيكي فضفاض من خيوط الكتان أو القطن الممتاز لكولكشن صيف ٢٠٢٧. تصميم يدمج بين الفخامة والعملية اليومية بياقة عريضة وأزرار صدفية طبيعية ممتازة.",
+    "details": [
+      "المادة: كتان بلجيكي معالج بنعومة الكشمير 100% (أو قطن معالج)",
+      "القصة: قصة واسعة مريحة بأكمام طويلة قابلة للطي",
+      "التفاصيل: ياقة عريضة كلاسيكية وأزرار صدفية طبيعية",
+      "الصنع: صنع يدوي بأيدي خياطي دار أورا بالمهندسين",
+      "العناية: غسيل يدوي بارد أو تنظيف جاف لطيف."
     ],
-    fabric: "قطن مصري ممتاز ممزوج بالكتان لتقليل التجعد.",
-    packaging: "يُسلم في حافظة قطنية صديقة للبيئة.",
-    colors: ["أبيض", "أزرق فاتح", "وردي"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    variants: [
+    "fabric": "كتان بلجيكي نقي معالج للحصول على سقوط مثالي وملمس مريح.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "أبيض",
-        value: "#FFFFFF",
-        images: ["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"]
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/flatlay/flatlay_2.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/products/product_linen_set.png"
+        ]
       }
     ]
   },
   {
-    id: "9",
-    title: "طقم كلاسيكي قطعتين من الحرير والكتان",
-    price: 3200,
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
-    collection: "أطقم",
-    badge: "مخيط يدوياً",
-    description: "طقم الأناقة العصرية يجمع بين بنطلون كلاسيكي وبلوزة متناسقة، يمنحك حضوراً رسمياً بطابع فخم ومريح.",
-    details: [
-      "مزيج من الكتان والحرير الفاخر",
-      "بنطلون بقصة مستقيمة",
-      "بلوزة بأزرار مخفية",
-      "تصميم هندسي دقيق"
+    "id": "8",
+    "title": "قميص Aura Noir من الحرير الشفاف — صيف ٢٠٢٧",
+    "price": 2100,
+    "image": "/images/campaign/campaign_1.png",
+    "hoverImage": "/images/campaign/campaign_4.png",
+    "collection": "قمصان",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "قميص كلاسيكي فضفاض من خيوط الكتان أو القطن الممتاز لكولكشن صيف ٢٠٢٧. تصميم يدمج بين الفخامة والعملية اليومية بياقة عريضة وأزرار صدفية طبيعية ممتازة.",
+    "details": [
+      "المادة: كتان بلجيكي معالج بنعومة الكشمير 100% (أو قطن معالج)",
+      "القصة: قصة واسعة مريحة بأكمام طويلة قابلة للطي",
+      "التفاصيل: ياقة عريضة كلاسيكية وأزرار صدفية طبيعية",
+      "الصنع: صنع يدوي بأيدي خياطي دار أورا بالمهندسين",
+      "العناية: غسيل يدوي بارد أو تنظيف جاف لطيف."
     ],
-    fabric: "كتان ممزوج بالحرير للحصول على مظهر انسيابي وثابت.",
-    packaging: "يُسلم بصندوق أورا المخملي.",
-    colors: ["رمادي داكن", "بيج"],
-    sizes: ["XS", "S", "M", "L"],
-    variants: [
+    "fabric": "كتان بلجيكي نقي معالج للحصول على سقوط مثالي وملمس مريح.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
       {
-        color: "رمادي داكن",
-        value: "#4B4B4B",
-        images: ["https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"]
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/products/product_evening_gown.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_1.png"
+        ]
       }
     ]
   },
   {
-    id: "10",
-    title: "حقيبة سهرة كلاسيكية ذهبية",
-    price: 4500,
-    image: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=800&auto=format&fit=crop",
-    collection: "حقائب",
-    badge: "قطعة أساسية",
-    description: "حقيبة سهرة صلبة كلاسيكية باللون الذهبي اللامع، مصممة لتكمل إطلالتك بفخامة. تتسع لاحتياجاتك الأساسية مع سلسلة ذهبية رقيقة.",
-    details: ["معدن مطلي بماء الذهب المطفأ", "بطانة داخلية من الحرير الأصلي", "قفل هندسي أيقوني"],
-    fabric: "معدن فاخر مضاد للخدش",
-    packaging: "تُسلم في حقيبة قطنية ناعمة داخل صندوق أورا.",
-    colors: ["ذهبي"],
-    sizes: ["One Size"]
+    "id": "9",
+    "title": "بلوزة Celeste من الحرير الطبيعي الملوكي — صيف ٢٠٢٧",
+    "price": 2400,
+    "image": "/images/campaign/campaign_2.png",
+    "hoverImage": "/images/campaign/campaign_5.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "بلوزة أنيقة من الحرير أو الساتان لكولكشن صيف ٢٠٢٧. تصميم مترهل يبرز تفاصيل الأنوثة برقة مع تطريز برونزي يدوي ناعم عند الياقة الملوكية الكلاسيكية.",
+    "details": [
+      "المادة: حرير طبيعي 100% ذو لمعان مطفأ فاخر",
+      "القصة: قصة منسدلة بياقة مرتفعة وأكمام واسعة تنتهي بأساور مطرزة",
+      "التفاصيل: تطريز يدوي ناعم بخيوط البرونز والذهب",
+      "الصنع: صناعة يدوية فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي على البارد مغلّفاً بقطعة قطنية."
+    ],
+    "fabric": "حرير طبيعي 100% ناعم على البشرة وذو مظهر منسدل راقٍ.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      }
+    ]
   },
   {
-    id: "11",
-    title: "حذاء كعب عالي كلاسيكي أسود",
-    price: 3200,
-    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=800&auto=format&fit=crop",
-    collection: "أحذية",
-    badge: "حصري",
-    description: "حذاء كعب عالي (Stiletto) بجلد طبيعي لامع. قصة مدببة تبرز أنوثة القدمين ومثالي لإطلالات المساء.",
-    details: ["جلد عجل طبيعي 100%", "كعب بارتفاع 9 سم", "نعل مريح مبطن"],
-    fabric: "جلد طبيعي لامع",
-    packaging: "يُسلم في صندوق أحذية أورا الفاخر.",
-    colors: ["أسود"],
-    sizes: ["37", "38", "39", "40", "41"]
+    "id": "10",
+    "title": "بلوزة انسيابية بكسرات ناعمة من الساتان — صيف ٢٠٢٧",
+    "price": 2250,
+    "image": "/images/products/product_silk_blouse.png",
+    "hoverImage": "/images/flatlay/flatlay_2.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "بلوزة أنيقة من الحرير أو الساتان لكولكشن صيف ٢٠٢٧. تصميم مترهل يبرز تفاصيل الأنوثة برقة مع تطريز برونزي يدوي ناعم عند الياقة الملوكية الكلاسيكية.",
+    "details": [
+      "المادة: حرير طبيعي 100% ذو لمعان مطفأ فاخر",
+      "القصة: قصة منسدلة بياقة مرتفعة وأكمام واسعة تنتهي بأساور مطرزة",
+      "التفاصيل: تطريز يدوي ناعم بخيوط البرونز والذهب",
+      "الصنع: صناعة يدوية فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي على البارد مغلّفاً بقطعة قطنية."
+    ],
+    "fabric": "حرير طبيعي 100% ناعم على البشرة وذو مظهر منسدل راقٍ.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/flatlay/flatlay_2.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      }
+    ]
   },
   {
-    id: "12",
-    title: "قلادة كوتور ذهبية بطبقات متدلية",
-    price: 2100,
-    image: "https://images.unsplash.com/photo-1599643478524-fb66f7ca065b?q=80&w=800&auto=format&fit=crop",
-    hoverImage: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop",
-    collection: "مجوهرات",
-    description: "قلادة رقيقة بطبقات متدلية تبرز جمال منطقة العنق بشكل مثالي مع الفساتين ذات الفتحات الكلاسيكية والياقات المفتوحة.",
-    details: ["نحاس مطلي بذهب عيار 18", "تصميم بطبقتين مع تعليقة دائرية هندسية", "خالية من النيكل ومقاومة للتحسس"],
-    fabric: "مطلي بالذهب",
-    packaging: "تُسلم في علبة مجوهرات أورا الفاخرة.",
-    colors: ["ذهبي"],
-    sizes: ["One Size"]
+    "id": "11",
+    "title": "بلوزة بأكمام منفوخة وتطريز يدوي ذهبي — صيف ٢٠٢٧",
+    "price": 2500,
+    "image": "/images/campaign/campaign_4.png",
+    "hoverImage": "/images/products/product_evening_gown.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "بلوزة أنيقة من الحرير أو الساتان لكولكشن صيف ٢٠٢٧. تصميم مترهل يبرز تفاصيل الأنوثة برقة مع تطريز برونزي يدوي ناعم عند الياقة الملوكية الكلاسيكية.",
+    "details": [
+      "المادة: حرير طبيعي 100% ذو لمعان مطفأ فاخر",
+      "القصة: قصة منسدلة بياقة مرتفعة وأكمام واسعة تنتهي بأساور مطرزة",
+      "التفاصيل: تطريز يدوي ناعم بخيوط البرونز والذهب",
+      "الصنع: صناعة يدوية فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي على البارد مغلّفاً بقطعة قطنية."
+    ],
+    "fabric": "حرير طبيعي 100% ناعم على البشرة وذو مظهر منسدل راقٍ.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/products/product_evening_gown.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "title": "بلوزة حريرية مطرزة بدون أكمام — صيف ٢٠٢٧",
+    "price": 1999,
+    "image": "/images/campaign/campaign_5.png",
+    "hoverImage": "/images/products/product_linen_set.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "بلوزة أنيقة من الحرير أو الساتان لكولكشن صيف ٢٠٢٧. تصميم مترهل يبرز تفاصيل الأنوثة برقة مع تطريز برونزي يدوي ناعم عند الياقة الملوكية الكلاسيكية.",
+    "details": [
+      "المادة: حرير طبيعي 100% ذو لمعان مطفأ فاخر",
+      "القصة: قصة منسدلة بياقة مرتفعة وأكمام واسعة تنتهي بأساور مطرزة",
+      "التفاصيل: تطريز يدوي ناعم بخيوط البرونز والذهب",
+      "الصنع: صناعة يدوية فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي على البارد مغلّفاً بقطعة قطنية."
+    ],
+    "fabric": "حرير طبيعي 100% ناعم على البشرة وذو مظهر منسدل راقٍ.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "title": "توب صيفي ناعم بفتحة ظهر هندسية — صيف ٢٠٢٧",
+    "price": 1100,
+    "image": "/images/flatlay/flatlay_2.png",
+    "hoverImage": "/images/campaign/campaign_1.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "توب صيفي خفيف منسوج من ألياف مسامية ناعمة. قطعة أساسية مريحة لتنسيقات الصيف المشرقة وأسفل السترات المفتوحة.",
+    "details": [
+      "المادة: مزيج حرير وفيسكوز معالج 100%",
+      "القصة: قصة منسدلة بدون أكمام بياقة دائرية ناعمة",
+      "التفاصيل: حاشية يدوية دقيقة وقصة هندسية مريحة",
+      "الصنع: خياطة وتجهيز كوتور بأتيلييه الجيزة",
+      "العناية: غسيل يدوي لطيف بماء بارد. كوي بخار خفيف جداً."
+    ],
+    "fabric": "مزيج حريري ناعم وخفيف الوزن يوفر انتعاشاً كاملاً.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/flatlay/flatlay_2.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "14",
+    "title": "توب مضلع بدون أكمام من خيوط الفيسكوز — صيف ٢٠٢٧",
+    "price": 1050,
+    "image": "/images/products/product_evening_gown.png",
+    "hoverImage": "/images/campaign/campaign_2.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "توب صيفي خفيف منسوج من ألياف مسامية ناعمة. قطعة أساسية مريحة لتنسيقات الصيف المشرقة وأسفل السترات المفتوحة.",
+    "details": [
+      "المادة: مزيج حرير وفيسكوز معالج 100%",
+      "القصة: قصة منسدلة بدون أكمام بياقة دائرية ناعمة",
+      "التفاصيل: حاشية يدوية دقيقة وقصة هندسية مريحة",
+      "الصنع: خياطة وتجهيز كوتور بأتيلييه الجيزة",
+      "العناية: غسيل يدوي لطيف بماء بارد. كوي بخار خفيف جداً."
+    ],
+    "fabric": "مزيج حريري ناعم وخفيف الوزن يوفر انتعاشاً كاملاً.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_evening_gown.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "title": "توب كروب كلاسيكي للشاطئ — صيف ٢٠٢٧",
+    "price": 990,
+    "image": "/images/products/product_linen_set.png",
+    "hoverImage": "/images/products/product_silk_blouse.png",
+    "collection": "بلوزات",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "توب صيفي خفيف منسوج من ألياف مسامية ناعمة. قطعة أساسية مريحة لتنسيقات الصيف المشرقة وأسفل السترات المفتوحة.",
+    "details": [
+      "المادة: مزيج حرير وفيسكوز معالج 100%",
+      "القصة: قصة منسدلة بدون أكمام بياقة دائرية ناعمة",
+      "التفاصيل: حاشية يدوية دقيقة وقصة هندسية مريحة",
+      "الصنع: خياطة وتجهيز كوتور بأتيلييه الجيزة",
+      "العناية: غسيل يدوي لطيف بماء بارد. كوي بخار خفيف جداً."
+    ],
+    "fabric": "مزيج حريري ناعم وخفيف الوزن يوفر انتعاشاً كاملاً.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/flatlay/flatlay_2.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/products/product_linen_set.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "title": "بنطلون Horizon كريب بخصر عريض ومشدود — صيف ٢٠٢٧",
+    "price": 1899,
+    "image": "/images/campaign/campaign_1.png",
+    "hoverImage": "/images/campaign/campaign_4.png",
+    "collection": "بنطلونات",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "بنطلون صيفي بقصة أرجل واسعة وخصر مرتفع مبطن. تصميم مريح يسقط باستقامة تامة مصنوع من الكتان أو الكريب الخفيف لتأمين إطلالة باردة وأنيقة.",
+    "details": [
+      "المادة: كتان بلجيكي طبيعي 100% (أو كريب خفيف)",
+      "القصة: خصر مرتفع مع قصة أرجل مستقيمة واسعة",
+      "التفاصيل: حزام خصر مبطن وجيوب جانبية متداخلة دقيقة",
+      "الصنع: حياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف لطيف أو غسيل يدوي بماء بارد."
+    ],
+    "fabric": "كتان بلجيكي طبيعي ذو جودة استثنائية وسقوط مثالي.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/products/product_evening_gown.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "17",
+    "title": "بنطلون كتان بلجيكي واسع الساق — صيف ٢٠٢٧",
+    "price": 1799,
+    "image": "/images/campaign/campaign_2.png",
+    "hoverImage": "/images/campaign/campaign_5.png",
+    "collection": "بنطلونات",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "بنطلون صيفي بقصة أرجل واسعة وخصر مرتفع مبطن. تصميم مريح يسقط باستقامة تامة مصنوع من الكتان أو الكريب الخفيف لتأمين إطلالة باردة وأنيقة.",
+    "details": [
+      "المادة: كتان بلجيكي طبيعي 100% (أو كريب خفيف)",
+      "القصة: خصر مرتفع مع قصة أرجل مستقيمة واسعة",
+      "التفاصيل: حزام خصر مبطن وجيوب جانبية متداخلة دقيقة",
+      "الصنع: حياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف لطيف أو غسيل يدوي بماء بارد."
+    ],
+    "fabric": "كتان بلجيكي طبيعي ذو جودة استثنائية وسقوط مثالي.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "18",
+    "title": "بنطلون صيفي مستقيم من القطن الخفيف — صيف ٢٠٢٧",
+    "price": 1650,
+    "image": "/images/products/product_silk_blouse.png",
+    "hoverImage": "/images/flatlay/flatlay_2.png",
+    "collection": "بنطلونات",
+    "season": "summer",
+    "badge": "إصدار خاص",
+    "description": "بنطلون صيفي بقصة أرجل واسعة وخصر مرتفع مبطن. تصميم مريح يسقط باستقامة تامة مصنوع من الكتان أو الكريب الخفيف لتأمين إطلالة باردة وأنيقة.",
+    "details": [
+      "المادة: كتان بلجيكي طبيعي 100% (أو كريب خفيف)",
+      "القصة: خصر مرتفع مع قصة أرجل مستقيمة واسعة",
+      "التفاصيل: حزام خصر مبطن وجيوب جانبية متداخلة دقيقة",
+      "الصنع: حياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف لطيف أو غسيل يدوي بماء بارد."
+    ],
+    "fabric": "كتان بلجيكي طبيعي ذو جودة استثنائية وسقوط مثالي.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/flatlay/flatlay_2.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/flatlay/flatlay_2.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "19",
+    "title": "فستان Soleil صيفي من القطن والكتان البلجيكي — صيف ٢٠٢٧",
+    "price": 2999,
+    "image": "/images/campaign/campaign_4.png",
+    "hoverImage": "/images/products/product_evening_gown.png",
+    "collection": "فساتين كاجوال",
+    "season": "summer",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "فستان صيفي متوسط الطول بقصة منسدلة وتفاصيل أنثوية رقيقة. تصميم يوفر لكِ حرية الحركة والانتعاش في سهرات النهار والمساء الصيفية.",
+    "details": [
+      "المادة: مزيج قطن وكتان ناعم ومسامي 100%",
+      "القصة: قصة ملتفة (Wrap) كلاسيكية بحزام جانبي قابل للتعديل",
+      "التفاصيل: ياقة V انسيابية وأطراف سفلية واسعة تمنح حركة جميلة",
+      "الصنع: صنع بكل فخر وحرفية في أتيلييه الجيزة، مصر",
+      "العناية: غسيل يدوي بارد. تجفيف طبيعي وكوي على حرارة متوسطة."
+    ],
+    "fabric": "مزيج قطن طبيعي وكتان ناعم ومعالج لتقليل التجعد.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/products/product_evening_gown.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/products/product_evening_gown.png",
+          "/images/campaign/campaign_2.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_2.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "20",
+    "title": "فستان صيفي ملتف حول الجسم بياقة V — صيف ٢٠٢٧",
+    "price": 2850,
+    "image": "/images/campaign/campaign_5.png",
+    "hoverImage": "/images/products/product_linen_set.png",
+    "collection": "فساتين كاجوال",
+    "season": "summer",
+    "badge": "قطعة أساسية",
+    "description": "فستان صيفي متوسط الطول بقصة منسدلة وتفاصيل أنثوية رقيقة. تصميم يوفر لكِ حرية الحركة والانتعاش في سهرات النهار والمساء الصيفية.",
+    "details": [
+      "المادة: مزيج قطن وكتان ناعم ومسامي 100%",
+      "القصة: قصة ملتفة (Wrap) كلاسيكية بحزام جانبي قابل للتعديل",
+      "التفاصيل: ياقة V انسيابية وأطراف سفلية واسعة تمنح حركة جميلة",
+      "الصنع: صنع بكل فخر وحرفية في أتيلييه الجيزة، مصر",
+      "العناية: غسيل يدوي بارد. تجفيف طبيعي وكوي على حرارة متوسطة."
+    ],
+    "fabric": "مزيج قطن طبيعي وكتان ناعم ومعالج لتقليل التجعد.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_5.png",
+          "/images/products/product_linen_set.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/products/product_linen_set.png",
+          "/images/products/product_silk_blouse.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/products/product_silk_blouse.png",
+          "/images/campaign/campaign_5.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "21",
+    "title": "معطف Étoile من الكشمير الإيطالي الفاخر — شتاء ٢٠٢٧",
+    "price": 6500,
+    "image": "/images/detail/detail_fabric.png",
+    "hoverImage": "/images/lifestyle/lifestyle_interior.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "معطف شتوي فاخر مصنوع من الكشمير الخالص المنسوج بحرفية عالية من كولكشن شتاء ٢٠٢٧. يمنحكِ الهيبة والدفء الاستثنائي بوزنه الخفيف ومظهره الملكي.",
+    "details": [
+      "المادة: كشمير طبيعي نقي 100% ثقيل الوزن وفائق النعومة",
+      "القصة: تصميم طويل يمنحكِ الهيبة والدفء مع حزام خصر عريض",
+      "التفاصيل: بطانة حريرية ناعمة وجيوب جانبية دافئة مبطنة بالصوف",
+      "الصنع: حياكة كوتور فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف حصرياً بمراكز متخصصة. يُحفظ معلقاً على علاقة عريضة."
+    ],
+    "fabric": "كشمير إيطالي نقي 100% يوفر دفئاً فائقاً بوزن خفيف.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "22",
+    "title": "معطف ترنش كلاسيكي طويل مقاوم للمطر — شتاء ٢٠٢٧",
+    "price": 5900,
+    "image": "/images/campaign/campaign_1.png",
+    "hoverImage": "/images/campaign/campaign_3.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "معطف شتوي فاخر مصنوع من الكشمير الخالص المنسوج بحرفية عالية من كولكشن شتاء ٢٠٢٧. يمنحكِ الهيبة والدفء الاستثنائي بوزنه الخفيف ومظهره الملكي.",
+    "details": [
+      "المادة: كشمير طبيعي نقي 100% ثقيل الوزن وفائق النعومة",
+      "القصة: تصميم طويل يمنحكِ الهيبة والدفء مع حزام خصر عريض",
+      "التفاصيل: بطانة حريرية ناعمة وجيوب جانبية دافئة مبطنة بالصوف",
+      "الصنع: حياكة كوتور فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف حصرياً بمراكز متخصصة. يُحفظ معلقاً على علاقة عريضة."
+    ],
+    "fabric": "كشمير إيطالي نقي 100% يوفر دفئاً فائقاً بوزن خفيف.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "23",
+    "title": "معطف صوفي طويل مزدوج الصدر بحزام — شتاء ٢٠٢٧",
+    "price": 6200,
+    "image": "/images/campaign/campaign_6.png",
+    "hoverImage": "/images/flatlay/flatlay_1.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "معطف شتوي فاخر مصنوع من الكشمير الخالص المنسوج بحرفية عالية من كولكشن شتاء ٢٠٢٧. يمنحكِ الهيبة والدفء الاستثنائي بوزنه الخفيف ومظهره الملكي.",
+    "details": [
+      "المادة: كشمير طبيعي نقي 100% ثقيل الوزن وفائق النعومة",
+      "القصة: تصميم طويل يمنحكِ الهيبة والدفء مع حزام خصر عريض",
+      "التفاصيل: بطانة حريرية ناعمة وجيوب جانبية دافئة مبطنة بالصوف",
+      "الصنع: حياكة كوتور فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف حصرياً بمراكز متخصصة. يُحفظ معلقاً على علاقة عريضة."
+    ],
+    "fabric": "كشمير إيطالي نقي 100% يوفر دفئاً فائقاً بوزن خفيف.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "24",
+    "title": "معطف ميرينو فاخر ببطانة حريرية — شتاء ٢٠٢٧",
+    "price": 6800,
+    "image": "/images/lifestyle/lifestyle_interior.png",
+    "hoverImage": "/images/campaign/campaign_4.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "معطف شتوي فاخر مصنوع من الكشمير الخالص المنسوج بحرفية عالية من كولكشن شتاء ٢٠٢٧. يمنحكِ الهيبة والدفء الاستثنائي بوزنه الخفيف ومظهره الملكي.",
+    "details": [
+      "المادة: كشمير طبيعي نقي 100% ثقيل الوزن وفائق النعومة",
+      "القصة: تصميم طويل يمنحكِ الهيبة والدفء مع حزام خصر عريض",
+      "التفاصيل: بطانة حريرية ناعمة وجيوب جانبية دافئة مبطنة بالصوف",
+      "الصنع: حياكة كوتور فاخرة بأتيلييه الجيزة",
+      "العناية: تنظيف جاف حصرياً بمراكز متخصصة. يُحفظ معلقاً على علاقة عريضة."
+    ],
+    "fabric": "كشمير إيطالي نقي 100% يوفر دفئاً فائقاً بوزن خفيف.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "25",
+    "title": "جاكيت صوف مبطن بالريش الطبيعي — شتاء ٢٠٢٧",
+    "price": 4900,
+    "image": "/images/campaign/campaign_3.png",
+    "hoverImage": "/images/products/product_winter_coat.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "جاكيت شتوي بتصميم عصري وخامات معالجة ضد الرياح والمطر. يجمع بين الفخامة الحضرية والدفء الاستثنائي لحمايتكِ طوال الفصل البارد.",
+    "details": [
+      "المادة: صوف ميرينو 80% وألياف معزولة 20% مقاومة للماء والثلج",
+      "القصة: قصة منتفخة هندسية متوسطة الطول بياقة عالية وغطاء رأس مخفي",
+      "التفاصيل: سحاب معدني متين مع أزرار كبس مخفية وجيوب بسحابات",
+      "الصنع: تصميم وحياكة مشتركة يدوية في صالون أورا بالمهندسين",
+      "العناية: تنظيف جاف لطيف بمراكز متخصصة بسترات الصوف الشتوية."
+    ],
+    "fabric": "صوف ميرينو معالج مع بطانة داخلية ناعمة عازلة للحرارة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "26",
+    "title": "جاكيت جلد غزال طبيعي مبطن بالصوف — شتاء ٢٠٢٧",
+    "price": 7500,
+    "image": "/images/flatlay/flatlay_1.png",
+    "hoverImage": "/images/detail/detail_fabric.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "جاكيت شتوي بتصميم عصري وخامات معالجة ضد الرياح والمطر. يجمع بين الفخامة الحضرية والدفء الاستثنائي لحمايتكِ طوال الفصل البارد.",
+    "details": [
+      "المادة: صوف ميرينو 80% وألياف معزولة 20% مقاومة للماء والثلج",
+      "القصة: قصة منتفخة هندسية متوسطة الطول بياقة عالية وغطاء رأس مخفي",
+      "التفاصيل: سحاب معدني متين مع أزرار كبس مخفية وجيوب بسحابات",
+      "الصنع: تصميم وحياكة مشتركة يدوية في صالون أورا بالمهندسين",
+      "العناية: تنظيف جاف لطيف بمراكز متخصصة بسترات الصوف الشتوية."
+    ],
+    "fabric": "صوف ميرينو معالج مع بطانة داخلية ناعمة عازلة للحرارة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "27",
+    "title": "جاكيت صوف قصير بتصميم هندسي واسع — شتاء ٢٠٢٧",
+    "price": 4200,
+    "image": "/images/campaign/campaign_4.png",
+    "hoverImage": "/images/campaign/campaign_1.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "جاكيت شتوي بتصميم عصري وخامات معالجة ضد الرياح والمطر. يجمع بين الفخامة الحضرية والدفء الاستثنائي لحمايتكِ طوال الفصل البارد.",
+    "details": [
+      "المادة: صوف ميرينو 80% وألياف معزولة 20% مقاومة للماء والثلج",
+      "القصة: قصة منتفخة هندسية متوسطة الطول بياقة عالية وغطاء رأس مخفي",
+      "التفاصيل: سحاب معدني متين مع أزرار كبس مخفية وجيوب بسحابات",
+      "الصنع: تصميم وحياكة مشتركة يدوية في صالون أورا بالمهندسين",
+      "العناية: تنظيف جاف لطيف بمراكز متخصصة بسترات الصوف الشتوية."
+    ],
+    "fabric": "صوف ميرينو معالج مع بطانة داخلية ناعمة عازلة للحرارة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "28",
+    "title": "جاكيت بومبر صوفي كلاسيكي دافئ — شتاء ٢٠٢٧",
+    "price": 3999,
+    "image": "/images/products/product_winter_coat.png",
+    "hoverImage": "/images/campaign/campaign_6.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "جاكيت شتوي بتصميم عصري وخامات معالجة ضد الرياح والمطر. يجمع بين الفخامة الحضرية والدفء الاستثنائي لحمايتكِ طوال الفصل البارد.",
+    "details": [
+      "المادة: صوف ميرينو 80% وألياف معزولة 20% مقاومة للماء والثلج",
+      "القصة: قصة منتفخة هندسية متوسطة الطول بياقة عالية وغطاء رأس مخفي",
+      "التفاصيل: سحاب معدني متين مع أزرار كبس مخفية وجيوب بسحابات",
+      "الصنع: تصميم وحياكة مشتركة يدوية في صالون أورا بالمهندسين",
+      "العناية: تنظيف جاف لطيف بمراكز متخصصة بسترات الصوف الشتوية."
+    ],
+    "fabric": "صوف ميرينو معالج مع بطانة داخلية ناعمة عازلة للحرارة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "29",
+    "title": "كنزة Cable Knit من صوف الألبكا الدافئ — شتاء ٢٠٢٧",
+    "price": 2450,
+    "image": "/images/detail/detail_fabric.png",
+    "hoverImage": "/images/lifestyle/lifestyle_interior.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "كنزة شتوية محبوكة بنقوش كلاسيكية دافئة من صوف الألبكا الفاخر. توفر دفئاً فائقاً ومظهراً ريفياً فاخراً في صالونات الشتاء.",
+    "details": [
+      "المادة: صوف ألبكا طبيعي نقي 100% ذو عزل حراري فائق",
+      "القصة: قصة واسعة مريحة بياقة دائرية محبوكة وأكمام طويلة كلاسيكية",
+      "التفاصيل: نقوش ضفائر هندسية (Cable Knit) متقنة بسقوط منسدل جميل",
+      "الصنع: حياكة يدوية متكاملة بأيدي حرفيات دار أورا",
+      "العناية: غسيل يدوي بماء بارد ومنظف صوف خاص. تجفيف مسطح."
+    ],
+    "fabric": "صوف ألبكا خام 100% فائق النعومة لا يسبب التحسس ويحفظ حرارة الجسم.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "title": "سترة Blazer صوفية مزدوجة الصدر — شتاء ٢٠٢٧",
+    "price": 4200,
+    "image": "/images/campaign/campaign_1.png",
+    "hoverImage": "/images/campaign/campaign_3.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "كنزة شتوية محبوكة بنقوش كلاسيكية دافئة من صوف الألبكا الفاخر. توفر دفئاً فائقاً ومظهراً ريفياً فاخراً في صالونات الشتاء.",
+    "details": [
+      "المادة: صوف ألبكا طبيعي نقي 100% ذو عزل حراري فائق",
+      "القصة: قصة واسعة مريحة بياقة دائرية محبوكة وأكمام طويلة كلاسيكية",
+      "التفاصيل: نقوش ضفائر هندسية (Cable Knit) متقنة بسقوط منسدل جميل",
+      "الصنع: حياكة يدوية متكاملة بأيدي حرفيات دار أورا",
+      "العناية: غسيل يدوي بماء بارد ومنظف صوف خاص. تجفيف مسطح."
+    ],
+    "fabric": "صوف ألبكا خام 100% فائق النعومة لا يسبب التحسس ويحفظ حرارة الجسم.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "31",
+    "title": "كنزة ميرينو بياقة مرتفعة مضلعة — شتاء ٢٠٢٧",
+    "price": 2100,
+    "image": "/images/campaign/campaign_6.png",
+    "hoverImage": "/images/flatlay/flatlay_1.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "كنزة شتوية محبوكة بنقوش كلاسيكية دافئة من صوف الألبكا الفاخر. توفر دفئاً فائقاً ومظهراً ريفياً فاخراً في صالونات الشتاء.",
+    "details": [
+      "المادة: صوف ألبكا طبيعي نقي 100% ذو عزل حراري فائق",
+      "القصة: قصة واسعة مريحة بياقة دائرية محبوكة وأكمام طويلة كلاسيكية",
+      "التفاصيل: نقوش ضفائر هندسية (Cable Knit) متقنة بسقوط منسدل جميل",
+      "الصنع: حياكة يدوية متكاملة بأيدي حرفيات دار أورا",
+      "العناية: غسيل يدوي بماء بارد ومنظف صوف خاص. تجفيف مسطح."
+    ],
+    "fabric": "صوف ألبكا خام 100% فائق النعومة لا يسبب التحسس ويحفظ حرارة الجسم.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "32",
+    "title": "كنزة صوفية ضخمة من الجاكار الهندسي — شتاء ٢٠٢٧",
+    "price": 2600,
+    "image": "/images/lifestyle/lifestyle_interior.png",
+    "hoverImage": "/images/campaign/campaign_4.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "كنزة شتوية محبوكة بنقوش كلاسيكية دافئة من صوف الألبكا الفاخر. توفر دفئاً فائقاً ومظهراً ريفياً فاخراً في صالونات الشتاء.",
+    "details": [
+      "المادة: صوف ألبكا طبيعي نقي 100% ذو عزل حراري فائق",
+      "القصة: قصة واسعة مريحة بياقة دائرية محبوكة وأكمام طويلة كلاسيكية",
+      "التفاصيل: نقوش ضفائر هندسية (Cable Knit) متقنة بسقوط منسدل جميل",
+      "الصنع: حياكة يدوية متكاملة بأيدي حرفيات دار أورا",
+      "العناية: غسيل يدوي بماء بارد ومنظف صوف خاص. تجفيف مسطح."
+    ],
+    "fabric": "صوف ألبكا خام 100% فائق النعومة لا يسبب التحسس ويحفظ حرارة الجسم.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "33",
+    "title": "كارديجان طويل مفتوح من الكشمير والصوف — شتاء ٢٠٢٧",
+    "price": 3650,
+    "image": "/images/campaign/campaign_3.png",
+    "hoverImage": "/images/products/product_winter_coat.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "كارديجان طويل مفتوح بدون أزرار منسوج من خيوط الكشمير والصوف الإيطالي الناعم. ينساب بنعومة بالغة ليمنحك الدفء والاسترخاء الفخم في إطلالاتكِ الشتوية.",
+    "details": [
+      "المادة: مزيج كشمير طبيعي 70% وصوف ناعم 30%",
+      "القصة: قصة طويلة مفتوحة بياقة شال عريضة وجيوب جانبية مخفية واسعة",
+      "التفاصيل: حواف مرنة محبوكة بدقة وحياكة جانبية معززة لمزيد من القوة",
+      "الصنع: حياكة وتجهيز يدوي بأتيلييه المهندسين، الجيزة",
+      "العناية: غسيل يدوي لطيف أو تنظيف جاف. تجفيف مسطح."
+    ],
+    "fabric": "مزيج كشمير وصوف طبيعي يمنح ملمساً حريرياً فائق الخفة والدفء.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "34",
+    "title": "كارديجان صوف قصير بكسرات وأزرار ذهبية — شتاء ٢٠٢٧",
+    "price": 2999,
+    "image": "/images/flatlay/flatlay_1.png",
+    "hoverImage": "/images/detail/detail_fabric.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "كارديجان طويل مفتوح بدون أزرار منسوج من خيوط الكشمير والصوف الإيطالي الناعم. ينساب بنعومة بالغة ليمنحك الدفء والاسترخاء الفخم في إطلالاتكِ الشتوية.",
+    "details": [
+      "المادة: مزيج كشمير طبيعي 70% وصوف ناعم 30%",
+      "القصة: قصة طويلة مفتوحة بياقة شال عريضة وجيوب جانبية مخفية واسعة",
+      "التفاصيل: حواف مرنة محبوكة بدقة وحياكة جانبية معززة لمزيد من القوة",
+      "الصنع: حياكة وتجهيز يدوي بأتيلييه المهندسين، الجيزة",
+      "العناية: غسيل يدوي لطيف أو تنظيف جاف. تجفيف مسطح."
+    ],
+    "fabric": "مزيج كشمير وصوف طبيعي يمنح ملمساً حريرياً فائق الخفة والدفء.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "35",
+    "title": "كارديجان بياقة شال عريضة من صوف الألبكا — شتاء ٢٠٢٧",
+    "price": 3400,
+    "image": "/images/campaign/campaign_4.png",
+    "hoverImage": "/images/campaign/campaign_1.png",
+    "collection": "أزياء الشتاء",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "كارديجان طويل مفتوح بدون أزرار منسوج من خيوط الكشمير والصوف الإيطالي الناعم. ينساب بنعومة بالغة ليمنحك الدفء والاسترخاء الفخم في إطلالاتكِ الشتوية.",
+    "details": [
+      "المادة: مزيج كشمير طبيعي 70% وصوف ناعم 30%",
+      "القصة: قصة طويلة مفتوحة بياقة شال عريضة وجيوب جانبية مخفية واسعة",
+      "التفاصيل: حواف مرنة محبوكة بدقة وحياكة جانبية معززة لمزيد من القوة",
+      "الصنع: حياكة وتجهيز يدوي بأتيلييه المهندسين، الجيزة",
+      "العناية: غسيل يدوي لطيف أو تنظيف جاف. تجفيف مسطح."
+    ],
+    "fabric": "مزيج كشمير وصوف طبيعي يمنح ملمساً حريرياً فائق الخفة والدفء.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "36",
+    "title": "بنطال صوفي بقصة مستقيمة واسعة — شتاء ٢٠٢٧",
+    "price": 2100,
+    "image": "/images/products/product_winter_coat.png",
+    "hoverImage": "/images/campaign/campaign_6.png",
+    "collection": "بنطلونات",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "بنطال شتوي بقصة واسعة مستقيمة منسوج من خيوط الصوف الإيطالي ثقيل الوزن. يتميز بكسرات أمامية حادة وجيوب جانبية متناسقة تمنح حضورك الفخم طابعاً رسمياً.",
+    "details": [
+      "المادة: صوف إيطالي نقي 100% ذو بنية متماسكة ووزن مثالي يسقط باستقامة",
+      "القصة: خصر مرتفع مبطن بحزام قماشي عريض داخلي وقصة بالازو مستقيمة",
+      "التفاصيل: كسرات أمامية هندسية وجيوب مخفية وسحاب معدني مخفي متين",
+      "الصنع: قص وحياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف فقط للحفاظ على كسرات البنطال والنسيج الصوفي."
+    ],
+    "fabric": "صوف طبيعي إيطالي ثقيل مع بطانة داخلية ناعمة تحميك من الاحتكاك.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "37",
+    "title": "بنطال شتوي صوف عازل بخصر مرتفع — شتاء ٢٠٢٧",
+    "price": 2300,
+    "image": "/images/detail/detail_fabric.png",
+    "hoverImage": "/images/lifestyle/lifestyle_interior.png",
+    "collection": "بنطلونات",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "بنطال شتوي بقصة واسعة مستقيمة منسوج من خيوط الصوف الإيطالي ثقيل الوزن. يتميز بكسرات أمامية حادة وجيوب جانبية متناسقة تمنح حضورك الفخم طابعاً رسمياً.",
+    "details": [
+      "المادة: صوف إيطالي نقي 100% ذو بنية متماسكة ووزن مثالي يسقط باستقامة",
+      "القصة: خصر مرتفع مبطن بحزام قماشي عريض داخلي وقصة بالازو مستقيمة",
+      "التفاصيل: كسرات أمامية هندسية وجيوب مخفية وسحاب معدني مخفي متين",
+      "الصنع: قص وحياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف فقط للحفاظ على كسرات البنطال والنسيج الصوفي."
+    ],
+    "fabric": "صوف طبيعي إيطالي ثقيل مع بطانة داخلية ناعمة تحميك من الاحتكاك.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "38",
+    "title": "بنطال كشمير رياضي ناعم ومريح — شتاء ٢٠٢٧",
+    "price": 2450,
+    "image": "/images/campaign/campaign_1.png",
+    "hoverImage": "/images/campaign/campaign_3.png",
+    "collection": "بنطلونات",
+    "season": "winter",
+    "badge": "قطعة أساسية",
+    "description": "بنطال شتوي بقصة واسعة مستقيمة منسوج من خيوط الصوف الإيطالي ثقيل الوزن. يتميز بكسرات أمامية حادة وجيوب جانبية متناسقة تمنح حضورك الفخم طابعاً رسمياً.",
+    "details": [
+      "المادة: صوف إيطالي نقي 100% ذو بنية متماسكة ووزن مثالي يسقط باستقامة",
+      "القصة: خصر مرتفع مبطن بحزام قماشي عريض داخلي وقصة بالازو مستقيمة",
+      "التفاصيل: كسرات أمامية هندسية وجيوب مخفية وسحاب معدني مخفي متين",
+      "الصنع: قص وحياكة يدوية دقيقة في أتيلييه الجيزة، مصر",
+      "العناية: تنظيف جاف فقط للحفاظ على كسرات البنطال والنسيج الصوفي."
+    ],
+    "fabric": "صوف طبيعي إيطالي ثقيل مع بطانة داخلية ناعمة تحميك من الاحتكاك.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "جملي دافئ",
+      "رمادي ملانژ",
+      "برونزي مطفأ"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "جملي دافئ",
+        "value": "#C19A6B",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/campaign/campaign_3.png"
+        ]
+      },
+      {
+        "color": "رمادي ملانژ",
+        "value": "#7F8C8D",
+        "images": [
+          "/images/campaign/campaign_3.png",
+          "/images/products/product_winter_coat.png"
+        ]
+      },
+      {
+        "color": "برونزي مطفأ",
+        "value": "#8E6B4B",
+        "images": [
+          "/images/products/product_winter_coat.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "39",
+    "title": "فستان Velvet كوتور بأكمام طويلة — شتاء ٢٠٢٧",
+    "price": 3900,
+    "image": "/images/campaign/campaign_6.png",
+    "hoverImage": "/images/flatlay/flatlay_1.png",
+    "collection": "فساتين كاجوال",
+    "season": "winter",
+    "badge": "إصدار خاص",
+    "description": "فستان شتوي طويل مصمم من قماش القطيفة المخملية (Velvet) أو الصوف المحبوك الفاخر. قصة انسيابية ضيقة تبرز جمال القوام وفتحة ظهر دائرية ناعمة لتميز حضوركِ.",
+    "details": [
+      "المادة: قطيفة حريرية فاخرة (Silk Velvet) أو صوف ميرينو 100% محبوك بنعومة",
+      "القصة: أكمام طويلة ضيقة بنهاية سحاب مخفي عند المعصم للقصة المثالية",
+      "التفاصيل: فتحة ظهر دائرية هادئة وسحاب خلفي طويل غير مرئي",
+      "الصنع: خياطة يدوية دقيقة بأيادي حرفيي أتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي بالبخار العمودي الهادئ بدون ضغط المكواة."
+    ],
+    "fabric": "قطيفة حريرية فاخرة (Silk Velvet) ثقيلة الوزن مع بطانة مرنة ناعمة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "زيتوني هادئ",
+      "كحلي داكن",
+      "خمري ملوكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "زيتوني هادئ",
+        "value": "#556B2F",
+        "images": [
+          "/images/campaign/campaign_6.png",
+          "/images/flatlay/flatlay_1.png"
+        ]
+      },
+      {
+        "color": "كحلي داكن",
+        "value": "#1A2E40",
+        "images": [
+          "/images/flatlay/flatlay_1.png",
+          "/images/detail/detail_fabric.png"
+        ]
+      },
+      {
+        "color": "خمري ملوكي",
+        "value": "#800020",
+        "images": [
+          "/images/detail/detail_fabric.png",
+          "/images/campaign/campaign_6.png"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "40",
+    "title": "فستان صوفي محبوك ذو ياقة مرتفعة — شتاء ٢٠٢٧",
+    "price": 3100,
+    "image": "/images/lifestyle/lifestyle_interior.png",
+    "hoverImage": "/images/campaign/campaign_4.png",
+    "collection": "فساتين كاجوال",
+    "season": "winter",
+    "badge": "كولكشن ٢٠٢٧",
+    "description": "فستان شتوي طويل مصمم من قماش القطيفة المخملية (Velvet) أو الصوف المحبوك الفاخر. قصة انسيابية ضيقة تبرز جمال القوام وفتحة ظهر دائرية ناعمة لتميز حضوركِ.",
+    "details": [
+      "المادة: قطيفة حريرية فاخرة (Silk Velvet) أو صوف ميرينو 100% محبوك بنعومة",
+      "القصة: أكمام طويلة ضيقة بنهاية سحاب مخفي عند المعصم للقصة المثالية",
+      "التفاصيل: فتحة ظهر دائرية هادئة وسحاب خلفي طويل غير مرئي",
+      "الصنع: خياطة يدوية دقيقة بأيادي حرفيي أتيلييه الجيزة",
+      "العناية: تنظيف جاف فقط. كوي بالبخار العمودي الهادئ بدون ضغط المكواة."
+    ],
+    "fabric": "قطيفة حريرية فاخرة (Silk Velvet) ثقيلة الوزن مع بطانة مرنة ناعمة.",
+    "packaging": "تُسلم في علبة أورا الكوتور المخصصة مع ورق حريري فاخر وحامل ملابس حريري.",
+    "colors": [
+      "عاجي",
+      "أسود",
+      "بيج كلاسيكي"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [
+      {
+        "color": "عاجي",
+        "value": "#FAF8F5",
+        "images": [
+          "/images/lifestyle/lifestyle_interior.png",
+          "/images/campaign/campaign_4.png"
+        ]
+      },
+      {
+        "color": "أسود",
+        "value": "#111111",
+        "images": [
+          "/images/campaign/campaign_4.png",
+          "/images/campaign/campaign_1.png"
+        ]
+      },
+      {
+        "color": "بيج كلاسيكي",
+        "value": "#E1D7C6",
+        "images": [
+          "/images/campaign/campaign_1.png",
+          "/images/lifestyle/lifestyle_interior.png"
+        ]
+      }
+    ]
   }
 ];

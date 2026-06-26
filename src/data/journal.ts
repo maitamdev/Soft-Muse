@@ -28,7 +28,7 @@ export const mockArticles: JournalArticle[] = [
     publishDate: "20 مايو 2026",
     isoDate: "2026-05-20T10:00:00Z",
     readTime: "4 دقائق",
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop"
+    image: "/images/campaign/campaign_2.png"
   },
   {
     slug: "how-to-choose-perfect-look-every-occasion",
@@ -39,7 +39,7 @@ export const mockArticles: JournalArticle[] = [
     publishDate: "15 مايو 2026",
     isoDate: "2026-05-15T10:00:00Z",
     readTime: "5 دقائق",
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1200&auto=format&fit=crop"
+    image: "/images/campaign/campaign_3.png"
   },
   {
     slug: "luxury-fabrics-guide",
@@ -50,7 +50,7 @@ export const mockArticles: JournalArticle[] = [
     publishDate: "10 مايو 2026",
     isoDate: "2026-05-10T10:00:00Z",
     readTime: "6 دقائق",
-    image: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=1200&auto=format&fit=crop"
+    image: "/images/flatlay/flatlay_1.png"
   },
   {
     slug: "secrets-of-quiet-luxury-styling",
@@ -61,17 +61,17 @@ export const mockArticles: JournalArticle[] = [
     publishDate: "5 مايو 2026",
     isoDate: "2026-05-05T10:00:00Z",
     readTime: "3 دقائق",
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1200&auto=format&fit=crop"
+    image: "/images/detail/detail_fabric.png"
   },
   {
     slug: "building-elegant-wardrobe",
     title: "كيف تبنين خزانة أزياء أنيقة",
     excerpt: "خطوات عملية للانتقال من خزانة مكدسة بالملابس التي لا تُلبس، إلى كبسولة أزياء كوتور تخدمك في كل أوقاتك.",
-    content: "الخزانة الأنيقة لا تقاس بعدد القطع، بل بقدرة هذه القطع على التناغم معاً... <br/><br/> ابدأي بتحديد الألوان المحايدة التي تليق ببشرتك. أضيفي قمصاناً حريرية وفساتين ميدي بسيطة يمكن تحويلها لإطلالة مسائية بلمسات بسيطة من المجوهرات الفاخرة.",
+    content: "الخزانة الأنيقة لا تقاس بعدد القطع، بل بقدرة هذه القطع على التناغم معاً... <br/><br/> ابدأي بتحديد الألوان المحايدة التي تليق ببشرتك. أضف قمصاناً حريرية وفساتين ميدي بسيطة يمكن تحويلها لإطلالة مسائية بلمسات بسيطة من المجوهرات الفاخرة.",
     category: "نصائح الموضة",
     publishDate: "1 مايو 2026",
     isoDate: "2026-05-01T10:00:00Z",
     readTime: "5 دقائق",
-    image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1200&auto=format&fit=crop"
+    image: "/images/lifestyle/lifestyle_interior.png"
   }
 ];

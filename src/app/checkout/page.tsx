@@ -233,7 +233,7 @@ export default function CheckoutPage() {
                   <div className="flex flex-col gap-2">
                     <p className="font-sans text-base font-semibold text-text-primary">جاري إرسال طلبكِ الفاخر...</p>
                     <p className="text-xs text-text-secondary font-light max-w-xs leading-relaxed">
-                      يتم الآن صياغة كود الطلب وتنسيق قياساتكِ وتفاصيل الشحن يدوياً بأتيلييه الإسكندرية.
+                      يتم الآن صياغة كود الطلب وتنسيق قياساتكِ وتفاصيل الشحن يدوياً بأتيلييه الجيزة.
                     </p>
                   </div>
                 </motion.div>

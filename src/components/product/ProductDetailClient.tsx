@@ -35,6 +35,7 @@ export default function ProductDetailClient({ params }: PageProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [activeDetailsTab, setActiveDetailsTab] = useState("story");
 
   const { addViewedItem } = useRecentlyViewed();
 
@@ -63,9 +64,9 @@ export default function ProductDetailClient({ params }: PageProps) {
   // Gallery images array (fallback to defaults if no variant is selected)
   const defaultImages = [
     product.image,
-    product.hoverImage || product.image,
-    "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
+    product.hoverImage || "/images/flatlay/flatlay_1.png",
+    "/images/detail/detail_fabric.png",
+    "/images/lifestyle/lifestyle_interior.png",
   ];
 
   const galleryImages = selectedVariant && selectedVariant.images && selectedVariant.images.length > 0
@@ -296,35 +297,121 @@ export default function ProductDetailClient({ params }: PageProps) {
               <span className="flex items-center gap-1">✓ استبدال سهل</span>
             </div>
 
-            {/* Collapsible Details */}
-            <div className="border-t border-brand-border mt-8">
-              <details className="border-b border-brand-border py-4 group" open>
-                <summary className="font-sans text-xs font-bold text-text-primary flex justify-between items-center cursor-pointer list-none">
-                  <span>تفاصيل المنسوجات والأثر</span>
-                  <span className="text-accent group-open:rotate-180 transition-transform duration-300">↓</span>
-                </summary>
-                <div className="text-xs text-text-secondary font-light mt-3 flex flex-col gap-2 leading-relaxed">
-                  <p>{product.fabric}</p>
-                  <ul className="list-disc pr-4 flex flex-col gap-1 mt-2 mb-4">
-                    {product.details.map((det, idx) => (
-                      <li key={idx}>{det}</li>
-                    ))}
-                  </ul>
-                  <Image src="/aura_clothing_label.png" alt="أتيلييه أورا" width={320} height={160} className="w-full max-w-xs border border-brand-border mt-2" />
-                </div>
-              </details>
+            {/* Elegant Luxury Tabs */}
+            <div className="border-t border-brand-border mt-8 pt-6 w-full text-right" dir="rtl">
+              <div className="flex border-b border-brand-border pb-2 gap-6 md:gap-8 overflow-x-auto scrollbar-none">
+                <button
+                  onClick={() => setActiveDetailsTab("story")}
+                  className={`text-xs font-sans font-bold pb-2 transition-all relative whitespace-nowrap cursor-pointer ${
+                    activeDetailsTab === "story" ? "text-accent border-b-2 border-accent" : "text-text-secondary hover:text-text-primary"
+                  }`}
+                  type="button"
+                >
+                  القصة والأثر
+                </button>
+                <button
+                  onClick={() => setActiveDetailsTab("fabric")}
+                  className={`text-xs font-sans font-bold pb-2 transition-all relative whitespace-nowrap cursor-pointer ${
+                    activeDetailsTab === "fabric" ? "text-accent border-b-2 border-accent" : "text-text-secondary hover:text-text-primary"
+                  }`}
+                  type="button"
+                >
+                  المنسوجات والرعاية
+                </button>
+                <button
+                  onClick={() => setActiveDetailsTab("fit")}
+                  className={`text-xs font-sans font-bold pb-2 transition-all relative whitespace-nowrap cursor-pointer ${
+                    activeDetailsTab === "fit" ? "text-accent border-b-2 border-accent" : "text-text-secondary hover:text-text-primary"
+                  }`}
+                  type="button"
+                >
+                  الملاءمة والقياس
+                </button>
+                <button
+                  onClick={() => setActiveDetailsTab("shipping")}
+                  className={`text-xs font-sans font-bold pb-2 transition-all relative whitespace-nowrap cursor-pointer ${
+                    activeDetailsTab === "shipping" ? "text-accent border-b-2 border-accent" : "text-text-secondary hover:text-text-primary"
+                  }`}
+                  type="button"
+                >
+                  الشحن والتغليف
+                </button>
+              </div>
 
-              <details className="border-b border-brand-border py-4 group">
-                <summary className="font-sans text-xs font-bold text-text-primary flex justify-between items-center cursor-pointer list-none">
-                  <span>التغليف الفاخر والشحن</span>
-                  <span className="text-accent group-open:rotate-180 transition-transform duration-300">↓</span>
-                </summary>
-                <div className="text-xs text-text-secondary font-light mt-3 leading-relaxed">
-                  <p>{product.packaging}</p>
-                  <p className="mt-2 mb-4 text-accent">شحن سريع ومؤمن خلال 2-5 أيام عمل لجميع محافظات مصر.</p>
-                  <Image src="/aura_packaging_mockup.png" alt="علبة أورا الفاخرة" width={320} height={160} className="w-full max-w-xs border border-brand-border mt-2" />
-                </div>
-              </details>
+              <div className="mt-4 min-h-[160px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeDetailsTab}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-xs text-text-secondary font-light leading-relaxed"
+                  >
+                    {activeDetailsTab === "story" && (
+                      <div className="flex flex-col gap-3">
+                        <p className="font-serif italic text-text-primary text-sm">
+                          &quot;تنساب الأناقة الهادئة من تفاصيل الخياطة المتقنة ومفهوم الموضة البطيئة الراقية.&quot;
+                        </p>
+                        <p>
+                          هذه القطعة صُممت ونُفذت يدوياً بالكامل في أتيلييه أورا بالمهندسين، الجيزة. نهدف من خلالها إلى إضفاء مظهر يفيض بالثقة والشاعرية الكلاسيكية، باستخدام خطوط هندسية مدروسة بعناية تواكب تفاصيل حضوركِ اليومي والمناسبات الفاخرة.
+                        </p>
+                      </div>
+                    )}
+
+                    {activeDetailsTab === "fabric" && (
+                      <div className="flex flex-col gap-3">
+                        <p className="font-medium text-text-primary">{product.fabric}</p>
+                        <p>تفاصيل الحياكة والنسيج:</p>
+                        <ul className="list-disc pr-4 flex flex-col gap-1.5 text-[11px] text-text-secondary">
+                          {product.details.map((det, idx) => (
+                            <li key={idx}>{det}</li>
+                          ))}
+                        </ul>
+                        <div className="flex gap-4 items-center mt-3 pt-3 border-t border-brand-border/40">
+                          <Image src="/aura_clothing_label.png" alt="أتيلييه أورا" width={100} height={50} className="border border-brand-border h-auto object-cover" />
+                          <div>
+                            <span className="font-bold block text-text-primary text-[10px]">تعليمات العناية الفاخرة:</span>
+                            <span className="block text-[10px] text-text-secondary">تنظيف جاف فقط (Dry Clean). كوي بالبخار على درجة حرارة منخفضة جداً. يُحفظ في مكان جاف وبارد على علاقة ملابس مبطنة.</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeDetailsTab === "fit" && (
+                      <div className="flex flex-col gap-3">
+                        <p>
+                          قصة انسيابية راقية تبرز تفاصيل القوام برقّة بالغة. تم تصميم هذه القطعة لتلائم القياس القياسي بدقة (True to size).
+                        </p>
+                        <ul className="list-disc pr-4 flex flex-col gap-1 text-[11px] text-text-secondary">
+                          <li>تصميم مريح مع لمسة جمالية محددة للخصر.</li>
+                          <li>محيط الصدر والأكتاف صُمم ليمنحكِ هيبة الحضور وحرية الحركة التامة.</li>
+                          <li>طول القطعة متناسق هندسياً ويناسب الطول المتوسط إلى الطويل.</li>
+                        </ul>
+                        <p className="mt-2 text-accent">
+                          * فريق الأتيلييه سيتواصل معكِ مباشرة عبر الواتساب لتسجيل تفاصيل قياسات قوامكِ الشخصية (الصدر، الخصر، الورك، والطول الكلي) للتأكد من الملاءمة المثالية قبل قص القماش وبدء الخياطة اليدوية.
+                        </p>
+                      </div>
+                    )}
+
+                    {activeDetailsTab === "shipping" && (
+                      <div className="flex flex-col gap-3">
+                        <p>{product.packaging}</p>
+                        <p>
+                          نحرص على تسليم مقتنياتكِ الفخمة في تغليف مخملي كوتور مبطن بالقطيفة لحمايتها وتجهيزها كهدية تليق بكِ أو بمن تحبين.
+                        </p>
+                        <div className="flex gap-4 items-center mt-3 pt-3 border-t border-brand-border/40">
+                          <Image src="/aura_packaging_mockup.png" alt="علبة أورا الفاخرة" width={100} height={50} className="border border-brand-border h-auto object-cover" />
+                          <div>
+                            <span className="font-bold block text-text-primary text-[10px]">مدة الشحن والتسليم:</span>
+                            <span className="block text-[10px] text-accent">القاهرة والجيزة: خلال 2 إلى 3 أيام عمل. باقي محافظات مصر: خلال 3 إلى 5 أيام عمل بحد أقصى. شحن مؤمن بالكامل مع تتبع حي للطلب.</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
 
           </div>

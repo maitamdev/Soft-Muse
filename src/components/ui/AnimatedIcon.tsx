@@ -25,23 +25,23 @@ export type IconVariant =
   | "ghost";    // very soft, nearly transparent
 
 const variantStyles: Record<IconVariant, string> = {
-  default:  "text-[#4A3728]",
-  accent:   "text-[#9A7355]",
-  muted:    "text-[#A89888]",
+  default:  "text-[#2E2E2D]",
+  accent:   "text-[#C5A880]",
+  muted:    "text-[#5C5A56]",
   rose:     "text-[#C4927A]",
-  filled:   "text-[#9A7355]",
+  filled:   "text-[#C5A880]",
   white:    "text-[#FAF8F5]",
   ghost:    "text-[#C8B9AE]",
 };
 
 const hoverVariantStyles: Record<IconVariant, string> = {
-  default:  "hover:text-[#9A7355]",
-  accent:   "hover:text-[#7A5835]",
-  muted:    "hover:text-[#9A7355]",
+  default:  "hover:text-[#C5A880]",
+  accent:   "hover:text-[#B89C72]",
+  muted:    "hover:text-[#C5A880]",
   rose:     "hover:text-[#A8745C]",
-  filled:   "hover:text-[#7A5835]",
+  filled:   "hover:text-[#B89C72]",
   white:    "hover:text-white",
-  ghost:    "hover:text-[#9A7355]",
+  ghost:    "hover:text-[#C5A880]",
 };
 
 /* ─────────────────────────────────────────────────
@@ -170,8 +170,8 @@ export function AnimatedHeart({ active = false, size = "md", onClick, className 
       >
         <Heart
           style={{ width: px, height: px }}
-          fill={active ? "#9A7355" : "none"}
-          className={`${stroke} transition-colors duration-300 ${active ? "text-[#9A7355]" : "text-[#A89888] hover:text-[#C4927A]"}`}
+          fill={active ? "#C5A880" : "none"}
+          className={`${stroke} transition-colors duration-300 ${active ? "text-[#C5A880]" : "text-text-secondary hover:text-[#C5A880]"}`}
         />
       </motion.div>
     </motion.button>
@@ -249,7 +249,7 @@ export function SocialIconButton({ children, href = "#", label, size = "md" }: S
       aria-label={label}
       whileHover={{ y: -4, transition: { duration: 0.22, ease: "easeOut" } }}
       whileTap={{ scale: 0.9 }}
-      className={`${touch} flex items-center justify-center text-[#A89888] hover:text-[#9A7355] transition-colors duration-300`}
+      className={`${touch} flex items-center justify-center text-text-secondary hover:text-[#C5A880] transition-colors duration-300`}
     >
       {children}
     </motion.a>
@@ -293,7 +293,7 @@ export function AnimatedStars({ rating, max = 5, size = 16, interactive = false,
             <Star
               style={{ width: size, height: size }}
               fill={filled ? "currentColor" : "none"}
-              className={`transition-colors duration-200 ${filled ? "text-[#9A7355]" : "text-[#D4C5B8]"}`}
+              className={`transition-colors duration-200 ${filled ? "text-[#C5A880]" : "text-[#E5E0D8]"}`}
             />
           </motion.button>
         );
@@ -324,7 +324,7 @@ export function FeatureIcon({ icon: Icon, label, description }: FeatureIconProps
         className="w-14 h-14 rounded-full bg-[#F3EDE6] flex items-center justify-center
                    group-hover:bg-[#EAE0D6] transition-colors duration-300"
       >
-        <Icon className="w-6 h-6 stroke-[1.25] text-[#9A7355]" aria-hidden="true" />
+        <Icon className="w-6 h-6 stroke-[1.25] text-[#C5A880]" aria-hidden="true" />
       </motion.div>
       <p className="font-sans text-xs font-semibold text-text-primary">{label}</p>
       {description && (

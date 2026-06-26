@@ -17,15 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default function WinterFashionPage() {
-  // Filter winter products
-  const winterProducts = mockProducts.filter((product) => product.collection === "أزياء الشتاء");
+  const winterProducts = mockProducts.filter((product) => product.season === "winter");
 
   return (
     <div className="bg-background-primary min-h-screen">
       <CollectionHero
         title="أزياء الشتاء"
         description="تصاميم شتوية تجمع بين الدفء والأناقة. استكشفي مجموعتنا الحصرية المنسوجة من أرقى الخامات الإيطالية الفاخرة التي تعانق قوامكِ برقي ونعومة الكشمير والحرير."
-        imageSrc="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop"
+        imageSrc="/images/campaign/campaign_3.png"
         ctaText="اكتشفي التشكيلة"
       />
       

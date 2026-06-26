@@ -26,17 +26,16 @@ export default function AboutPage() {
     {
       number: "04",
       title: "التفاصيل",
-      description: "تفاصيل خياطة يدوية دقيقة في أتيلييه الإسكندرية تُبرز ندرة القطعة وعراقة الصنع."
+      description: "تفاصيل خياطة يدوية دقيقة في أتيلييه الجيزة تُبرز ندرة القطعة وعراقة الصنع."
     }
   ];
 
   return (
     <div className="bg-background-primary min-h-screen flex flex-col items-center">
       
-      {/* 1. HERO SECTION - Full-width campaign image, large elegant headline */}
       <section className="w-full max-w-[1440px] relative h-[50vh] md:h-[65vh] flex items-center justify-center overflow-hidden border-b border-brand-border bg-background-secondary">
         <Image
-          src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1600&auto=format&fit=crop"
+          src="/images/campaign/campaign_1.png"
           alt="حملة أورا الكلاسيكية"
           fill
           priority
@@ -83,7 +82,7 @@ export default function AboutPage() {
           {/* Left Tall Image */}
           <div className="relative aspect-[3/4] w-full overflow-hidden border border-brand-border bg-background-secondary">
             <Image
-              src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
+              src="/images/campaign/campaign_2.png"
               alt="فلسفة التصميم"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -99,10 +98,10 @@ export default function AboutPage() {
         <div className="max-w-[720px] mx-auto px-6 text-center flex flex-col items-center gap-6">
           <span className="font-sans text-[10px] text-accent font-bold uppercase">حرفية الصنع والأثر</span>
           <h2 className="font-sans text-3xl font-light text-text-primary leading-tight">
-            تفاصيل تُحاك بعناية في أتيلييه الإسكندرية
+            تفاصيل تُحاك بعناية في أتيلييه الجيزة
           </h2>
           <p className="font-sans text-sm font-light text-text-secondary leading-relaxed">
-            من اختيار خيوط الكتان البلجيكي الطبيعي المعالج بنعومة الكشمير، إلى اختيار أورجانزا الحرير الفرنسي، نلتزم في دار أورا بأعلى معايير جودة المواد الخام. يتم رسم وتفصيل كل قطعة يدوياً في أتيلييه الإسكندرية بمصر، في إطار خياطة بطيئة ومدروسة تضمن إخراج كل غرزة بدقة استثنائية وعمر افتراضي يدوم طويلاً، مما يجعل من ثوبكِ إرثاً حقيقياً.
+            من اختيار خيوط الكتان البلجيكي الطبيعي المعالج بنعومة الكشمير، إلى اختيار أورجانزا الحرير الفرنسي، نلتزم في دار أورا بأعلى معايير جودة المواد الخام. يتم رسم وتفصيل كل قطعة يدوياً في أتيلييه الجيزة بمصر، في إطار خياطة بطيئة ومدروسة تضمن إخراج كل غرزة بدقة استثنائية وعمر افتراضي يدوم طويلاً، مما يجعل من ثوبكِ إرثاً حقيقياً.
           </p>
         </div>
       </section>
@@ -138,14 +137,14 @@ export default function AboutPage() {
               &quot;رؤيتنا أن نقدم للمرأة قطعًا تعكس شخصيتها وتمنحها حضورًا استثنائيًا&quot;
             </blockquote>
             <span className="font-sans text-xs text-text-secondary font-bold block mt-2">
-              — منسقو ومصممو أتيلييه أورا الإسكندرية
+              — منسقو ومصممو أتيلييه أورا الجيزة
             </span>
           </div>
 
           {/* Portrait side */}
           <div className="relative aspect-[3/4] w-full overflow-hidden border border-brand-border bg-background-primary">
             <Image
-              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+              src="/images/campaign/campaign_3.png"
               alt="رؤية مصممينا"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

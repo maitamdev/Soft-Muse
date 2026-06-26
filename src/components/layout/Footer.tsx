@@ -245,13 +245,28 @@ export default function Footer() {
         >
 
           {/* Copyright */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 text-[10px] font-sans font-light text-text-secondary">
-            <span>© ٢٠٢٦ دار أورا للأزياء الراقية</span>
-            <span className="hidden sm:block text-[#EAE3D9]">|</span>
-            <address className="not-italic flex gap-1">
-              <span>صُممت لتُرى —</span>
-              <span className="text-accent font-medium">صنع بكل فخر في مصر</span>
-            </address>
+          <div className="flex flex-col items-center md:items-start gap-2.5">
+            <div className="flex flex-col sm:flex-row items-center gap-3 text-[10px] font-sans font-light text-text-secondary">
+              <span>© ٢٠٢٦ دار أورا للأزياء الراقية</span>
+              <span className="hidden sm:block text-[#EAE3D9]">|</span>
+              <address className="not-italic flex gap-1">
+                <span>صُممت لتُرى —</span>
+                <span className="text-accent font-medium">صنع بكل فخر في مصر</span>
+              </address>
+            </div>
+            {/* Developer Attribution */}
+            <div className="text-[10px] font-sans font-light text-text-secondary/90 flex items-center gap-1.5 select-none">
+              <span>تجربة رقمية من تصميم وتطوير</span>
+              <a
+                href="https://salahkhaled.com/en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-normal text-text-secondary hover:text-accent opacity-90 hover:opacity-100 transition-all duration-300 relative py-0.5 group focus:outline-none focus-visible:ring-1 focus-visible:ring-accent rounded px-1 -mx-1"
+              >
+                صلاح خالد
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent group-hover:w-full transition-all duration-300 ease-out motion-reduce:transition-none" />
+              </a>
+            </div>
           </div>
 
           {/* Social icons */}

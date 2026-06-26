@@ -17,15 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default function SummerFashionPage() {
-  // Filter summer products
-  const summerProducts = mockProducts.filter((product) => product.collection === "أزياء الصيف");
+  const summerProducts = mockProducts.filter((product) => product.season === "summer");
 
   return (
     <div className="bg-background-primary min-h-screen">
       <CollectionHero
         title="أزياء الصيف"
         description="استقبلي نسيم الصيف بتصاميم تجمع بين الخفة والأنوثة. قطع مصممة بعناية من القطن والكتان والحرير لتمنحكِ شعوراً بالانتعاش والحرية في كل خطوة."
-        imageSrc="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2000&auto=format&fit=crop"
+        imageSrc="/images/campaign/campaign_2.png"
         ctaText="تسوقي الآن"
       />
       

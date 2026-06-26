@@ -38,7 +38,7 @@ function TrackingContent() {
                 title: "فستان سهرة كلاسيك ميدي",
                 color: "برونزي",
                 size: "M",
-                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
+                image: "/images/products/product_evening_gown.png",
               }
             ],
             shippingAddress: "التجمع الخامس، القاهرة الجديدة",
@@ -78,8 +78,8 @@ function TrackingContent() {
         customerName: "نورة الشافعي",
         paymentMethod: "InstaPay",
         subtotal: 3400,
-        address: "حي لوران - طريق الجيش الرئيسي - مبنى ٤٢ - شقة ٤",
-        governorate: "الإسكندرية",
+        address: "حي المهندسين - شارع جامعة الدول العربية - مبنى ٤٢ - شقة ٤",
+        governorate: "الجيزة",
         status: "preparing",
         cartItems: [
           {
@@ -87,7 +87,7 @@ function TrackingContent() {
             title: "فستان أورا من الحرير بفتحة كتف راقية",
             price: 3400,
             quantity: 1,
-            image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=300&auto=format&fit=crop",
+            image: "/images/products/product_evening_gown.png",
             size: "S",
             color: "أسود"
           }
@@ -121,7 +121,7 @@ function TrackingContent() {
               title: "فستان سهرة كلاسيك ميدي",
               color: "برونزي",
               size: "M",
-              image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
+              image: "/images/products/product_evening_gown.png",
             }
           ],
           shippingAddress: "التجمع الخامس، القاهرة الجديدة",
@@ -142,7 +142,7 @@ function TrackingContent() {
 
   const steps = [
     { num: "01", name: "تم استلام الطلب", desc: "تم اعتماد المقاسات وتأكيد الطلب", active: true },
-    { num: "02", name: "جاري تجهيز الطلب", desc: "يتم تفصيل القطعة يدوياً بأتيلييه الإسكندرية", active: true },
+    { num: "02", name: "جاري تجهيز الطلب", desc: "يتم تفصيل القطعة يدوياً بأتيلييه الجيزة", active: true },
     { num: "03", name: "خرج للشحن", desc: "الشحنة مع مندوب التوصيل السريع", active: searchedOrder?.status === "shipped" || searchedOrder?.status === "delivered" },
     { num: "04", name: "تم التوصيل", desc: "تم التسليم الفردي الفاخر لعنوانكِ", active: searchedOrder?.status === "delivered" }
   ];
@@ -302,7 +302,7 @@ function TrackingContent() {
                 {/* Product Thumbnail */}
                 <div className="relative aspect-[3/4] w-20 md:w-24 overflow-hidden border border-brand-border bg-background-primary mx-auto md:mx-0">
                   <Image
-                    src={searchedOrder.cartItems?.[0]?.image || "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=300&auto=format&fit=crop"}
+                    src={searchedOrder.cartItems?.[0]?.image || "/images/products/product_evening_gown.png"}
                     alt="صورة المنتج المختار"
                     fill
                     sizes="96px"

@@ -40,9 +40,12 @@ function ShopContent() {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.collection.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Category matching
       const matchesCategory =
-        selectedCategory === "الكل" || product.collection === selectedCategory || (selectedCategory === "أطقم" && product.collection === "أطقم قطعتين");
+        selectedCategory === "الكل" ||
+        product.collection === selectedCategory ||
+        (selectedCategory === "أطقم" && product.collection === "أطقم قطعتين") ||
+        (selectedCategory === "أزياء الصيف" && product.season === "summer") ||
+        (selectedCategory === "أزياء الشتاء" && product.season === "winter");
       
       // Price matching
       const matchesPrice =
@@ -65,7 +68,7 @@ function ShopContent() {
           <CollectionHero
             title="مجموعة الأطقم"
             description="أطقم راقية مصممة لتوفر لكِ إطلالة متكاملة بجهد أقل. خامات طبيعية وتصاميم هندسية دقيقة."
-            imageSrc="https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=2000&auto=format&fit=crop"
+            imageSrc="/images/products/product_linen_set.png"
           />
         </div>
       ) : selectedCategory === "مجموعة المساء الكوتور" ? (
@@ -73,7 +76,7 @@ function ShopContent() {
           <CollectionHero
             title="فساتين السهرة الكوتور"
             description="فساتين صُممت لتعكس فخامة دار أورا الراقية، منسوجة من الحرير الطبيعي الخالص."
-            imageSrc="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=2000&auto=format&fit=crop"
+            imageSrc="/images/products/product_evening_gown.png"
           />
         </div>
       ) : (
@@ -86,7 +89,7 @@ function ShopContent() {
               معرض تصاميم الكوتور
             </h1>
             <p className="font-sans text-xs text-text-secondary font-light mt-3 leading-relaxed">
-              استكشفي أزياء أورا الفاخرة المنسوجة يدوياً في أتيلييه الإسكندرية، مصر. قطع فردية نادرة تصدر بكميات محدودة لعملائنا الأكثر تميزاً في مصر.
+              استكشفي أزياء أورا الفاخرة المنسوجة يدوياً في أتيلييه الجيزة، مصر. تصاميم حصرية تُصاغ لتعكس جوهر الأنوثة العصرية بأعداد محدودة.
             </p>
           </div>
         </section>

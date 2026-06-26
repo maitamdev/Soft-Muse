@@ -7,7 +7,6 @@ import { NotificationProvider } from "@/context/NotificationContext";
 import Navbar from "@/components/layout/Navbar";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
-// Lazy load Footer for faster initial page render (TTI)
 const Footer = dynamic(() => import("@/components/layout/Footer"), { ssr: true });
 import ScrollToTop from "@/components/ui/ScrollToTopClient";
 import ScrollProgressClient from "@/components/ui/ScrollProgressClient";
@@ -86,6 +85,61 @@ export default function RootLayout({
       className={`${inter.variable} ${alexandria.variable} ${elMessiri.variable} ${playfairDisplay.variable} h-full antialiased overflow-x-hidden`}
     >
       <body className="min-h-full flex flex-col bg-background-primary text-text-primary selection:bg-accent selection:text-background-secondary overflow-x-hidden w-full">
+        {/* Structured Data: JSON-LD for Organization & LocalBusiness */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "AURA",
+                "url": "https://aura-fashion-virid.vercel.app",
+                "logo": "https://aura-fashion-virid.vercel.app/logo.svg",
+                "sameAs": [
+                  "https://www.instagram.com/aura.eg",
+                  "https://www.facebook.com/aura.eg"
+                ]
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "LocalBusiness",
+                "name": "AURA Atelier",
+                "image": "https://aura-fashion-virid.vercel.app/aura_hero_campaign.png",
+                "@id": "https://aura-fashion-virid.vercel.app/#localbusiness",
+                "url": "https://aura-fashion-virid.vercel.app",
+                "telephone": "+201000000000",
+                "priceRange": "$$$",
+                "address": {
+                  "@type": "PostalAddress",
+                  "streetAddress": "المهندسين",
+                  "addressLocality": "الجيزة",
+                  "addressRegion": "الجيزة",
+                  "postalCode": "12611",
+                  "addressCountry": "EG"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 30.0596,
+                  "longitude": 31.2018
+                },
+                "openingHoursSpecification": {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Saturday",
+                    "Sunday"
+                  ],
+                  "opens": "10:00",
+                  "closes": "22:00"
+                }
+              }
+            ])
+          }}
+        />
         <NotificationProvider>
           <StoreProvider>
             <ScrollProgressClient />

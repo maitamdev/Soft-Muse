@@ -72,7 +72,7 @@ export default function PrivacyPage() {
       <LegalList items={[
         "واتساب: متاح على موقعنا ضمن صفحة التواصل.",
         "البريد الإلكتروني: privacy@aura-fashion-virid.vercel.app",
-        "العنوان: سان ستيفانو، الإسكندرية، جمهورية مصر العربية.",
+        "العنوان: المهندسين، الجيزة، جمهورية مصر العربية.",
       ]} />
 
     </LegalPageLayout>

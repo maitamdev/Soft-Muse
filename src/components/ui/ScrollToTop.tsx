@@ -46,8 +46,8 @@ export default function ScrollToTop() {
           whileHover={{ scale: 1.08, y: -3 }}
           whileTap={{ scale: 0.93 }}
           className="
-            fixed bottom-24 left-5 z-50
-            md:bottom-10 md:left-8
+            fixed bottom-20 left-4 z-50
+            md:bottom-8 md:left-8
             w-12 h-12 md:w-[54px] md:h-[54px]
             flex items-center justify-center
             bg-background-secondary
@@ -74,7 +74,7 @@ export default function ScrollToTop() {
             <motion.circle
               cx="27" cy="27" r={radius}
               fill="none"
-              stroke="#9A7355"
+              stroke="#C5A880"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -96,7 +96,7 @@ export default function ScrollToTop() {
           </motion.span>
 
           {/* Gold dot accent — top center */}
-          <span className="absolute top-[3px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#9A7355] opacity-80" />
+          <span className="absolute top-[3px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C5A880] opacity-80" />
         </motion.button>
       )}
     </AnimatePresence>

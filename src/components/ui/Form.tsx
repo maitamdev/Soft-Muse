@@ -13,10 +13,13 @@ export function LuxuryInput({ label, error, className = "", ...props }: InputPro
           {label}
         </label>
       )}
-      <input
-        className="w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-all duration-300 focus:border-accent placeholder:text-text-secondary/40"
-        {...props}
-      />
+      <div className="relative">
+        <input
+          className="peer w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-colors duration-300 placeholder:text-text-secondary/40"
+          {...props}
+        />
+        <span className="pointer-events-none absolute bottom-0 start-0 h-[1.5px] w-0 bg-accent transition-all duration-300 ease-out peer-focus:w-full" />
+      </div>
       {error && <span className="text-[10px] text-red-500 font-light mt-1">{error}</span>}
     </div>
   );
@@ -38,7 +41,7 @@ export function LuxurySelect({ label, options, error, className = "", ...props }
       )}
       <div className="relative">
         <select
-          className="w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-all duration-300 focus:border-accent appearance-none cursor-pointer"
+          className="peer w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-colors duration-300 appearance-none cursor-pointer"
           {...props}
         >
           {options.map((opt) => (
@@ -47,7 +50,8 @@ export function LuxurySelect({ label, options, error, className = "", ...props }
             </option>
           ))}
         </select>
-        <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none text-accent">
+        <span className="pointer-events-none absolute bottom-0 start-0 h-[1.5px] w-0 bg-accent transition-all duration-300 ease-out peer-focus:w-full" />
+        <div className="absolute start-2 top-1/2 -translate-y-1/2 pointer-events-none text-accent">
           {/* Custom SVG arrow down */}
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" fill="none">
             <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -72,10 +76,13 @@ export function LuxuryTextarea({ label, error, className = "", ...props }: Texta
           {label}
         </label>
       )}
-      <textarea
-        className="w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-all duration-300 focus:border-accent placeholder:text-text-secondary/40 resize-y min-h-[80px]"
-        {...props}
-      />
+      <div className="relative">
+        <textarea
+          className="peer w-full bg-transparent border-b border-brand-border py-2 px-1 text-sm font-light text-text-primary outline-none transition-colors duration-300 placeholder:text-text-secondary/40 resize-y min-h-[80px]"
+          {...props}
+        />
+        <span className="pointer-events-none absolute bottom-0 start-0 h-[1.5px] w-0 bg-accent transition-all duration-300 ease-out peer-focus:w-full" />
+      </div>
       {error && <span className="text-[10px] text-red-500 font-light mt-1">{error}</span>}
     </div>
   );

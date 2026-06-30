@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
+import { mountFadeUp, mountFadeIn } from "@/lib/animations";
 
 export default function AboutPage() {
   const values = [
@@ -46,17 +47,18 @@ export default function AboutPage() {
         
         <div className="relative z-10 text-center px-6 max-w-[720px] text-background-secondary">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            variants={mountFadeUp}
+            initial="hidden"
+            animate="visible"
             className="font-sans text-5xl md:text-6xl lg:text-7xl font-light text-background-secondary"
           >
             قصتنا
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            variants={mountFadeIn}
+            custom={0.2}
+            initial="hidden"
+            animate="visible"
             className="font-sans text-sm md:text-base font-light text-background-secondary/90 mt-4 leading-relaxed"
           >
             مجموعات حصرية تُصاغ يدوياً للمرأة التي تثق بحضورها وتتحرك بأناقتها الهادئة.
@@ -159,7 +161,7 @@ export default function AboutPage() {
       <section className="w-full py-16 md:py-28 bg-background-primary border-t border-brand-border flex flex-col items-center">
         <div className="max-w-[720px] mx-auto px-6 text-center flex flex-col items-center gap-6">
           <span className="font-sans text-[10px] text-accent font-bold uppercase">زيارة صالة العرض</span>
-          <h2 className="font-sans text-2xl md:text-3xl font-light text-text-primary">اكتشفي التشكيلة الجديدة</h2>
+          <h2 className="font-sans text-2xl md:text-3xl font-light text-text-primary">تصفحي المتجر</h2>
           <p className="font-sans text-xs md:text-sm font-light text-text-secondary leading-relaxed">
             استكشفي أزياء أورا الفاخرة المنسوجة يدوياً بمقاييس الكوتور الحصرية ومستويات الخياطة الفاخرة.
           </p>

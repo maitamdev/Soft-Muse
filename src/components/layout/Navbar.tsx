@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavigationService } from "@/lib/services/storefront/navigation.service";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
 import { useStore } from "@/context/StoreContext";
-import { Search, ShoppingBag, X, Plus, Minus, Menu, User, MessageCircle } from "lucide-react";
+import { IconSearch as Search, IconShoppingBag as ShoppingBag, IconX as X, IconPlus as Plus, IconMinus as Minus, IconMenu2 as Menu, IconUser as User, IconMessageCircle as MessageCircle } from "@tabler/icons-react";
 import { PiHouseThin, PiCompassThin, PiMagnifyingGlassThin, PiHeartThin, PiHandbagThin } from "react-icons/pi";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { mockProducts, Product } from "@/data/products";
+import { type Product, primaryImage } from "@/data/mock/products";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Logo from "@/components/Logo";
 import { getWhatsAppUrl } from "@/config/whatsapp";
@@ -17,7 +20,17 @@ export default function Navbar() {
   const { cart, wishlist, cartCount, cartSubtotal, isCartOpen, setCartOpen, removeFromCart, updateQuantity } = useStore();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const products = useStorefrontProducts();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Search overlay state
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,8 +80,8 @@ export default function Navbar() {
 
     searchTimeoutRef.current = setTimeout(() => {
       const queryLower = val.toLowerCase();
-      const filtered = mockProducts.filter((p) =>
-        p.title.toLowerCase().includes(queryLower) ||
+      const filtered = products.filter((p) =>
+        p.name.toLowerCase().includes(queryLower) ||
         p.collection.toLowerCase().includes(queryLower) ||
         p.description.toLowerCase().includes(queryLower)
       );
@@ -83,8 +96,8 @@ export default function Navbar() {
     setSearchLoading(true);
     setTimeout(() => {
       const queryLower = term.toLowerCase();
-      const filtered = mockProducts.filter((p) =>
-        p.title.toLowerCase().includes(queryLower) ||
+      const filtered = products.filter((p) =>
+        p.name.toLowerCase().includes(queryLower) ||
         p.collection.toLowerCase().includes(queryLower) ||
         p.description.toLowerCase().includes(queryLower)
       );
@@ -100,26 +113,76 @@ export default function Navbar() {
     setSearchLoading(false);
   };
 
-  const leftLinks = [
-    { name: "أزياء الشتاء", path: "/winter-fashion" },
-    { name: "أزياء الصيف", path: "/summer-fashion" },
-    { name: "التشكيلة", path: "/shop" },
-    { name: "الفساتين", path: "/shop?category=dresses" },
-    { name: "الأطقم", path: "/shop?category=sets" },
-    { name: "مجلة AURA", path: "/journal" },
-  ];
+  // Close whichever overlay is open on Escape
+  useEffect(() => {
+    if (!isMobileMenuOpen && !isSearchOpen && !isCartOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (isMobileMenuOpen) setMobileMenuOpen(false);
+      else if (isSearchOpen) closeSearch();
+      else if (isCartOpen) setCartOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMobileMenuOpen, isSearchOpen, isCartOpen, setCartOpen]);
 
-  const rightLinks = [
+  const mobileMenuCloseRef = useRef<HTMLButtonElement>(null);
+  const cartCloseRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) mobileMenuCloseRef.current?.focus();
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (isCartOpen) cartCloseRef.current?.focus();
+  }, [isCartOpen]);
+
+  const DEFAULT_LEFT_LINKS = [
+    { name: "الرئيسية", path: "/" },
+    { name: "أزياء الشتاء", path: "/shop?category=winter" },
+    { name: "أزياء الصيف", path: "/shop?category=summer" },
+    { name: "المتجر", path: "/shop" },
+  ];
+  const DEFAULT_RIGHT_LINKS = [
     { name: "الأتيليه", path: "/about" },
-    { name: "آراء العملاء", path: "/reviews" },
+    { name: "تتبع الطلب", path: "/tracking" },
     { name: "تواصل معنا", path: "/contact" },
   ];
 
+  const [leftLinks, setLeftLinks] = useState(DEFAULT_LEFT_LINKS);
+  const [rightLinks, setRightLinks] = useState(DEFAULT_RIGHT_LINKS);
+
+  const loadNavLinks = useCallback(async () => {
+    try {
+      const menu = await NavigationService.getMenuByLocation('header');
+      if (menu?.items?.length) {
+        const sorted = [...menu.items].sort((a, b) => a.order - b.order);
+        setLeftLinks(sorted.filter(i => i.group === 'primary').map(i => ({ name: i.label, path: i.url })));
+        setRightLinks(sorted.filter(i => i.group === 'secondary').map(i => ({ name: i.label, path: i.url })));
+      }
+    } catch {
+      // keep defaults
+    }
+  }, []);
+
+  useEffect(() => { loadNavLinks(); }, [loadNavLinks]);
+  useEventSubscribeMany(['website.changed'], loadNavLinks);
+
   return (
     <>
-      {/* 1. HEADER WRAPPER - SOLID BACKGROUND, NO GLASSMORPHISM */}
-      <header className="sticky top-0 z-50 w-full bg-background-secondary border-b border-brand-border">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-12 h-16 md:h-32 flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]">
+      {/* 1. HEADER WRAPPER */}
+      <header
+        className={`sticky top-0 z-50 w-full border-b transition-all duration-500 ${
+          scrolled
+            ? "bg-background-secondary/85 backdrop-blur-md border-brand-border/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]"
+            : "bg-background-secondary border-brand-border/20"
+        }`}
+      >
+        <div
+          className={`max-w-[1440px] mx-auto px-4 md:px-12 flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr] transition-all duration-500 ${
+            scrolled ? "h-16 md:h-[76px]" : "h-16 md:h-[96px]"
+          }`}
+        >
           
           {/* LEFT: Menu links on Desktop / Menu Button on Mobile */}
           <div className="flex-1 flex items-center justify-start gap-4 md:gap-6">
@@ -133,25 +196,28 @@ export default function Navbar() {
             </button>
 
             {/* Desktop Left Links */}
-            <nav className="hidden md:flex items-center gap-5 lg:gap-7">
+            <nav className="hidden md:flex items-center gap-9 lg:gap-10">
               {leftLinks.map((link) => {
                 const isActive = pathname === link.path;
                 return (
                   <Link
                     key={link.path}
                     href={link.path}
-                    className={`font-sans text-[11px] font-semibold transition-colors relative py-2 ${
-                      isActive ? "text-accent" : "text-text-primary hover:text-accent"
+                    style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                    className={`group font-sans text-[15px] font-medium tracking-[0.2px] whitespace-nowrap transition-all duration-300 relative py-2 flex items-center justify-center ${
+                      isActive ? "text-accent" : "text-text-primary hover:text-accent hover:-translate-y-[2px]"
                     }`}
                   >
                     {link.name}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-underline-left"
-                        className="absolute bottom-0 right-0 left-0 h-[1.5px] bg-accent"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
+                    {/* Hover / Active luxury underline */}
+                    <span
+                      style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                      className={`absolute -bottom-1 inset-x-0 mx-auto h-[1px] bg-accent transition-all duration-300 ${
+                        isActive
+                          ? "w-[70%] opacity-100"
+                          : "w-0 opacity-0 group-hover:w-[70%] group-hover:opacity-100"
+                      }`}
+                    />
                   </Link>
                 );
               })}
@@ -168,44 +234,46 @@ export default function Navbar() {
           {/* RIGHT: Desktop links + Actions */}
           <div className="flex-1 flex items-center justify-end gap-4 md:gap-6">
             {/* Desktop Right Links */}
-            <nav className="hidden md:flex items-center gap-5 lg:gap-7 ml-4 lg:ml-8">
+            <nav className="hidden md:flex items-center gap-9 lg:gap-10 me-4 lg:me-8">
               {rightLinks.map((link) => {
                 const isActive = pathname === link.path;
                 return (
                   <Link
                     key={link.path}
                     href={link.path}
-                    className={`font-sans text-[11px] font-semibold transition-colors relative py-2 ${
-                      isActive ? "text-accent" : "text-text-primary hover:text-accent"
+                    style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                    className={`group font-sans text-[15px] font-medium tracking-[0.2px] whitespace-nowrap transition-all duration-300 relative py-2 flex items-center justify-center ${
+                      isActive ? "text-accent" : "text-text-primary hover:text-accent hover:-translate-y-[2px]"
                     }`}
                   >
                     {link.name}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-underline-right"
-                        className="absolute bottom-0 right-0 left-0 h-[1.5px] bg-accent"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
+                    <span
+                      style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                      className={`absolute -bottom-1 inset-x-0 mx-auto h-[1px] bg-accent transition-all duration-300 ${
+                        isActive
+                          ? "w-[70%] opacity-100"
+                          : "w-0 opacity-0 group-hover:w-[70%] group-hover:opacity-100"
+                      }`}
+                    />
                   </Link>
                 );
               })}
             </nav>
 
             {/* Action Icons - Premium Thin Styling */}
-            <div className="hidden md:flex items-center gap-6 mr-2">
+            <div className="hidden md:flex items-center gap-8 lg:gap-9 ms-2">
               {/* Search */}
               <button
                 onClick={() => setSearchOpen(!isSearchOpen)}
-                className="text-text-primary hover:text-accent transition-all duration-300 relative group"
+                className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center"
                 aria-label="بحث"
               >
-                <PiMagnifyingGlassThin className="w-[26px] h-[26px] transition-transform duration-300 group-hover:scale-105" />
+                <PiMagnifyingGlassThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
               </button>
 
               {/* Wishlist */}
               <Link href="/wishlist" className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center" aria-label="المفضلة">
-                <PiHeartThin className="w-[26px] h-[26px] transition-transform duration-300 group-hover:scale-105" />
+                <PiHeartThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
                 {wishlist.length > 0 && (
                   <span className="absolute -top-1 -right-2 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-medium text-white shadow-sm border border-background-secondary leading-none">
                     {wishlist.length > 9 ? "9+" : wishlist.length}
@@ -219,7 +287,7 @@ export default function Navbar() {
                 className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center"
                 aria-label="حقيبة التسوق"
               >
-                <PiHandbagThin className="w-[26px] h-[26px] transition-transform duration-300 group-hover:scale-105" />
+                <PiHandbagThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-2 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-medium text-white shadow-sm border border-background-secondary leading-none">
                     {cartCount > 9 ? "9+" : cartCount}
@@ -251,6 +319,9 @@ export default function Navbar() {
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
               className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-[400px] bg-background-secondary z-50 flex flex-col md:hidden shadow-[0_0_40px_rgba(0,0,0,0.1)]"
+              role="dialog"
+              aria-modal="true"
+              aria-label="القائمة الرئيسية"
             >
               {/* Header: Logo and Close */}
               <div className="flex justify-between items-center px-6 py-8 border-b border-brand-border/30">
@@ -258,8 +329,9 @@ export default function Navbar() {
                   <Logo size="md" variant="black" animated={false} />
                 </Link>
                 <button
+                  ref={mobileMenuCloseRef}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 -ml-2 text-text-primary hover:text-accent transition-colors"
+                  className="p-2 -me-2 text-text-primary hover:text-accent transition-colors"
                   aria-label="إغلاق القائمة"
                 >
                   <X className="w-7 h-7 stroke-[0.75]" />
@@ -300,10 +372,7 @@ export default function Navbar() {
                 transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               >
                 <div className="flex justify-between items-center border-t border-brand-border/40 pt-8">
-                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors">
-                    <User className="w-5 h-5 stroke-[1]" />
-                    <span className="font-sans text-xs">حسابي</span>
-                  </Link>
+
                   <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors">
                     <MessageCircle className="w-5 h-5 stroke-[1]" />
                     <span className="font-sans text-xs">واتساب</span>
@@ -348,6 +417,9 @@ export default function Navbar() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="fixed top-24 left-0 right-0 bg-background-secondary border-b border-brand-border z-40 py-8 px-6 shadow-md max-h-[85vh] overflow-y-auto"
+              role="dialog"
+              aria-modal="true"
+              aria-label="بحث"
             >
               <div className="max-w-[1280px] mx-auto flex flex-col gap-6">
                 
@@ -363,7 +435,7 @@ export default function Navbar() {
                         addRecentSearch(searchQuery);
                       }
                     }}
-                    placeholder="ابحثي عن فساتين، أطقم، بلوزات الكتان..."
+                    placeholder="ابحثي عن فساتين، قمصان، بلوزات الكتان..."
                     className="w-full text-base font-sans font-light outline-none bg-transparent placeholder:text-text-secondary/40 text-right"
                     dir="rtl"
                     autoFocus
@@ -386,12 +458,12 @@ export default function Navbar() {
                 <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8 mt-2 text-right" dir="rtl">
                   
                   {/* Left Column: Popular & Recent */}
-                  <div className="flex flex-col gap-6 border-l border-brand-border/40 pl-6">
+                  <div className="flex flex-col gap-6 border-e border-brand-border/40 pe-6">
                     {/* Popular Suggestions */}
                     <div>
                       <h4 className="font-sans text-[10px] text-accent font-bold uppercase mb-3">مقترحات شائعة</h4>
                       <div className="flex flex-wrap gap-2">
-                        {["فستان حرير", "طقم كتان", "بلوزة", "عباءة"].map((term) => (
+                        {["فستان حرير", "قميص", "بلوزة", "عباءة"].map((term) => (
                           <button
                             key={term}
                             onClick={() => handleSuggestionClick(term)}
@@ -461,11 +533,11 @@ export default function Navbar() {
                               className="flex gap-3 items-center border border-brand-border/40 hover:border-accent p-2 bg-background-primary transition-all duration-300 group"
                             >
                               <div className="relative w-12 h-16 shrink-0 bg-background-secondary border border-brand-border">
-                                <Image src={product.image} alt={product.title} fill sizes="48px" className="object-cover" />
+                                <Image src={primaryImage(product)} alt={product.name} fill sizes="48px" className="object-cover" />
                               </div>
                               <div className="flex flex-col justify-center min-w-0">
                                 <h5 className="font-sans text-xs font-medium text-text-primary group-hover:text-accent transition-colors truncate max-w-[160px]">
-                                  {product.title}
+                                  {product.name}
                                 </h5>
                                 <span className="font-display text-xs text-accent font-semibold mt-1">
                                   {product.price.toLocaleString()} ج.م
@@ -505,6 +577,9 @@ export default function Navbar() {
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.35, ease: "easeOut" }}
               className="fixed top-0 right-0 bottom-0 w-full max-w-[450px] bg-background-secondary z-50 p-6 md:p-8 flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              aria-label="حقيبة التسوق"
             >
               <div className="flex justify-between items-center border-b border-brand-border pb-4">
                 <div className="flex items-center gap-2">
@@ -512,6 +587,7 @@ export default function Navbar() {
                   <span className="font-display text-xs text-text-secondary">({cartCount} قطع)</span>
                 </div>
                 <button
+                  ref={cartCloseRef}
                   onClick={() => setCartOpen(false)}
                   className="p-1 hover:text-accent transition-colors"
                   aria-label="إغلاق حقيبة التسوق"
@@ -534,7 +610,7 @@ export default function Navbar() {
                       onClick={() => setCartOpen(false)}
                       className="inline-flex items-center justify-center bg-text-primary text-background-secondary font-sans text-xs min-h-[44px] px-8 hover:bg-accent transition-colors mt-4"
                     >
-                      اكتشفي التشكيلة الجديدة
+                      تصفحي المتجر
                     </Link>
                   </div>
                 ) : (
@@ -564,7 +640,7 @@ export default function Navbar() {
                           <div className="flex items-center border border-brand-border bg-background-primary">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}
-                              className="px-2 py-1 text-xs text-text-secondary hover:text-text-primary"
+                              className="px-2.5 py-1.5 text-xs text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                               aria-label="تقليل الكمية"
                             >
                               <Minus className="w-3 h-3" />
@@ -574,7 +650,7 @@ export default function Navbar() {
                             </span>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
-                              className="px-2 py-1 text-xs text-text-secondary hover:text-text-primary"
+                              className="px-2.5 py-1.5 text-xs text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                               aria-label="زيادة الكمية"
                             >
                               <Plus className="w-3 h-3" />
@@ -650,7 +726,7 @@ export default function Navbar() {
           }`}
         >
           <PiCompassThin className="w-6 h-6" />
-          <span className="text-[9px] font-sans">التشكيلة</span>
+          <span className="text-[9px] font-sans">المتجر</span>
         </Link>
 
         <button

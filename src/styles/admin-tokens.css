@@ -1,0 +1,32 @@
+@theme {
+  --color-admin-bg: var(--admin-bg-base);
+  --color-admin-surface: var(--admin-bg-surface);
+  --color-admin-card: var(--admin-bg-card);
+  --color-admin-border: var(--admin-border-base);
+  --color-admin-border-light: var(--admin-border-light);
+  
+  --color-admin-text: var(--admin-text-base);
+  --color-admin-text-muted: var(--admin-text-muted);
+  
+  --color-admin-primary: var(--admin-primary);
+  --color-admin-primary-hover: var(--admin-primary-hover);
+  
+  --color-admin-accent: var(--admin-accent);
+  --color-admin-accent-hover: var(--admin-accent-hover);
+  
+  --color-admin-success: var(--admin-success);
+  --color-admin-danger: var(--admin-danger);
+  --color-admin-warning: var(--admin-warning);
+  --color-admin-info: var(--admin-info);
+  
+  --radius-admin-sm: 0.375rem;
+  --radius-admin-md: 0.5rem;
+  --radius-admin-lg: 0.75rem;
+  --radius-admin-xl: 1rem;
+  --radius-admin-2xl: 1.5rem;
+  --radius-admin-3xl: 2rem;
+  
+  --shadow-admin-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-admin-floating: 0 10px 40px -4px rgba(0, 0, 0, 0.08);
+  --shadow-admin-card: 0 2px 10px -2px rgba(0, 0, 0, 0.02);
+}

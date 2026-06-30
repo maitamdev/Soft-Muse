@@ -1,0 +1,190 @@
+@import "./admin-tokens.css";
+
+/* ═══════════════════════════════════════════
+   AURA Admin — 2026 SaaS Enterprise Theme System
+   Premium, High-Performance, Accessible.
+═══════════════════════════════════════════ */
+
+/* Light Mode */
+:root {
+  /* Surfaces */
+  --admin-bg-base:       #F4F7FB;
+  --admin-bg-surface:    #FAFAFC;
+  --admin-bg-card:       #FFFFFF;
+  --admin-bg-sidebar:    #FFFFFF;
+  --admin-bg-elevated:   #FFFFFF;
+  --admin-bg-hover:      #F8FAFC;
+  --admin-bg-active:     #F1F5F9;
+
+  /* Borders */
+  --admin-border-base:   #E5E7EB;
+  --admin-border-light:  #F3F4F6;
+  --admin-border-strong: #D1D5DB;
+
+  /* Text */
+  --admin-text-base:     #0F172A;
+  --admin-text-muted:    #475569;
+  --admin-text-subtle:   #94A3B8;
+  --admin-text-inverse:  #FFFFFF;
+
+  /* Brand Colors */
+  --admin-primary:       #4F46E5;
+  --admin-primary-hover: #4338CA;
+  --admin-primary-muted: rgba(79, 70, 229, 0.08);
+
+  --admin-accent:        #6366F1;
+  --admin-accent-hover:  #4F46E5;
+
+  /* Status Colors */
+  --admin-success:       #22C55E;
+  --admin-success-muted: rgba(34, 197, 94, 0.1);
+  --admin-danger:        #EF4444;
+  --admin-danger-muted:  rgba(239, 68, 68, 0.1);
+  --admin-warning:       #F59E0B;
+  --admin-warning-muted: rgba(245, 158, 11, 0.1);
+  --admin-info:          #38BDF8;
+  --admin-info-muted:    rgba(56, 189, 248, 0.1);
+
+  /* Shadows - Premium SaaS */
+  --admin-shadow-sm:     0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --admin-shadow-md:     0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --admin-shadow-lg:     0 12px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+  --admin-shadow-xl:     0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+  --admin-shadow-sidebar: 4px 0 24px rgba(0, 0, 0, 0.04);
+  --admin-shadow-float:   0 8px 30px rgba(0, 0, 0, 0.08);
+
+  /* Radius */
+  --admin-radius-sm:     8px;
+  --admin-radius-md:     12px;
+  --admin-radius-lg:     16px;
+  --admin-radius-xl:     20px;
+  --admin-radius-2xl:    24px;
+  --admin-radius-full:   9999px;
+}
+
+/* Dark Mode */
+.dark {
+  /* Surfaces */
+  --admin-bg-base:       #0B1220;
+  --admin-bg-surface:    #0F172A;
+  --admin-bg-card:       #111827;
+  --admin-bg-sidebar:    #0F172A;
+  --admin-bg-elevated:   #1E293B;
+  --admin-bg-hover:      #172033;
+  --admin-bg-active:     #1E293B;
+
+  /* Borders */
+  --admin-border-base:   #1E293B;
+  --admin-border-light:  #172033;
+  --admin-border-strong: #334155;
+
+  /* Text */
+  --admin-text-base:     #F8FAFC;
+  --admin-text-muted:    #94A3B8;
+  --admin-text-subtle:   #64748B;
+  --admin-text-inverse:  #0B1220;
+
+  /* Brand Colors */
+  --admin-primary:       #4F46E5;
+  --admin-primary-hover: #6366F1;
+  --admin-primary-muted: rgba(79, 70, 229, 0.15);
+
+  --admin-accent:        #818CF8;
+  --admin-accent-hover:  #6366F1;
+
+  /* Status Colors */
+  --admin-success:       #22C55E;
+  --admin-success-muted: rgba(34, 197, 94, 0.15);
+  --admin-danger:        #EF4444;
+  --admin-danger-muted:  rgba(239, 68, 68, 0.15);
+  --admin-warning:       #F59E0B;
+  --admin-warning-muted: rgba(245, 158, 11, 0.15);
+  --admin-info:          #38BDF8;
+  --admin-info-muted:    rgba(56, 189, 248, 0.15);
+
+  /* Shadows - Dark Mode */
+  --admin-shadow-sm:     0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --admin-shadow-md:     0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --admin-shadow-lg:     0 12px 24px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+  --admin-shadow-xl:     0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --admin-shadow-sidebar: 4px 0 24px rgba(0, 0, 0, 0.6);
+  --admin-shadow-float:   0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Base Admin container — override storefront styles */
+.admin-theme {
+  background-color: var(--admin-bg-base);
+  color: var(--admin-text-base);
+  font-family: var(--font-geist), var(--font-inter), 'Inter', system-ui, sans-serif;
+  line-height: 1.8; /* Increased line-height for better readability */
+  word-spacing: 0.08em; /* Increased word spacing for Arabic text */
+  font-size: 14px; /* Decreased base font size */
+}
+
+.admin-theme * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography scale inside admin */
+.admin-theme h1,
+.admin-theme h2,
+.admin-theme h3,
+.admin-theme h4,
+.admin-theme h5,
+.admin-theme h6 {
+  font-family: var(--font-geist), var(--font-inter), 'Inter', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+}
+
+.admin-title-page { font-size: 28px !important; }
+.admin-title-section { font-size: 20px !important; }
+.admin-title-card { font-size: 16px !important; }
+.admin-text-body { font-size: 14px !important; }
+.admin-text-sidebar { font-size: 13.5px !important; }
+.admin-text-number { font-size: 34px !important; letter-spacing: -0.02em; }
+
+/* Global Tailwind Overrides for Admin Panel to make everything smaller */
+.admin-theme .text-base { font-size: 14px !important; line-height: 1.7 !important; }
+.admin-theme .text-sm { font-size: 13px !important; line-height: 1.6 !important; }
+.admin-theme .text-xs { font-size: 11.5px !important; line-height: 1.5 !important; }
+.admin-theme .text-lg { font-size: 16px !important; line-height: 1.6 !important; }
+.admin-theme .text-xl { font-size: 18px !important; line-height: 1.5 !important; }
+.admin-theme .text-2xl { font-size: 22px !important; line-height: 1.4 !important; }
+.admin-theme .text-3xl { font-size: 26px !important; line-height: 1.3 !important; }
+
+/* SaaS-grade scrollbar inside admin */
+.admin-theme * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--admin-border-strong) transparent;
+}
+
+.admin-theme ::-webkit-scrollbar,
+.admin-theme *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-theme ::-webkit-scrollbar-track,
+.admin-theme *::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-left: none !important;
+}
+
+.admin-theme ::-webkit-scrollbar-thumb,
+.admin-theme *::-webkit-scrollbar-thumb {
+  background: var(--admin-border-strong) !important;
+  border-radius: var(--admin-radius-full) !important;
+  border: none !important;
+}
+
+.admin-theme ::-webkit-scrollbar-thumb:hover,
+.admin-theme *::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-text-subtle) !important;
+}
+
+.admin-theme ::-webkit-scrollbar-corner,
+.admin-theme *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}

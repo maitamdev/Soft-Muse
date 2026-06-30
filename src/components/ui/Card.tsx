@@ -4,11 +4,12 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Heart } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { useNotification } from "@/context/NotificationContext";
 import { motion } from "framer-motion";
-import { ProductColorVariant } from "@/data/products";
+import { ProductColorVariant, ProductStockStatus } from "@/data/mock/products";
+import { AnimatedHeart } from "@/components/ui/AnimatedIcon";
+import { scrollFadeUp, scrollViewport } from "@/lib/animations";
 
 interface ProductCardProps {
   id: string;
@@ -18,6 +19,13 @@ interface ProductCardProps {
   hoverImage?: string;
   collection?: string;
   variants?: ProductColorVariant[];
+  /** Editorial label (e.g. "إصدار خاص"). Rendered as a corner tag. */
+  badge?: string;
+  /** Pre-discount price. When greater than `price`, shows a discount badge + struck-through price. */
+  originalPrice?: number;
+  stockStatus?: ProductStockStatus;
+  /** Position within a grid — drives a staggered reveal delay. */
+  index?: number;
 }
 
 export const ProductCard = React.memo(function ProductCard({
@@ -28,6 +36,10 @@ export const ProductCard = React.memo(function ProductCard({
   hoverImage,
   collection,
   variants,
+  badge,
+  originalPrice,
+  stockStatus = "in_stock",
+  index,
 }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useStore();
   const { showNotification } = useNotification();
@@ -39,9 +51,16 @@ export const ProductCard = React.memo(function ProductCard({
     setCurrentImage(image);
   }, [image]);
 
+  const isOutOfStock = stockStatus === "out_of_stock";
+  const discountPercent =
+    originalPrice && originalPrice > price
+      ? Math.round((1 - price / originalPrice) * 100)
+      : null;
+
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     showNotification(
       "يرجى اختيار اللون والمقاس قبل إضافة القطعة إلى الحقيبة",
       "warning"
@@ -56,15 +75,40 @@ export const ProductCard = React.memo(function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "200px" }}
-      transition={{ duration: 0.6 }}
+      variants={scrollFadeUp}
+      custom={typeof index === "number" ? index * 0.08 : 0}
+      initial="hidden"
+      whileInView="visible"
+      viewport={scrollViewport}
       className="group relative flex flex-col w-full bg-transparent cursor-pointer"
     >
       {/* 1. Large Image Frame - Image Dominates */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-background-secondary border border-brand-border/40">
-        
+
+        {/* Corner badges */}
+        <div className="absolute top-3 start-3 z-20 flex flex-col items-start gap-1.5 pointer-events-none">
+          {discountPercent !== null && (
+            <span className="bg-accent-dark text-background-secondary text-[10px] font-sans font-bold uppercase tracking-wider px-2 py-1 shadow-sm">
+              خصم {discountPercent}٪
+            </span>
+          )}
+          {badge && (
+            <span className="bg-background-primary text-text-primary text-[10px] font-sans font-bold uppercase tracking-wider px-2 py-1 shadow-sm">
+              {badge}
+            </span>
+          )}
+        </div>
+
+        {/* Wishlist — always reachable on touch, hover-revealed on desktop */}
+        <div className="absolute top-3 end-3 z-20">
+          <AnimatedHeart
+            active={wishlisted}
+            size="sm"
+            onClick={() => toggleWishlist({ id, title, price, image, collection })}
+            className="p-2.5 rounded-full bg-background-primary/80 backdrop-blur-md shadow-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 hover:bg-background-primary"
+          />
+        </div>
+
         {/* Catalog Image Swapper */}
         <Link href={`/product/${id}`} className="block w-full h-full relative">
           <motion.div
@@ -79,10 +123,10 @@ export const ProductCard = React.memo(function ProductCard({
               alt={title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+              className={`object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105 ${isOutOfStock ? "opacity-60 grayscale-[0.3]" : ""}`}
             />
           </motion.div>
-          {cardHoverImage && (
+          {cardHoverImage && !isOutOfStock && (
             <div className="absolute inset-0 w-full h-full opacity-0 transition-opacity duration-[800ms] ease-out group-hover:opacity-100 overflow-hidden">
               <Image
                 src={cardHoverImage}
@@ -93,43 +137,54 @@ export const ProductCard = React.memo(function ProductCard({
               />
             </div>
           )}
+
+          {isOutOfStock && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-text-primary/15">
+              <span className="bg-text-primary text-background-secondary text-[11px] font-sans font-bold uppercase tracking-wider px-4 py-2">
+                نفدت الكمية
+              </span>
+            </div>
+          )}
         </Link>
 
         {/* Hover quick add overlay - Solid Background, No Glassmorphism */}
         <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-text-primary flex flex-col gap-2 z-10">
-          <div className="flex justify-between items-center text-[10px] text-background-secondary font-sans">
-            <span>المقاسات المتوفرة: XS, S, M, L, XL</span>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleWishlist({ id, title, price, image, collection });
-              }}
-              className="text-background-secondary hover:text-accent transition-colors"
-              title="أضيفي للمفضلة"
-            >
-              <Heart className={`w-4 h-4 stroke-[1.5] ${wishlisted ? "fill-accent text-accent" : "text-background-secondary"}`} />
-            </button>
-          </div>
+          <span className="text-[10px] text-background-secondary font-sans">المقاسات المتوفرة: XS, S, M, L, XL</span>
           <button
             onClick={handleQuickAdd}
-            className="w-full bg-background-secondary text-text-primary text-[10px] font-sans font-semibold py-2.5 hover:bg-accent hover:text-background-secondary transition-colors text-center"
+            disabled={isOutOfStock}
+            className="w-full bg-background-secondary text-text-primary text-[10px] font-sans font-semibold py-2.5 hover:bg-accent hover:text-background-secondary transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background-secondary disabled:hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
-            إضافة سريعة +
+            {isOutOfStock ? "نفدت الكمية" : "إضافة سريعة +"}
           </button>
         </div>
       </div>
 
       {/* 2. Details Pane - Minimal Editorial Typography */}
       <div className="pt-4 flex flex-col items-start gap-1 w-full">
+        {collection && (
+          <span className="font-sans text-[9px] font-bold uppercase tracking-[0.15em] text-text-secondary/70">
+            {collection}
+          </span>
+        )}
         <h3 className="font-sans text-xs text-text-primary hover:text-accent font-medium transition-colors leading-snug">
           <Link href={`/product/${id}`}>
             {title}
           </Link>
         </h3>
         <div className="flex justify-between items-center w-full mt-0.5">
-          <span className="font-display text-xs text-text-secondary font-medium">
-            {price.toLocaleString()} ج.م
+          <span className="flex items-baseline gap-2">
+            <span className={`font-display text-xs font-medium ${discountPercent !== null ? "text-accent-dark font-semibold" : "text-text-secondary"}`}>
+              {price.toLocaleString()} ج.م
+            </span>
+            {discountPercent !== null && (
+              <span className="font-display text-[10px] text-text-secondary/50 line-through">
+                {originalPrice!.toLocaleString()} ج.م
+              </span>
+            )}
+            {stockStatus === "low_stock" && (
+              <span className="font-sans text-[9px] text-accent-dark font-bold uppercase tracking-wide">كمية محدودة</span>
+            )}
           </span>
           {variants && variants.length > 0 && (
             <div className="flex gap-1.5" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
@@ -143,11 +198,13 @@ export const ProductCard = React.memo(function ProductCard({
                   }}
                   className="w-3.5 h-3.5 rounded-full border transition-all duration-300 bg-background-primary flex items-center justify-center cursor-pointer"
                   style={{
-                    borderColor: currentImage === v.images[0] ? "#8E6B4B" : "#E7E1D8",
+                    borderColor: currentImage === v.images[0] ? "var(--color-accent-dark)" : "var(--color-brand-border)",
                     borderWidth: currentImage === v.images[0] ? "1.5px" : "1px",
                     transform: currentImage === v.images[0] ? "scale(1.08)" : "none",
                   }}
                   title={v.color}
+                  aria-label={`اللون: ${v.color}`}
+                  aria-pressed={currentImage === v.images[0]}
                 >
                   <span
                     className="w-2 h-2 rounded-full border border-black/5"
@@ -183,12 +240,12 @@ export const StoryCard = React.memo(function StoryCard({ title, description, ima
         className={`relative ${reversed ? "md:order-2" : ""}`}
       >
         <div className="relative aspect-[3/4] w-full overflow-hidden border border-brand-border">
-          <Image 
-            src={image} 
-            alt={title} 
-            fill 
+          <Image
+            src={image}
+            alt={title}
+            fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover" 
+            className="object-cover"
           />
         </div>
       </motion.div>
@@ -216,4 +273,3 @@ export const StoryCard = React.memo(function StoryCard({ title, description, ima
     </div>
   );
 });
-

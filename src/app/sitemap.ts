@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { mockProducts } from '@/data/products';
+import { getPublishedProducts } from '@/lib/catalog/storefront-catalog';
 import { mockArticles } from '@/data/journal';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Product routes
-  const productRoutes = mockProducts.map((product) => ({
+  const productRoutes = getPublishedProducts().map((product) => ({
     url: `${baseUrl}/product/${product.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

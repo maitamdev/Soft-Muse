@@ -10,7 +10,7 @@ export default function PremiumLoader() {
     // Check if the loader has already been shown in this session
     const hasLoaded = sessionStorage.getItem("aura_loaded_2026");
     if (hasLoaded) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setShow(false);
       return;
     }

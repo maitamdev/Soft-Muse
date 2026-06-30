@@ -1,19 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ProductCard } from "@/components/ui/Card";
-import { mockProducts } from "@/data/products";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
 import Button from "@/components/ui/Button";
 import HeroSection from "@/components/HeroSection";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
-import PremiumLoader from "@/components/ui/PremiumLoader";
+import { heroFadeUp, scrollViewport } from "@/lib/animations";
+import { HomepageService, HomepageSection } from "@/lib/services/storefront/homepage.service";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
+
+// Code-split: only ever renders for ~3.2s on a visitor's first session visit, never on repeat navigations.
+const PremiumLoader = dynamic(() => import("@/components/ui/PremiumLoader"));
 
 export default function HomePage() {
-  // Get first 4 products for Best Sellers
-  const bestSellers = mockProducts.slice(0, 4);
+  const products = useStorefrontProducts();
+  const [sections, setSections] = useState<HomepageSection[]>([]);
+
+  useEffect(() => {
+    HomepageService.getSections().then(setSections).catch(() => {});
+  }, []);
+  useEventSubscribeMany(['website.changed'], () => {
+    HomepageService.getSections().then(setSections).catch(() => {});
+  });
+
+  // Derive product grids from enabled HomepageService sections + live product flags
+  const bestSellersSection = sections.find(s => s.type === 'best_sellers' && s.enabled);
+  const newArrivalsSection = sections.find(s => s.type === 'new_arrivals' && s.enabled);
+  const featuredSection    = sections.find(s => s.type === 'featured_products' && s.enabled);
+
+  const bsLimit = bestSellersSection?.settings?.limit ?? 4;
+  const naLimit = newArrivalsSection?.settings?.limit ?? 4;
+  const fpLimit = featuredSection?.settings?.limit ?? 4;
+
+  const flaggedBestSellers = products.filter(p => p.bestSeller);
+  const bestSellers = (flaggedBestSellers.length > 0 ? flaggedBestSellers : products).slice(0, bsLimit);
+
+  const flaggedNewArrivals = products.filter(p => p.newArrival);
+  const newArrivals = (flaggedNewArrivals.length > 0 ? flaggedNewArrivals : products).slice(0, naLimit);
+
+  const flaggedFeatured = products.filter(p => p.featured);
+  const featuredProducts = (flaggedFeatured.length > 0 ? flaggedFeatured : products).slice(0, fpLimit);
 
   return (
     <div className="w-full bg-background-primary flex flex-col items-center">
@@ -23,18 +55,18 @@ export default function HomePage() {
       {/* 1. HERO CAMPAIGN - Asymmetrical Magazine Layout */}
       <HeroSection />
 
-      {/* 2. NEW COLLECTION SLIDER (Editorial visual story) - Reveal Entrance */}
+      {/* 2. NEW ARRIVALS SLIDER (Editorial visual story) - Reveal Entrance */}
       <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
+        variants={heroFadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={scrollViewport}
         className="w-full max-w-[1280px] px-6 md:px-12 py-12 md:py-24"
       >
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12">
           <div>
             <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.2em]">نظرة مسبقة</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-light text-text-primary mt-2">كواليس التشكيلة الحالية</h2>
+            <h2 className="font-serif text-3xl md:text-4xl font-light text-text-primary mt-2">وصل حديثاً</h2>
           </div>
           <Link href="/shop" className="font-sans text-xs text-accent hover:text-text-primary transition-colors underline underline-offset-4 mt-2 md:mt-0">
             مشاهدة كل القطع
@@ -43,7 +75,7 @@ export default function HomePage() {
 
         {/* 3 Campaign looks - Women's Clothing Only */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href="/shop?category=dresses" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
+          <Link href="/shop" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
             <Image
               src="/images/campaign/campaign_1.png"
               alt="إطلالة كلاسيكية راقية"
@@ -58,7 +90,7 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-text-primary/65 via-transparent to-transparent pointer-events-none" />
           </Link>
 
-          <Link href="/summer-fashion" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
+          <Link href="/shop?category=summer" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
             <Image
               src="/images/campaign/campaign_2.png"
               alt="بدلة عصرية بيضاء"
@@ -73,7 +105,7 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-text-primary/65 via-transparent to-transparent pointer-events-none" />
           </Link>
 
-          <Link href="/winter-fashion" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
+          <Link href="/shop?category=winter" className="relative aspect-[3/4] overflow-hidden border border-brand-border bg-background-secondary block group">
             <Image
               src="/images/campaign/campaign_3.png"
               alt="أزياء الشتاء"
@@ -92,10 +124,10 @@ export default function HomePage() {
 
       {/* 3. FEATURED LOOKS (Contemporary Egyptian Fashion Styling) - Reveal Entrance */}
       <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
+        variants={heroFadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={scrollViewport}
         className="w-full bg-background-secondary border-y border-brand-border py-12 md:py-24"
       >
         <div className="max-w-[1280px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -128,10 +160,10 @@ export default function HomePage() {
 
       {/* 4. EDITORIAL STORY - Reveal Entrance */}
       <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
+        variants={heroFadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={scrollViewport}
         className="w-full py-20 md:py-32 bg-background-primary"
       >
         <div className="max-w-[720px] mx-auto px-6 text-center flex flex-col items-center gap-6" dir="rtl">
@@ -148,42 +180,102 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {/* 5. BEST SELLERS - Reveal Entrance */}
-      <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
-        className="w-full bg-background-secondary border-t border-brand-border py-12 md:py-24"
-      >
-        <div className="max-w-[1280px] mx-auto px-6 md:px-12">
-          <div className="text-center mb-12 flex flex-col items-center gap-2">
-            <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.2em]">المجموعة الحصرية</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-light text-text-primary">القطع الأكثر طلباً</h2>
+      {/* 5. BEST SELLERS - section-driven via HomepageService */}
+      {(!sections.length || bestSellersSection) && bestSellers.length > 0 && (
+        <motion.section
+          variants={heroFadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollViewport}
+          className="w-full bg-background-secondary border-t border-brand-border py-12 md:py-24"
+        >
+          <div className="max-w-[1280px] mx-auto px-6 md:px-12">
+            <div className="text-center mb-12 flex flex-col items-center gap-2">
+              <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.2em]">
+                {bestSellersSection?.subtitle || 'المجموعة الحصرية'}
+              </span>
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-text-primary">
+                {bestSellersSection?.title || 'القطع الأكثر طلباً'}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {bestSellers.map((product, index) => (
+                <ProductCard key={product.id} id={product.id} title={product.name} price={product.price}
+                  originalPrice={discountOriginalPrice(product)} image={primaryImage(product)}
+                  hoverImage={product.hoverImage} collection={product.collection}
+                  badge={product.badge} stockStatus={resolveStockStatus(product)} index={index} />
+              ))}
+            </div>
           </div>
+        </motion.section>
+      )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {bestSellers.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                price={product.price}
-                image={product.image}
-                hoverImage={product.hoverImage}
-                collection={product.collection}
-              />
-            ))}
+      {/* 5b. NEW ARRIVALS - section-driven via HomepageService + newArrival flag */}
+      {newArrivalsSection && newArrivals.length > 0 && (
+        <motion.section
+          variants={heroFadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollViewport}
+          className="w-full border-t border-brand-border py-12 md:py-24"
+        >
+          <div className="max-w-[1280px] mx-auto px-6 md:px-12">
+            <div className="text-center mb-12 flex flex-col items-center gap-2">
+              <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.2em]">
+                {newArrivalsSection.subtitle || 'نظرة مسبقة'}
+              </span>
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-text-primary">
+                {newArrivalsSection.title || 'وصل حديثاً'}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {newArrivals.map((product, index) => (
+                <ProductCard key={product.id} id={product.id} title={product.name} price={product.price}
+                  originalPrice={discountOriginalPrice(product)} image={primaryImage(product)}
+                  hoverImage={product.hoverImage} collection={product.collection}
+                  badge={product.badge} stockStatus={resolveStockStatus(product)} index={index} />
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.section>
+        </motion.section>
+      )}
+
+      {/* 5c. FEATURED PRODUCTS - section-driven via HomepageService + featured flag */}
+      {featuredSection && featuredProducts.length > 0 && (
+        <motion.section
+          variants={heroFadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollViewport}
+          className="w-full bg-background-secondary border-t border-brand-border py-12 md:py-24"
+        >
+          <div className="max-w-[1280px] mx-auto px-6 md:px-12">
+            <div className="text-center mb-12 flex flex-col items-center gap-2">
+              <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.2em]">
+                {featuredSection.subtitle || 'تشكيلة مختارة'}
+              </span>
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-text-primary">
+                {featuredSection.title || 'منتجات مميزة'}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredProducts.map((product, index) => (
+                <ProductCard key={product.id} id={product.id} title={product.name} price={product.price}
+                  originalPrice={discountOriginalPrice(product)} image={primaryImage(product)}
+                  hoverImage={product.hoverImage} collection={product.collection}
+                  badge={product.badge} stockStatus={resolveStockStatus(product)} index={index} />
+              ))}
+            </div>
+          </div>
+        </motion.section>
+      )}
 
       {/* 6. CUSTOMER EXPERIENCE & BRAND TRUST - Reveal Entrance */}
       <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
+        variants={heroFadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={scrollViewport}
         className="w-full py-12 md:py-24 bg-background-primary border-t border-brand-border"
       >
         <div className="max-w-[1280px] mx-auto px-6 md:px-12 flex flex-col gap-16">

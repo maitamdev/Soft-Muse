@@ -2,10 +2,12 @@
 
 import React, { useState, use, useEffect } from "react";
 import Link from "next/link";
-import { Heart, ShoppingBag, Check, X } from "lucide-react";
+import { IconHeart as Heart, IconShoppingBag as ShoppingBag, IconCheck as Check, IconX as X } from "@tabler/icons-react";
 import { useStore } from "@/context/StoreContext";
 import { useNotification } from "@/context/NotificationContext";
-import { mockProducts } from "@/data/products";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
+import { getRelatedProducts } from "@/lib/catalog/storefront-catalog";
 import { ProductCard } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,12 +28,13 @@ export default function ProductDetailClient({ params }: PageProps) {
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
   const { showNotification } = useNotification();
 
-  const product = mockProducts.find((p) => p.id === id);
+  const products = useStorefrontProducts();
+  const product = products.find((p) => p.id === id);
 
   // States
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [activeImage, setActiveImage] = useState(product?.image || "");
+  const [activeImage, setActiveImage] = useState(product ? primaryImage(product) : "");
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
@@ -41,7 +44,7 @@ export default function ProductDetailClient({ params }: PageProps) {
 
   useEffect(() => {
     if (product) {
-      analytics.trackProductView(product.id, product.title, product.price);
+      analytics.trackProductView(product.id, product.name, product.price);
       addViewedItem(product.id);
     }
   }, [product, addViewedItem]);
@@ -59,11 +62,11 @@ export default function ProductDetailClient({ params }: PageProps) {
   }
 
   // Find matching variant
-  const selectedVariant = product.variants?.find((v) => v.color === selectedColor);
+  const selectedVariant = product.colorVariants?.find((v) => v.color === selectedColor);
 
   // Gallery images array (fallback to defaults if no variant is selected)
   const defaultImages = [
-    product.image,
+    primaryImage(product),
     product.hoverImage || "/images/flatlay/flatlay_1.png",
     "/images/detail/detail_fabric.png",
     "/images/lifestyle/lifestyle_interior.png",
@@ -75,13 +78,16 @@ export default function ProductDetailClient({ params }: PageProps) {
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
-    const variant = product.variants?.find((v) => v.color === color);
+    const variant = product.colorVariants?.find((v) => v.color === color);
     if (variant && variant.images && variant.images.length > 0) {
       setActiveImage(variant.images[0]);
     }
   };
 
+  const isOutOfStock = resolveStockStatus(product) === "out_of_stock";
+
   const handleAddToBag = () => {
+    if (isOutOfStock) return;
     if (!selectedColor || !selectedSize) {
       showNotification(
         "يرجى اختيار اللون والمقاس قبل إضافة القطعة إلى الحقيبة",
@@ -91,15 +97,15 @@ export default function ProductDetailClient({ params }: PageProps) {
     }
     addToCart({
       id: product.id,
-      title: product.title,
+      title: product.name,
       price: product.price,
-      image: activeImage || product.image,
+      image: activeImage || primaryImage(product),
       size: selectedSize,
       color: selectedColor,
       collection: product.collection,
       variantImages: galleryImages,
     });
-    analytics.trackAddToCart(product.id, product.title, product.price, selectedSize, selectedColor, quantity);
+    analytics.trackAddToCart(product.id, product.name, product.price, selectedSize, selectedColor, quantity);
     showNotification(
       "تمت إضافة القطعة إلى حقيبتكِ بنجاح",
       "success"
@@ -109,7 +115,9 @@ export default function ProductDetailClient({ params }: PageProps) {
   };
 
   const wishlisted = isInWishlist(product.id);
-  const relatedProducts = mockProducts.filter((p) => p.id !== product.id).slice(0, 4);
+
+  // Same-collection matches first, backfilled with same-season items, capped at 4.
+  const relatedProducts = getRelatedProducts(product, products);
 
   return (
     <div className="bg-background-primary min-h-screen pb-20 md:pb-0 flex flex-col items-center">
@@ -118,7 +126,7 @@ export default function ProductDetailClient({ params }: PageProps) {
       <nav className="w-full max-w-[1280px] px-6 md:px-12 py-6 text-xs text-text-secondary font-sans font-light flex items-center gap-2 border-b border-brand-border/40">
         <Link href="/">الرئيسية</Link> / 
         <Link href="/shop">المتجر</Link> / 
-        <span className="text-text-primary font-medium">{product.title}</span>
+        <span className="text-text-primary font-medium">{product.name}</span>
       </nav>
 
       {/* Main product display section */}
@@ -146,9 +154,9 @@ export default function ProductDetailClient({ params }: PageProps) {
             {/* Big Main Image Preview */}
             <div className="flex-grow aspect-[3/4] overflow-hidden border border-brand-border/60 bg-background-secondary relative">
               <Image
-                key={activeImage || product.image}
-                src={activeImage || product.image}
-                alt={product.title}
+                key={activeImage || primaryImage(product)}
+                src={activeImage || primaryImage(product)}
+                alt={product.name}
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -166,17 +174,36 @@ export default function ProductDetailClient({ params }: PageProps) {
                 {product.collection}
               </span>
               <h1 className="font-sans text-2xl font-light text-text-primary leading-snug">
-                {product.title}
+                {product.name}
               </h1>
-              {product.badge && (
-                <span className="inline-block bg-accent text-background-secondary text-[9px] font-sans font-bold px-2 py-0.5 mt-2">
-                  {product.badge}
-                </span>
-              )}
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {product.badge && (
+                  <span className="inline-block bg-accent text-background-secondary text-[9px] font-sans font-bold px-2 py-0.5">
+                    {product.badge}
+                  </span>
+                )}
+                {isOutOfStock && (
+                  <span className="inline-block bg-text-primary text-background-secondary text-[9px] font-sans font-bold uppercase px-2 py-0.5">
+                    نفدت الكمية
+                  </span>
+                )}
+                {resolveStockStatus(product) === "low_stock" && (
+                  <span className="inline-block border border-accent-dark text-accent-dark text-[9px] font-sans font-bold uppercase px-2 py-0.5">
+                    كمية محدودة
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="font-display text-2xl font-semibold text-accent">
-              {product.price.toLocaleString()} ج.م
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-2xl font-semibold text-accent">
+                {product.price.toLocaleString()} ج.م
+              </span>
+              {discountOriginalPrice(product) && (
+                <span className="font-display text-sm text-text-secondary/50 line-through">
+                  {discountOriginalPrice(product)!.toLocaleString()} ج.م
+                </span>
+              )}
             </div>
 
             <p className="font-sans text-xs md:text-sm font-light text-text-secondary leading-relaxed">
@@ -189,7 +216,7 @@ export default function ProductDetailClient({ params }: PageProps) {
                 اللون: {selectedColor || "اختاري اللون"}
               </label>
               <div className="flex gap-3">
-                {(product.variants || [
+                {(product.colorVariants || [
                   { color: "برونزي", value: "#8E6B4B" },
                   { color: "أسود", value: "#111111" },
                   { color: "عاجي", value: "#FAF8F5" }
@@ -199,11 +226,13 @@ export default function ProductDetailClient({ params }: PageProps) {
                     onClick={() => handleColorSelect(col.color)}
                     className="relative w-8 h-8 rounded-full border transition-all duration-300 bg-background-primary flex items-center justify-center animate-fade-in"
                     style={{
-                      borderColor: selectedColor === col.color ? "#8E6B4B" : "#E7E1D8",
+                      borderColor: selectedColor === col.color ? "var(--color-accent-dark)" : "var(--color-brand-border)",
                       borderWidth: selectedColor === col.color ? "2px" : "1px",
                       transform: selectedColor === col.color ? "scale(1.05)" : "none",
                     }}
                     title={col.color}
+                    aria-label={`اللون: ${col.color}`}
+                    aria-pressed={selectedColor === col.color}
                   >
                     <span
                       className="absolute inset-1 rounded-full border border-black/5 shadow-sm"
@@ -231,11 +260,13 @@ export default function ProductDetailClient({ params }: PageProps) {
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
+                    aria-label={`المقاس: ${sz}`}
+                    aria-pressed={selectedSize === sz}
                     className="text-xs px-4 py-2 border transition-all duration-300 bg-background-primary"
                     style={{
-                      borderColor: selectedSize === sz ? "#8E6B4B" : "#E7E1D8",
+                      borderColor: selectedSize === sz ? "var(--color-accent-dark)" : "var(--color-brand-border)",
                       backgroundColor: selectedSize === sz ? "rgba(142, 107, 75, 0.08)" : "transparent",
-                      color: selectedSize === sz ? "#8E6B4B" : "#555555",
+                      color: selectedSize === sz ? "var(--color-accent-dark)" : "var(--color-text-secondary)",
                       fontWeight: selectedSize === sz ? "bold" : "normal",
                     }}
                   >
@@ -265,9 +296,12 @@ export default function ProductDetailClient({ params }: PageProps) {
               <Button
                 variant="primary"
                 onClick={handleAddToBag}
-                className="flex-grow h-12"
+                disabled={isOutOfStock}
+                className="flex-grow h-12 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isAdded ? (
+                {isOutOfStock ? (
+                  <span>نفدت الكمية</span>
+                ) : isAdded ? (
                   <>
                     <Check className="w-4 h-4 text-background-secondary" />
                     <span>تمت الإضافة لحقيبتكِ</span>
@@ -282,7 +316,7 @@ export default function ProductDetailClient({ params }: PageProps) {
               
               <Button
                 variant="secondary"
-                onClick={() => toggleWishlist(product)}
+                onClick={() => toggleWishlist({ id: product.id, title: product.name, price: product.price, image: primaryImage(product), collection: product.collection })}
                 className={`h-12 w-1/3 ${wishlisted ? "border-accent text-accent" : ""}`}
               >
                 <Heart className={`w-4 h-4 ${wishlisted ? "fill-accent text-accent" : ""}`} />
@@ -364,7 +398,7 @@ export default function ProductDetailClient({ params }: PageProps) {
                         <p className="font-medium text-text-primary">{product.fabric}</p>
                         <p>تفاصيل الحياكة والنسيج:</p>
                         <ul className="list-disc pr-4 flex flex-col gap-1.5 text-[11px] text-text-secondary">
-                          {product.details.map((det, idx) => (
+                          {(product.details ?? []).map((det, idx) => (
                             <li key={idx}>{det}</li>
                           ))}
                         </ul>
@@ -420,6 +454,7 @@ export default function ProductDetailClient({ params }: PageProps) {
       </main>
 
       {/* Related Products Grid */}
+      {relatedProducts.length > 0 && (
       <section className="w-full bg-background-secondary border-t border-brand-border py-16 md:py-24">
         <div className="max-w-[1280px] mx-auto px-6 md:px-12">
           <div className="text-center mb-12">
@@ -430,20 +465,25 @@ export default function ProductDetailClient({ params }: PageProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {relatedProducts.map((rel) => (
+            {relatedProducts.map((rel, index) => (
               <ProductCard
                 key={rel.id}
                 id={rel.id}
-                title={rel.title}
+                title={rel.name}
                 price={rel.price}
-                image={rel.image}
+                originalPrice={discountOriginalPrice(rel)}
+                image={primaryImage(rel)}
                 hoverImage={rel.hoverImage}
                 collection={rel.collection}
+                badge={rel.badge}
+                stockStatus={resolveStockStatus(rel)}
+                index={index}
               />
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* Complete The Look Section */}
       <CompleteTheLook currentProduct={product} />
@@ -456,10 +496,10 @@ export default function ProductDetailClient({ params }: PageProps) {
         <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary">
-              <Image src={product.image} alt="" fill sizes="40px" className="object-cover" />
+              <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" />
             </div>
             <div className="hidden sm:block">
-              <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.title}</h5>
+              <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5>
               <span className="text-[10px] text-text-secondary font-light">المقاس: {selectedSize || "لم يحدد"} | اللون: {selectedColor || "لم يحدد"}</span>
             </div>
           </div>

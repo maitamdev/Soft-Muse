@@ -48,7 +48,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedCart = localStorage.getItem("aura_cart");
     const savedWishlist = localStorage.getItem("aura_wishlist");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
   }, []);

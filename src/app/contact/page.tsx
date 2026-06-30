@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MessageCircle, Mail, MapPin, Clock } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { getWhatsAppUrl, WHATSAPP_CONFIG } from "@/config/whatsapp";
+import { getWhatsAppUrl } from "@/config/whatsapp";
+import { ContactItems } from "./ContactItems";
 
 export const metadata: Metadata = {
   title: "تواصلي معنا | AURA",
   description: "تواصلي مع مستشارات دار AURA للاستفسار عن المنتجات، المقاسات، الطلبات الخاصة، وخدمات الأتيلييه.",
 };
-
-const contactItems = [
-  { icon: MessageCircle, title: "واتساب المستشارة", text: `+${WHATSAPP_CONFIG.phoneNumber}`, href: getWhatsAppUrl() },
-  { icon: Mail, title: "البريد الإلكتروني", text: "care@aura-fashion-virid.vercel.app", href: "mailto:care@aura-fashion-virid.vercel.app" },
-  { icon: MapPin, title: "أتيلييه AURA", text: "المهندسين، الجيزة، مصر", href: "#atelier" },
-  { icon: Clock, title: "مواعيد العناية", text: "يوميًا من 11 صباحًا حتى 8 مساءً", href: "#hours" },
-];
 
 export default function ContactPage() {
   return (
@@ -30,15 +23,7 @@ export default function ContactPage() {
       </section>
 
       <main className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-6 py-14 md:grid-cols-[1fr_0.9fr] md:px-12 md:py-24">
-        <section className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {contactItems.map(({ icon: Icon, title, text, href }) => (
-            <a key={title} href={href} className="border border-brand-border bg-background-secondary p-6 transition-colors duration-300 hover:border-accent">
-              <Icon className="h-5 w-5 text-accent stroke-[1.4]" aria-hidden="true" />
-              <h2 className="mt-5 font-sans text-sm font-bold text-text-primary">{title}</h2>
-              <p className="mt-2 font-sans text-xs font-light leading-relaxed text-text-secondary">{text}</p>
-            </a>
-          ))}
-        </section>
+        <ContactItems />
 
         <section className="border border-brand-border bg-background-secondary p-7 md:p-8 text-right" dir="rtl">
           <span className="font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-accent">خدمة المقاسات</span>

@@ -2,7 +2,8 @@
 
 import React from "react";
 import { ProductCard } from "@/components/ui/Card";
-import { Product, mockProducts } from "@/data/products";
+import { type Product, primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { motion } from "framer-motion";
 
 interface CompleteTheLookProps {
@@ -10,6 +11,7 @@ interface CompleteTheLookProps {
 }
 
 export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps) {
+  const products = useStorefrontProducts();
   // Logic to determine matching categories based on current product collection
   const getMatchingCategories = () => {
     const col = currentProduct.collection || "";
@@ -33,7 +35,7 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
   const matchingCategories = getMatchingCategories();
 
   // Find products that match the categories AND are not the current product
-  const recommendedProducts = mockProducts
+  const recommendedProducts = products
     .filter((p) => p.id !== currentProduct.id && matchingCategories.some(c => p.collection.includes(c)))
     .slice(0, 4);
 
@@ -66,15 +68,19 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex overflow-x-auto md:grid md:grid-cols-4 gap-6 pb-8 md:pb-0 hide-scrollbar"
         >
-          {recommendedProducts.map((product) => (
+          {recommendedProducts.map((product, index) => (
             <div key={product.id} className="min-w-[260px] md:min-w-0 flex-shrink-0">
               <ProductCard
                 id={product.id}
-                title={product.title}
+                title={product.name}
                 price={product.price}
-                image={product.image}
+                originalPrice={discountOriginalPrice(product)}
+                image={primaryImage(product)}
                 hoverImage={product.hoverImage}
                 collection={product.collection}
+                badge={product.badge}
+                stockStatus={resolveStockStatus(product)}
+                index={index}
               />
             </div>
           ))}

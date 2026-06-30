@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { useNotification } from "@/context/NotificationContext";
+import { CouponService } from "@/lib/services/coupon.service";
+import { OrderService } from "@/lib/services/order.service";
 import { LuxuryInput, LuxurySelect } from "@/components/ui/Form";
 import Button from "@/components/ui/Button";
 import { analytics } from "@/utils/analytics";
-import { CheckCircle, Truck, ShieldAlert, Loader2, ArrowLeft, ArrowRight, Package } from "lucide-react";
+import { IconCircleCheck as CheckCircle, IconTruck as Truck, IconShieldExclamation as ShieldAlert, IconLoader2 as Loader2, IconArrowLeft as ArrowLeft, IconArrowRight as ArrowRight, IconPackage as Package } from "@tabler/icons-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { fadeIn, slideInRight, scaleIn } from "@/lib/animations";
 
 export default function CheckoutPage() {
   const { showNotification } = useNotification();
@@ -21,6 +24,8 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedOrderId, setGeneratedOrderId] = useState("");
+  // Snapshot of totals captured at submit (cart is cleared on success).
+  const [submittedTotals, setSubmittedTotals] = useState<{ subtotal: number; discount: number; total: number; couponCode: string | null } | null>(null);
 
   // Form Fields
   const [form, setForm] = useState({
@@ -35,6 +40,58 @@ export default function CheckoutPage() {
 
   // Validation Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Coupon state (validated through the shared CouponService — same source as admin)
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const discount = appliedCoupon?.discount ?? 0;
+  const cartTotal = Math.max(0, cartSubtotal - discount);
+
+  // Re-validate the applied coupon whenever the cart subtotal changes (e.g. min-order no longer met).
+  useEffect(() => {
+    if (!appliedCoupon) return;
+    let active = true;
+    CouponService.calculateDiscount(appliedCoupon.code, cartSubtotal).then((res) => {
+      if (!active) return;
+      if (!res.valid) {
+        setAppliedCoupon(null);
+        setCouponError(res.error || "لم يعد الكوبون صالحاً");
+      } else if (res.discountAmount !== appliedCoupon.discount) {
+        setAppliedCoupon({ code: appliedCoupon.code, discount: res.discountAmount });
+      }
+    });
+    return () => { active = false; };
+  }, [cartSubtotal]);
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) { setCouponError("أدخلي رمز الكوبون"); return; }
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await CouponService.calculateDiscount(code, cartSubtotal);
+      if (!res.valid) {
+        setAppliedCoupon(null);
+        setCouponError(res.error || "الكوبون غير صالح");
+      } else {
+        setAppliedCoupon({ code: code.toUpperCase(), discount: res.discountAmount });
+        showNotification("تم تطبيق الكوبون بنجاح", "success");
+      }
+    } catch {
+      setCouponError("تعذر التحقق من الكوبون");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   // Trigger Checkout Start Analytics
   useEffect(() => {
@@ -114,42 +171,65 @@ export default function CheckoutPage() {
     window.scrollTo(0, 0);
   };
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(3)) return;
 
     setIsSubmitting(true);
 
-    // Submit concierge order request
-    setTimeout(() => {
-      const orderId = `AURA-${Math.floor(10000 + Math.random() * 90000)}`;
-      setGeneratedOrderId(orderId);
-      
-      // Store the concierge request locally until backend order sync is connected
-      const conciergeOrder = {
-        orderId,
-        date: new Date().toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" }),
-        customerName: `${form.firstName} ${form.lastName}`,
-        paymentMethod: form.paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash",
-        subtotal: cartSubtotal,
-        cartItems: [...cart],
-        address: form.address,
-        governorate: governorateOptions.find(o => o.value === form.governorate)?.label || form.governorate,
-        status: "received"
-      };
-      
-      localStorage.setItem(`aura_order_${orderId}`, JSON.stringify(conciergeOrder));
-      // Save order ID to active tracking list for easy tracking page loading
-      localStorage.setItem("aura_last_order_id", orderId);
+    const governorateLabelValue = governorateOptions.find(o => o.value === form.governorate)?.label || form.governorate;
+    const paymentLabel = form.paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash";
 
-      // Trigger analytics
-      analytics.trackPurchaseSuccess(orderId, cart, cartSubtotal, form.paymentMethod);
+    try {
+      // Create the order through the SAME unified OrderService the admin uses, so it
+      // persists in mockStorage and appears live in Admin → Orders via the EventBus.
+      const created = await OrderService.createOrder({
+        customerId: "",
+        customerName: `${form.firstName} ${form.lastName}`.trim(),
+        customerEmail: form.email.trim(),
+        customerPhone: form.phone.trim(),
+        shippingAddress: `${governorateLabelValue} - ${form.address}`,
+        shipping: 0,
+        taxRate: 0,
+        discount,
+        couponCode: appliedCoupon?.code ?? null,
+        paymentMethod: form.paymentMethod,
+        source: "storefront",
+        notes: `طلب من المتجر — طريقة الدفع: ${paymentLabel}`,
+        items: cart.map((item) => ({
+          productId: String(item.id),
+          productName: item.title,
+          sku: String(item.id),
+          quantity: item.quantity,
+          price: item.price,
+          image: item.image,
+          size: item.size,
+          color: item.color,
+        })),
+      });
 
-      setIsSubmitting(false);
+      setGeneratedOrderId(created.orderNumber);
+      setSubmittedTotals({ subtotal: cartSubtotal, discount, total: cartTotal, couponCode: appliedCoupon?.code ?? null });
+
+      // Remember the latest order number so the tracking page can preload it.
+      localStorage.setItem("aura_last_order_id", created.orderNumber);
+
+      // Record coupon redemption through the shared service (auto-disables at limit,
+      // emits coupon.used → admin coupon list updates live).
+      if (appliedCoupon) {
+        CouponService.incrementUsage(appliedCoupon.code);
+      }
+
+      analytics.trackPurchaseSuccess(created.orderNumber, cart, cartTotal, form.paymentMethod);
+
       setStep(4);
       clearCart();
       showNotification("تم إرسال طلبكِ إلى مستشارة AURA بنجاح", "success");
-    }, 2000);
+    } catch {
+      showNotification("تعذر إرسال الطلب، يرجى المحاولة مرة أخرى", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0 && step !== 4) {
@@ -187,8 +267,14 @@ export default function CheckoutPage() {
       {step < 4 && (
         <div className="w-full max-w-[800px] px-6 mt-8">
           <div className="flex justify-between items-center relative py-4" dir="rtl">
-            <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-brand-border -translate-y-1/2 -z-10" />
-            
+            <div className="absolute top-1/2 start-0 end-0 h-[1.5px] bg-brand-border -translate-y-1/2 -z-10" />
+            <motion.div
+              className="absolute top-1/2 start-0 h-[1.5px] bg-accent -translate-y-1/2 -z-10"
+              initial={false}
+              animate={{ width: `${((step - 1) / 2) * 100}%` }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            />
+
             {[
               { num: 1, name: "البيانات الشخصية" },
               { num: 2, name: "تفاصيل الشحن" },
@@ -224,9 +310,7 @@ export default function CheckoutPage() {
               {isSubmitting ? (
                 /* Simulated Luxury Loading Screen */
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  {...fadeIn}
                   className="absolute inset-0 bg-background-secondary/95 z-30 flex flex-col justify-center items-center text-center gap-4 p-8"
                 >
                   <Loader2 className="w-12 h-12 stroke-[1.2] text-accent animate-spin" />
@@ -242,7 +326,7 @@ export default function CheckoutPage() {
 
             {/* STEP 1: Personal Info */}
             {step === 1 && (
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <motion.div {...slideInRight}>
                 <h3 className="font-sans text-base font-bold text-text-primary mb-6 border-b border-brand-border pb-3 text-right">
                   ١. البيانات الشخصية وبيانات الاتصال
                 </h3>
@@ -298,7 +382,7 @@ export default function CheckoutPage() {
 
             {/* STEP 2: Shipping Details */}
             {step === 2 && (
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <motion.div {...slideInRight}>
                 <h3 className="font-sans text-base font-bold text-text-primary mb-6 border-b border-brand-border pb-3 text-right">
                   ٢. تفاصيل الشحن والتسليم
                 </h3>
@@ -344,7 +428,7 @@ export default function CheckoutPage() {
 
             {/* STEP 3: Payment Selection */}
             {step === 3 && (
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <motion.div {...slideInRight}>
                 <h3 className="font-sans text-base font-bold text-text-primary mb-6 border-b border-brand-border pb-3 text-right">
                   ٣. تفضيل الدفع بعد المراجعة
                 </h3>
@@ -391,8 +475,7 @@ export default function CheckoutPage() {
             {/* STEP 4: Success Confirmation */}
             {step === 4 && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
+                {...scaleIn}
                 className="flex flex-col items-center text-center gap-6 py-8"
               >
                 <CheckCircle className="w-16 h-16 text-accent stroke-[1.2]" />
@@ -433,9 +516,15 @@ export default function CheckoutPage() {
                     <span>طريقة الدفع والتأكيد:</span>
                     <span>{form.paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash"}</span>
                   </div>
+                  {submittedTotals && submittedTotals.discount > 0 && (
+                    <div className="flex justify-between border-b border-brand-border/40 pb-2 text-accent">
+                      <span>الخصم{submittedTotals.couponCode ? ` (${submittedTotals.couponCode})` : ""}:</span>
+                      <span>- {submittedTotals.discount.toLocaleString()} ج.م</span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold pt-1">
                     <span>المبلغ قبل مراجعة المستشارة:</span>
-                    <span className="text-accent text-sm">{cartSubtotal.toLocaleString()} ج.م</span>
+                    <span className="text-accent text-sm">{(submittedTotals?.total ?? cartSubtotal).toLocaleString()} ج.م</span>
                   </div>
                 </div>
 
@@ -465,7 +554,7 @@ export default function CheckoutPage() {
                 {cart.map((item) => (
                   <div key={`${item.id}-${item.color}-${item.size}`} className="flex gap-4 items-center">
                     <div className="relative w-10 h-14 shrink-0 bg-background-primary border border-brand-border">
-                      <Image src={item.image} alt="" fill sizes="40px" className="object-cover" />
+                      <Image src={item.image} alt={item.title} fill sizes="40px" className="object-cover" />
                     </div>
                     <div className="flex-grow min-w-0">
                       <h4 className="font-sans text-xs font-medium truncate max-w-[160px]">{item.title}</h4>
@@ -480,12 +569,57 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Coupon Code */}
+              <div className="flex flex-col gap-2 border-b border-brand-border pb-4">
+                {appliedCoupon ? (
+                  <div className="flex justify-between items-center bg-accent/5 border border-accent/20 px-3 py-2">
+                    <div className="flex flex-col">
+                      <span className="font-sans text-xs font-bold text-accent uppercase">{appliedCoupon.code}</span>
+                      <span className="text-[10px] text-text-secondary">تم تطبيق الخصم</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-[10px] text-text-secondary hover:text-accent underline"
+                    >
+                      إزالة
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleApplyCoupon(); } }}
+                      placeholder="رمز الكوبون"
+                      className="flex-grow min-w-0 bg-background-primary border border-brand-border px-3 py-2 text-xs font-sans text-text-primary placeholder:text-text-secondary outline-none focus:border-accent transition-colors uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading}
+                      className="bg-text-primary text-background-secondary px-4 text-xs font-sans font-bold hover:bg-accent transition-colors disabled:opacity-50 shrink-0"
+                    >
+                      {couponLoading ? "..." : "تطبيق"}
+                    </button>
+                  </div>
+                )}
+                {couponError && <span className="text-[10px] text-red-500 font-sans">{couponError}</span>}
+              </div>
+
               {/* Cost Calculations */}
               <div className="flex flex-col gap-3 text-xs font-sans text-text-secondary border-b border-brand-border pb-4">
                 <div className="flex justify-between">
                   <span>المجموع الفرعي:</span>
                   <span className="font-display">{(cartSubtotal).toLocaleString()} ج.م</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-accent">
+                    <span>الخصم{appliedCoupon ? ` (${appliedCoupon.code})` : ""}:</span>
+                    <span className="font-display">- {discount.toLocaleString()} ج.م</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>التعبئة والعلبة الحصرية:</span>
                   <span>مجانًا</span>
@@ -498,7 +632,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between items-center text-sm font-bold text-text-primary">
                 <span className="font-sans">المجموع الإجمالي:</span>
-                <span className="font-display text-lg text-accent">{(cartSubtotal).toLocaleString()} ج.م</span>
+                <span className="font-display text-lg text-accent">{(cartTotal).toLocaleString()} ج.م</span>
               </div>
             </aside>
           )}

@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Alexandria, El_Messiri, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import dynamic from "next/dynamic";
 import { StoreProvider } from "@/context/StoreContext";
 import { NotificationProvider } from "@/context/NotificationContext";
-import Navbar from "@/components/layout/Navbar";
-import WhatsAppButton from "@/components/ui/WhatsAppButton";
-
-const Footer = dynamic(() => import("@/components/layout/Footer"), { ssr: true });
-import ScrollToTop from "@/components/ui/ScrollToTopClient";
+import { StorefrontLayoutWrapper } from "@/components/layout/StorefrontLayoutWrapper";
 import ScrollProgressClient from "@/components/ui/ScrollProgressClient";
 
 const inter = Inter({
@@ -39,7 +34,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aura-fashion-virid.vercel.app"),
+  metadataBase: new URL("https://aura-brand-virid.vercel.app"),
   title: "AURA | دار الأزياء المصرية الراقية",
   description: "أورا - دار أزياء نسائية مصرية فاخرة تقدم مفهومًا متطورًا للأناقة والأنوثة العصرية بأيدي حرفية متقنة وتفاصيل فريدة.",
   keywords: ["AURA", "أورا", "أزياء نسائية", "كوتور", "ملابس فاخرة", "أزياء مصرية"],
@@ -51,7 +46,7 @@ export const metadata: Metadata = {
     siteName: "AURA",
     images: [
       {
-        url: "/aura_hero_campaign.png",
+        url: "/aura_thumbnail.png",
         width: 1200,
         height: 630,
         alt: "AURA Luxury Campaign",
@@ -65,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AURA | دار الأزياء المصرية الراقية",
     description: "تجسيد الفخامة والأناقة الهادئة بتصاميم عصرية.",
-    images: ["/aura_hero_campaign.png"],
+    images: ["/aura_thumbnail.png"],
   },
   icons: {
     icon: "/logo.svg",
@@ -82,6 +77,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
+      suppressHydrationWarning
       className={`${inter.variable} ${alexandria.variable} ${elMessiri.variable} ${playfairDisplay.variable} h-full antialiased overflow-x-hidden`}
     >
       <body className="min-h-full flex flex-col bg-background-primary text-text-primary selection:bg-accent selection:text-background-secondary overflow-x-hidden w-full">
@@ -143,11 +139,9 @@ export default function RootLayout({
         <NotificationProvider>
           <StoreProvider>
             <ScrollProgressClient />
-            <Navbar />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <WhatsAppButton />
-            <ScrollToTop />
+            <StorefrontLayoutWrapper>
+              {children}
+            </StorefrontLayoutWrapper>
           </StoreProvider>
         </NotificationProvider>
       </body>

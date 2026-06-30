@@ -4,15 +4,27 @@ export interface ProductColorVariant {
   images: string[];
 }
 
-export interface Product {
+export type ProductStockStatus = "in_stock" | "low_stock" | "out_of_stock";
+
+/**
+ * Authoring-seed shape (flat). This is NOT the runtime product model — it exists
+ * only so the catalog seed below can be written in the storefront's original
+ * format. The single canonical `Product` interface lives in
+ * `src/data/mock/products.ts`; `seedToProduct` maps this shape onto it once.
+ */
+export interface StorefrontSeedInput {
   id: string;
   title: string;
   price: number;
+  /** Pre-discount price. When set and greater than `price`, the card shows a discount badge and a struck-through original price. */
+  originalPrice?: number;
   image: string;
   hoverImage?: string;
   collection: string;
   season: "summer" | "winter";
   badge?: string;
+  /** Defaults to "in_stock" when omitted. */
+  stockStatus?: ProductStockStatus;
   description: string;
   details: string[];
   fabric: string;
@@ -22,11 +34,19 @@ export interface Product {
   variants?: ProductColorVariant[];
 }
 
-export const mockProducts: Product[] = [
+/**
+ * Authoring seed for the unified product catalog. This is NOT a live catalog and
+ * must NOT be imported by storefront pages/components — they read the single
+ * source of truth via `src/lib/services/storefront/storefront-product.service.ts`.
+ * Only `src/data/mock/products.ts` consumes this seed (once, at catalog init) to
+ * build the canonical rich `Product[]`.
+ */
+export const storefrontSeed: StorefrontSeedInput[] = [
   {
     "id": "1",
     "title": "تيشيرت AURA من القطن العضوي الفاخر — صيف ٢٠٢٧",
     "price": 1200,
+    "originalPrice": 1450,
     "image": "/images/campaign/campaign_2.png",
     "hoverImage": "/images/campaign/campaign_5.png",
     "collection": "بلوزات",
@@ -143,6 +163,7 @@ export const mockProducts: Product[] = [
     "id": "3",
     "title": "تيشيرت واسع الأكمام من القطن المصري — صيف ٢٠٢٧",
     "price": 1250,
+    "originalPrice": 1550,
     "image": "/images/campaign/campaign_4.png",
     "hoverImage": "/images/products/product_evening_gown.png",
     "collection": "بلوزات",
@@ -259,6 +280,7 @@ export const mockProducts: Product[] = [
     "id": "5",
     "title": "قميص Linen الكلاسيكي الفضفاض — صيف ٢٠٢٧",
     "price": 1850,
+    "stockStatus": "low_stock",
     "image": "/images/flatlay/flatlay_2.png",
     "hoverImage": "/images/campaign/campaign_1.png",
     "collection": "قمصان",
@@ -375,6 +397,7 @@ export const mockProducts: Product[] = [
     "id": "7",
     "title": "قميص قطن إيطالي بياقة كلاسيكية واسعة — صيف ٢٠٢٧",
     "price": 1750,
+    "originalPrice": 2050,
     "image": "/images/products/product_linen_set.png",
     "hoverImage": "/images/products/product_silk_blouse.png",
     "collection": "قمصان",
@@ -491,6 +514,7 @@ export const mockProducts: Product[] = [
     "id": "9",
     "title": "بلوزة Celeste من الحرير الطبيعي الملوكي — صيف ٢٠٢٧",
     "price": 2400,
+    "stockStatus": "out_of_stock",
     "image": "/images/campaign/campaign_2.png",
     "hoverImage": "/images/campaign/campaign_5.png",
     "collection": "بلوزات",

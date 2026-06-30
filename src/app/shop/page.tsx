@@ -3,47 +3,49 @@
 import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/ui/Card";
-import { mockProducts } from "@/data/products";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
+import { IconSearch as Search, IconAdjustmentsHorizontal as SlidersHorizontal, IconChevronRight, IconChevronLeft } from "@tabler/icons-react";
 import CollectionHero from "@/components/ui/CollectionHero";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 function ShopContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
-  
+  const products = useStorefrontProducts();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("الكل");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(true);
+  const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc">("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const categories = ["الكل", "مجموعة المساء الكوتور", "أطقم قطعتين", "أطقم", "بلوزات", "فساتين كاجوال", "قمصان", "بنطلونات", "أزياء الشتاء", "أزياء الصيف"];
+  const categories = ["الكل", "أزياء الشتاء", "أزياء الصيف"];
   const sizes = ["XS", "S", "M", "L", "XL"];
+  const PAGE_SIZE = 12;
 
   useEffect(() => {
-    if (categoryParam === "sets") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedCategory("أطقم");
-    } else if (categoryParam === "dresses") {
-      setSelectedCategory("مجموعة المساء الكوتور");
-    } else if (categoryParam === "linen") {
-      setSelectedCategory("أطقم قطعتين");
+    if (categoryParam === "winter") {
+      setSelectedCategory("أزياء الشتاء");
+    } else if (categoryParam === "summer") {
+      setSelectedCategory("أزياء الصيف");
+    } else {
+      setSelectedCategory("الكل");
     }
   }, [categoryParam]);
 
   // Filter items dynamically
   const filteredProducts = useMemo(() => {
-    return mockProducts.filter((product) => {
+    return products.filter((product) => {
       // Search matching
       const matchesSearch =
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.collection.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesCategory =
         selectedCategory === "الكل" ||
-        product.collection === selectedCategory ||
-        (selectedCategory === "أطقم" && product.collection === "أطقم قطعتين") ||
         (selectedCategory === "أزياء الصيف" && product.season === "summer") ||
         (selectedCategory === "أزياء الشتاء" && product.season === "winter");
       
@@ -57,26 +59,52 @@ function ShopContent() {
 
       return matchesSearch && matchesCategory && matchesPrice && matchesSize;
     });
-  }, [searchQuery, selectedCategory, priceRange, selectedSizes]);
+  }, [products, searchQuery, selectedCategory, priceRange, selectedSizes]);
+
+  const sortedProducts = useMemo(() => {
+    if (sortBy === "price_asc") {
+      return [...filteredProducts].sort((a, b) => a.price - b.price);
+    }
+    if (sortBy === "price_desc") {
+      return [...filteredProducts].sort((a, b) => b.price - a.price);
+    }
+    // "newest" — mock catalog order is already newest-first
+    return filteredProducts;
+  }, [filteredProducts, sortBy]);
+
+  const pageCount = Math.max(1, Math.ceil(sortedProducts.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, priceRange, selectedSizes, sortBy]);
+
+  useEffect(() => {
+    if (currentPage > pageCount) setCurrentPage(pageCount);
+  }, [currentPage, pageCount]);
+
+  const paginatedProducts = sortedProducts.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <div className="bg-background-primary min-h-screen flex flex-col items-center w-full">
       
       {/* Dynamic Hero Section */}
-      {selectedCategory === "أطقم" ? (
+      {selectedCategory === "أزياء الشتاء" ? (
         <div className="w-full">
           <CollectionHero
-            title="مجموعة الأطقم"
-            description="أطقم راقية مصممة لتوفر لكِ إطلالة متكاملة بجهد أقل. خامات طبيعية وتصاميم هندسية دقيقة."
-            imageSrc="/images/products/product_linen_set.png"
+            title="تشكيلة الشتاء الفاخرة"
+            description="دفء وأناقة في تصاميم شتوية راقية تعكس فخامة دار أورا."
+            imageSrc="/images/campaign/campaign_3.png"
           />
         </div>
-      ) : selectedCategory === "مجموعة المساء الكوتور" ? (
+      ) : selectedCategory === "أزياء الصيف" ? (
         <div className="w-full">
           <CollectionHero
-            title="فساتين السهرة الكوتور"
-            description="فساتين صُممت لتعكس فخامة دار أورا الراقية، منسوجة من الحرير الطبيعي الخالص."
-            imageSrc="/images/products/product_evening_gown.png"
+            title="أزياء الصيف المنعشة"
+            description="تصاميم صيفية حصرية بأقمشة مسامية خفيفة تمنحكِ الراحة والتميز."
+            imageSrc="/images/campaign/campaign_2.png"
           />
         </div>
       ) : (
@@ -104,7 +132,7 @@ function ShopContent() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 font-sans text-xs transition-colors shrink-0 ${
+              className={`px-4 py-1.5 font-sans text-xs transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary ${
                 selectedCategory === cat
                   ? "text-accent border-b-2 border-accent font-semibold"
                   : "text-text-secondary hover:text-text-primary"
@@ -116,21 +144,34 @@ function ShopContent() {
         </div>
 
         {/* Search Input & Filter toggle */}
-        <div className="flex items-center gap-4 w-full md:w-auto">
+        <div className="flex items-center flex-wrap gap-3 md:gap-4 w-full md:w-auto">
           <div className="relative flex-grow md:flex-grow-0 w-full md:w-64">
             <input
               type="text"
               placeholder="ابحثي عن الكوتور..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background-secondary text-xs font-sans font-light py-2.5 pl-8 pr-3 border border-brand-border focus:border-accent outline-none"
+              className="w-full bg-background-secondary text-xs font-sans font-light py-2.5 ps-8 pe-3 border border-brand-border focus:border-accent outline-none"
             />
-            <Search className="w-4 h-4 text-text-secondary/50 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-text-secondary/50 absolute start-3 top-1/2 -translate-y-1/2" />
           </div>
+
+          <label className="relative shrink-0">
+            <span className="sr-only">ترتيب حسب</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="appearance-none bg-background-secondary text-xs font-sans text-text-secondary border border-brand-border py-2.5 ps-3 pe-8 outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+            >
+              <option value="newest">الأحدث</option>
+              <option value="price_asc">السعر: من الأقل للأعلى</option>
+              <option value="price_desc">السعر: من الأعلى للأقل</option>
+            </select>
+          </label>
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-brand-border text-xs font-sans text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors shrink-0 bg-background-secondary"
+            className="flex items-center gap-2 px-4 py-2 border border-brand-border text-xs font-sans text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors shrink-0 bg-background-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>تصفية</span>
@@ -215,7 +256,7 @@ function ShopContent() {
                   setSearchQuery("");
                   setSelectedSizes([]);
                 }}
-                className="w-full py-2.5 border border-accent text-[10px] uppercase text-accent hover:bg-accent hover:text-background-secondary transition-colors font-sans font-bold text-center mt-2"
+                className="w-full py-2.5 border border-accent text-[10px] uppercase text-accent hover:bg-accent hover:text-background-secondary transition-colors font-sans font-bold text-center mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
               >
                 إعادة ضبط الفلاتر
               </button>
@@ -225,32 +266,83 @@ function ShopContent() {
 
           {/* Product grid - Spacers/Layout consistent */}
           <div className="flex-grow w-full">
-            {filteredProducts.length === 0 ? (
+            {sortedProducts.length === 0 ? (
               <div className="text-center py-20 bg-background-secondary border border-brand-border">
                 <p className="font-sans text-lg font-light text-text-primary">لا توجد قطع تتطابق مع الفلاتر المحددة</p>
                 <p className="text-xs text-text-secondary font-sans font-light mt-1">تأكدي من تغيير شروط البحث أو التهيئة</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                {/* Loop products */}
-                {filteredProducts.map((product) => {
-                  return (
-                    <div key={product.id} className="col-span-1">
-                      <ProductCard
-                        id={product.id}
-                        title={product.title}
-                        price={product.price}
-                        image={product.image}
-                        hoverImage={product.hoverImage}
-                        collection={product.collection}
-                        variants={product.variants}
-                      />
-                    </div>
-                  );
-                })}
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <p className="font-sans text-xs text-text-secondary">
+                    {sortedProducts.length.toLocaleString()} قطعة
+                  </p>
+                </div>
 
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {/* Loop products */}
+                  {paginatedProducts.map((product, index) => {
+                    return (
+                      <div key={product.id} className="col-span-1">
+                        <ProductCard
+                          id={product.id}
+                          title={product.name}
+                          price={product.price}
+                          originalPrice={discountOriginalPrice(product)}
+                          image={primaryImage(product)}
+                          hoverImage={product.hoverImage}
+                          collection={product.collection}
+                          variants={product.colorVariants}
+                          badge={product.badge}
+                          stockStatus={resolveStockStatus(product)}
+                          index={index}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {pageCount > 1 && (
+                  <nav
+                    aria-label="تصفح صفحات المنتجات"
+                    className="flex items-center justify-center gap-2 mt-12 pt-8 border-t border-brand-border/60"
+                  >
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      aria-label="الصفحة السابقة"
+                      className="flex items-center justify-center w-9 h-9 border border-brand-border text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      <IconChevronRight className="w-4 h-4" />
+                    </button>
+
+                    {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setCurrentPage(p)}
+                        aria-current={p === currentPage ? "page" : undefined}
+                        className={`min-w-[36px] h-9 px-2 text-xs font-sans transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                          p === currentPage
+                            ? "bg-text-primary text-background-secondary font-semibold"
+                            : "border border-brand-border text-text-secondary hover:text-text-primary hover:border-text-primary"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
+                      disabled={currentPage === pageCount}
+                      aria-label="الصفحة التالية"
+                      className="flex items-center justify-center w-9 h-9 border border-brand-border text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      <IconChevronLeft className="w-4 h-4" />
+                    </button>
+                  </nav>
+                )}
+              </>
             )}
           </div>
 

@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Search, Heart, ShoppingBag, User, Menu, X,
-  Home, Compass, Star, Package, RotateCcw,
-  CreditCard, MessageCircle, HelpCircle,
-  MapPin, Phone, Mail, Truck, Check,
-  ChevronDown, ChevronUp, ArrowLeft, ArrowRight,
-  Sparkles,
-} from "lucide-react";
-import type { LucideProps } from "lucide-react";
+  IconHeart,
+  IconShoppingBag,
+  IconStar,
+} from "@tabler/icons-react";
+
+// Minimal prop type compatible with both tabler and any SVG icon component
+type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
 
 /* ─────────────────────────────────────────────────
    ICON COLOR THEMES — luxury fashion palette
@@ -62,12 +61,12 @@ const sizeMap: Record<IconSize, { icon: number; stroke: string; touch: string }>
 ───────────────────────────────────────────────── */
 export type IconAnimation =
   | "none"
-  | "lift"        // float up on hover
-  | "scale"       // gentle scale on hover
-  | "pulse"       // subtle pulse
-  | "bounce"      // quick bounce
-  | "spin"        // rotate on hover
-  | "wiggle";     // gentle wiggle
+  | "lift"
+  | "scale"
+  | "pulse"
+  | "bounce"
+  | "spin"
+  | "wiggle";
 
 const animationVariants: Record<IconAnimation, object> = {
   none:    {},
@@ -81,10 +80,9 @@ const animationVariants: Record<IconAnimation, object> = {
 
 /* ─────────────────────────────────────────────────
    BASE ANIMATED ICON
-   Wraps any lucide icon with motion + styling
 ───────────────────────────────────────────────── */
 interface AnimatedIconProps {
-  icon: React.ComponentType<LucideProps>;
+  icon: IconComponent;
   size?: IconSize;
   variant?: IconVariant;
   animation?: IconAnimation;
@@ -92,7 +90,7 @@ interface AnimatedIconProps {
   "aria-label"?: string;
   onClick?: () => void;
   badge?: number;
-  asTouchTarget?: boolean; // wraps in a min-44px touch target div
+  asTouchTarget?: boolean;
 }
 
 export function AnimatedIcon({
@@ -108,7 +106,6 @@ export function AnimatedIcon({
   const { icon: px, stroke, touch } = sizeMap[size];
   const colorClass = variantStyles[variant];
   const hoverClass = hoverVariantStyles[variant];
-
   const motionProps = animationVariants[animation];
 
   const iconEl = (
@@ -143,7 +140,6 @@ export function AnimatedIcon({
 
 /* ─────────────────────────────────────────────────
    ANIMATED HEART (WISHLIST)
-   Smooth fill animation on toggle
 ───────────────────────────────────────────────── */
 interface AnimatedHeartProps {
   active?: boolean;
@@ -161,17 +157,17 @@ export function AnimatedHeart({ active = false, size = "md", onClick, className 
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.88 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      className={`inline-flex items-center justify-center focus:outline-none ${className}`}
+      className={`inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary rounded-full ${className}`}
       aria-label={active ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
     >
       <motion.div
         animate={{ scale: active ? [1, 1.3, 1] : 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        <Heart
+        <IconHeart
           style={{ width: px, height: px }}
-          fill={active ? "#C5A880" : "none"}
-          className={`${stroke} transition-colors duration-300 ${active ? "text-[#C5A880]" : "text-text-secondary hover:text-[#C5A880]"}`}
+          fill={active ? "var(--color-accent)" : "none"}
+          className={`${stroke} transition-colors duration-300 ${active ? "text-accent" : "text-text-secondary hover:text-accent"}`}
         />
       </motion.div>
     </motion.button>
@@ -180,7 +176,6 @@ export function AnimatedHeart({ active = false, size = "md", onClick, className 
 
 /* ─────────────────────────────────────────────────
    ANIMATED CART ICON
-   Bounce when item added (via key change)
 ───────────────────────────────────────────────── */
 interface AnimatedCartProps {
   count?: number;
@@ -203,11 +198,11 @@ export function AnimatedCart({ count = 0, size = "md", onClick, variant = "defau
       aria-label={`حقيبة التسوق — ${count} قطع`}
     >
       <motion.div
-        key={count}            /* re-mounts & bounces when count changes */
+        key={count}
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
-        <ShoppingBag
+        <IconShoppingBag
           style={{ width: px, height: px }}
           className={stroke}
           aria-hidden="true"
@@ -230,7 +225,6 @@ export function AnimatedCart({ count = 0, size = "md", onClick, variant = "defau
 
 /* ─────────────────────────────────────────────────
    SOCIAL ICON
-   Used in footer — SVG + lift + color transition
 ───────────────────────────────────────────────── */
 interface SocialIconProps {
   children: React.ReactNode;
@@ -258,7 +252,6 @@ export function SocialIconButton({ children, href = "#", label, size = "md" }: S
 
 /* ─────────────────────────────────────────────────
    ANIMATED STAR RATING
-   Used in product cards + reviews page
 ───────────────────────────────────────────────── */
 interface AnimatedStarsProps {
   rating: number;
@@ -290,7 +283,7 @@ export function AnimatedStars({ rating, max = 5, size = 16, interactive = false,
             className={interactive ? "cursor-pointer focus:outline-none" : "cursor-default"}
             aria-label={interactive ? `${star} نجوم` : undefined}
           >
-            <Star
+            <IconStar
               style={{ width: size, height: size }}
               fill={filled ? "currentColor" : "none"}
               className={`transition-colors duration-200 ${filled ? "text-[#C5A880]" : "text-[#E5E0D8]"}`}
@@ -304,10 +297,9 @@ export function AnimatedStars({ rating, max = 5, size = 16, interactive = false,
 
 /* ─────────────────────────────────────────────────
    PAGE FEATURE ICON
-   Used in shipping / returns / payment info sections
 ───────────────────────────────────────────────── */
 interface FeatureIconProps {
-  icon: React.ComponentType<LucideProps>;
+  icon: IconComponent;
   label: string;
   description?: string;
 }
@@ -333,16 +325,3 @@ export function FeatureIcon({ icon: Icon, label, description }: FeatureIconProps
     </motion.div>
   );
 }
-
-/* ─────────────────────────────────────────────────
-   ICON EXPORTS — named convenience re-exports
-   So other files can import directly from here
-───────────────────────────────────────────────── */
-export {
-  Search, Heart, ShoppingBag, User, Menu, X,
-  Home, Compass, Star, Package, RotateCcw,
-  CreditCard, MessageCircle, HelpCircle,
-  MapPin, Phone, Mail, Truck, Check,
-  ChevronDown, ChevronUp, ArrowLeft, ArrowRight,
-  Sparkles,
-};

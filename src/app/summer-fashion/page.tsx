@@ -1,40 +1,21 @@
-import { Metadata } from "next";
+"use client";
+
 import CollectionHero from "@/components/ui/CollectionHero";
 import SeasonalProductGrid from "@/components/ui/SeasonalProductGrid";
-import { mockProducts } from "@/data/products";
-
-export const metadata: Metadata = {
-  title: "أزياء الصيف الفاخرة | AURA",
-  description: "اكتشفي مجموعة أورا لأزياء الصيف. تصاميم صيفية تتميز بالخفة، الأنوثة، واللمسات العصرية الراقية.",
-  openGraph: {
-    title: "أزياء الصيف | AURA",
-    description: "اكتشفي مجموعة أورا لأزياء الصيف النسائية الفاخرة.",
-    url: "https://aura-fashion-virid.vercel.app/summer-fashion",
-  },
-  alternates: {
-    canonical: "https://aura-fashion-virid.vercel.app/summer-fashion",
-  },
-};
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { getProductsBySeason } from "@/lib/catalog/storefront-catalog";
 
 export default function SummerFashionPage() {
-  const summerProducts = mockProducts.filter((product) => product.season === "summer");
+  const products = useStorefrontProducts();
+  const summerProducts = getProductsBySeason("summer", products);
 
   return (
-    <div className="bg-background-primary min-h-screen">
+    <div className="bg-background-primary min-h-screen flex flex-col items-center w-full">
       <CollectionHero
-        title="أزياء الصيف"
-        description="استقبلي نسيم الصيف بتصاميم تجمع بين الخفة والأنوثة. قطع مصممة بعناية من القطن والكتان والحرير لتمنحكِ شعوراً بالانتعاش والحرية في كل خطوة."
+        title="أزياء الصيف المنعشة"
+        description="تصاميم صيفية حصرية بأقمشة مسامية خفيفة تمنحكِ الراحة والتميز في أيام الصيف المشرقة."
         imageSrc="/images/campaign/campaign_2.png"
-        ctaText="تسوقي الآن"
       />
-      
-      <div className="py-8 md:py-16 text-center max-w-[800px] mx-auto px-6">
-        <h2 className="font-serif text-3xl md:text-4xl font-light text-text-primary mb-6">تألقي بروح الصيف</h2>
-        <p className="font-sans text-sm font-light text-text-secondary leading-relaxed">
-          تشكيلة صيفية مفعمة بالحيوية والنعومة، تناسب أوقات النهار المنعشة وسهرات الصيف الراقية.
-        </p>
-      </div>
-
       <SeasonalProductGrid products={summerProducts} />
     </div>
   );

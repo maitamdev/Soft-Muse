@@ -1,6 +1,9 @@
 import { Metadata } from "next";
-import { mockProducts } from "@/data/products";
+import { Suspense } from "react";
+import { getPublishedProductById } from "@/lib/catalog/storefront-catalog";
+import { primaryImage, resolveStockStatus } from "@/data/mock/products";
 import ProductDetailClient from "@/components/product/ProductDetailClient";
+import { ProductDetailSkeleton } from "@/components/ui/Skeleton";
 import { notFound } from "next/navigation";
 
 interface PageProps {
@@ -9,7 +12,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const product = mockProducts.find((p) => p.id === resolvedParams.id);
+  const product = getPublishedProductById(resolvedParams.id);
 
   if (!product) {
     return {
@@ -19,28 +22,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${product.title} | ${product.collection} - AURA`,
+    title: `${product.name} | ${product.collection} - AURA`,
     description: product.description.substring(0, 160),
     openGraph: {
-      title: `${product.title} | AURA`,
+      title: `${product.name} | AURA`,
       description: product.description.substring(0, 160),
       url: `https://aura-fashion-virid.vercel.app/product/${product.id}`,
       siteName: "AURA",
       images: [
         {
-          url: product.image,
+          url: primaryImage(product),
           width: 800,
           height: 1000,
-          alt: product.title,
+          alt: product.name,
         },
       ],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${product.title} | AURA`,
+      title: `${product.name} | AURA`,
       description: product.description.substring(0, 160),
-      images: [product.image],
+      images: [primaryImage(product)],
     },
     alternates: {
       canonical: `https://aura-fashion-virid.vercel.app/product/${product.id}`,
@@ -50,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const product = mockProducts.find((p) => p.id === resolvedParams.id);
+  const product = getPublishedProductById(resolvedParams.id);
 
   if (!product) {
     return notFound();
@@ -60,11 +63,11 @@ export default async function ProductPage({ params }: PageProps) {
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": product.title,
+    "name": product.name,
     "image": [
-      product.image,
+      primaryImage(product),
       product.hoverImage,
-      ...(product.variants?.flatMap(v => v.images) || [])
+      ...(product.colorVariants?.flatMap(v => v.images) || [])
     ].filter(Boolean),
     "description": product.description,
     "brand": {
@@ -76,7 +79,10 @@ export default async function ProductPage({ params }: PageProps) {
       "url": `https://aura-fashion-virid.vercel.app/product/${product.id}`,
       "priceCurrency": "EGP",
       "price": product.price,
-      "availability": "https://schema.org/InStock",
+      "availability":
+        resolveStockStatus(product) === "out_of_stock"
+          ? "https://schema.org/OutOfStock"
+          : "https://schema.org/InStock",
       "itemCondition": "https://schema.org/NewCondition"
     },
     "aggregateRating": {
@@ -86,13 +92,44 @@ export default async function ProductPage({ params }: PageProps) {
     }
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "الرئيسية",
+        "item": "https://aura-fashion-virid.vercel.app/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "المتجر",
+        "item": "https://aura-fashion-virid.vercel.app/shop"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.name,
+        "item": `https://aura-fashion-virid.vercel.app/product/${product.id}`
+      }
+    ]
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
-      <ProductDetailClient params={params} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <Suspense fallback={<ProductDetailSkeleton />}>
+        <ProductDetailClient params={params} />
+      </Suspense>
     </>
   );
 }

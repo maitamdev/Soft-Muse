@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { ProductCard } from "@/components/ui/Card";
-import { Heart } from "lucide-react";
+import { IconHeart as Heart } from "@tabler/icons-react";
 import Button from "@/components/ui/Button";
 
 export default function WishlistPage() {
@@ -42,7 +42,7 @@ export default function WishlistPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {wishlist.map((item) => (
+            {wishlist.map((item, index) => (
               <ProductCard
                 key={item.id}
                 id={item.id}
@@ -50,6 +50,7 @@ export default function WishlistPage() {
                 price={item.price}
                 image={item.image}
                 collection={item.collection}
+                index={index}
               />
             ))}
           </div>

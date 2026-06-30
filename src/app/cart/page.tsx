@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useStore } from "@/context/StoreContext";
-import { ShoppingBag, Plus, Minus, X } from "lucide-react";
+import { IconShoppingBag as ShoppingBag, IconPlus as Plus, IconMinus as Minus, IconX as X } from "@tabler/icons-react";
 import Button from "@/components/ui/Button";
 
 export default function CartPage() {
@@ -79,7 +79,7 @@ export default function CartPage() {
                       <div className="flex items-center border border-brand-border bg-background-primary">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}
-                          className="p-2 text-text-secondary hover:text-text-primary"
+                          className="p-2 text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                           aria-label="تقليل الكمية"
                         >
                           <Minus className="w-3.5 h-3.5" />
@@ -89,7 +89,7 @@ export default function CartPage() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
-                          className="p-2 text-text-secondary hover:text-text-primary"
+                          className="p-2 text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                           aria-label="زيادة الكمية"
                         >
                           <Plus className="w-3.5 h-3.5" />

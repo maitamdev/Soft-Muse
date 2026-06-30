@@ -14,7 +14,7 @@ export function useRecentlyViewed() {
       const stored = localStorage.getItem(RECENTLY_VIEWED_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+         
         setViewedIds(parsed);
       }
     } catch (error) {

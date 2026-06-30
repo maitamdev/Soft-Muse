@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "lucide-react";
+import { IconArrowUp } from "@tabler/icons-react";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
@@ -89,7 +89,7 @@ export default function ScrollToTop() {
             transition={{ duration: 0.3 }}
             className="relative z-10 flex items-center justify-center"
           >
-            <ArrowUp
+            <IconArrowUp
               className="w-[15px] h-[15px] md:w-4 md:h-4 text-[#4A3728] stroke-[1.75]"
               aria-hidden="true"
             />

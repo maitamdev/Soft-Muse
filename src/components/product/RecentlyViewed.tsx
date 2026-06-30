@@ -2,18 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ui/Card";
-import { mockProducts } from "@/data/products";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
 import { motion } from "framer-motion";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export default function RecentlyViewed() {
   const { viewedIds } = useRecentlyViewed();
+  const products = useStorefrontProducts();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setMounted(true);
     }
     return () => { isMounted = false; };
@@ -24,7 +26,7 @@ export default function RecentlyViewed() {
 
   // Map IDs to actual products, filtering out any that might have been deleted
   const viewedProducts = viewedIds
-    .map(id => mockProducts.find(p => p.id === id))
+    .map(id => products.find(p => p.id === id))
     .filter(Boolean); // removes undefined
 
   if (viewedProducts.length === 0) return null;
@@ -55,15 +57,19 @@ export default function RecentlyViewed() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex overflow-x-auto md:grid md:grid-cols-4 gap-6 pb-8 md:pb-0 hide-scrollbar"
         >
-          {viewedProducts.map((product) => product && (
+          {viewedProducts.map((product, index) => product && (
             <div key={product.id} className="min-w-[260px] md:min-w-0 flex-shrink-0">
               <ProductCard
                 id={product.id}
-                title={product.title}
+                title={product.name}
                 price={product.price}
-                image={product.image}
+                originalPrice={discountOriginalPrice(product)}
+                image={primaryImage(product)}
                 hoverImage={product.hoverImage}
                 collection={product.collection}
+                badge={product.badge}
+                stockStatus={resolveStockStatus(product)}
+                index={index}
               />
             </div>
           ))}

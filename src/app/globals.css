@@ -14,6 +14,7 @@
   --color-text-primary: #1C1C1B; /* Graphite / Black */
   --color-text-secondary: #5C5A56; /* Charcoal / Muted Grey */
   --color-accent: #C5A880; /* Muted Gold */
+  --color-accent-dark: #8E6B4B; /* Deep Bronze — selected/emphasis states */
   --color-brand-border: #E5E0D8;
 }
 

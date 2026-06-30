@@ -1,75 +1,20 @@
 "use client";
 
-// Note: Metadata exported from a server component wrapper (page.tsx imports this client component)
-// For client pages, metadata is handled in the layout. Here we export client component directly.
-
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { RatingStars, ReviewCard, fadeUp } from "@/components/ui/PageComponents";
 import { AnimatedStars } from "@/components/ui/AnimatedIcon";
 import { useNotification } from "@/context/NotificationContext";
+import { scrollFadeUp, scrollFadeIn, scrollScaleIn, revealTransition, scrollViewport } from "@/lib/animations";
+import { ReviewService } from "@/lib/services/review.service";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
 
-/* ── Mock reviews data ── */
-const reviews = [
-  {
-    name: "نورة الشمري",
-    initials: "ن.ش",
-    rating: 5,
-    text: "فستان الكريب الأسود فاق توقعاتي بمراحل. الخياطة دقيقة للغاية والقماش ثقيل ومريح بنفس الوقت. شعرت وكأنني أرتدي تحفة فنية حقيقية. التغليف الفاخر جعل لحظة فتح الصندوق تجربة لا تُنسى.",
-    product: "فستان الكريب المسائي",
-    date: "مايو ٢٠٢٦",
-  },
-  {
-    name: "منى عبد العزيز",
-    initials: "م.ع",
-    rating: 5,
-    text: "طقم الكتان بلون الرمال من أجمل ما اقتنيته في خزانتي. البساطة التي تجعلكِ تبدين متميزة في كل مناسبة. فريق أورا تواصل معي لتأكيد المقاس وهذه اللفتة الصغيرة قالت الكثير عن اهتمامهم بالتفاصيل.",
-    product: "طقم كتان رمل",
-    date: "أبريل ٢٠٢٦",
-  },
-  {
-    name: "سارة العمراني",
-    initials: "س.ع",
-    rating: 5,
-    text: "من أولى مرة أسمع عن أورا كنت متشككة، لكن بعد أول تجربة أصبحت من أكثر المعجبين بالعلامة. الجودة ممتازة والتوصيل كان أسرع مما توقعت. أنصح كل سيدة تبحث عن أناقة حقيقية.",
-    product: "بلوزة حرير",
-    date: "أبريل ٢٠٢٦",
-  },
-  {
-    name: "هند المصري",
-    initials: "ه.م",
-    rating: 5,
-    text: "اشتريت فستان السهرة لحفل زفاف وتلقيت مئات الإطراءات طوال الليلة. الجميع كان يسأل من أين الفستان. أورا استطاعت أن تجمع بين الأناقة الشرقية والطراز العصري بشكل رائع.",
-    product: "فستان سهرة حريري",
-    date: "مارس ٢٠٢٦",
-  },
-  {
-    name: "ريم الأنصاري",
-    initials: "ر.أ",
-    rating: 5,
-    text: "خدمة العملاء استثنائية وفريق الأتيلييه محترف جداً. أرسلوا لي فيديو لمرحلة الخياطة وكأنهم يريدونني أن أعيش التجربة من أولها. منتج راقٍ بكل المقاييس.",
-    product: "عباءة كتان",
-    date: "مارس ٢٠٢٦",
-  },
-  {
-    name: "لمى الحربي",
-    initials: "ل.ح",
-    rating: 5,
-    text: "بالنسبة للسعر تجدين جودة تفوق العلامات التجارية العالمية بكثير. كل خيط وكل تفصيلة تشعرين أنها صُنعت بحب وعناية. أورا مفخرة للصناعة المصرية.",
-    product: "تشكيلة الكوتور الجديدة",
-    date: "فبراير ٢٠٢٦",
-  },
-];
-
-/* ── Rating summary calculation ── */
-const totalReviews = reviews.length;
-const avgRating = +(reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1);
-const ratingDist = [5, 4, 3, 2, 1].map((star) => ({
-  star,
-  count: reviews.filter((r) => r.rating === star).length,
-  pct: Math.round((reviews.filter((r) => r.rating === star).length / totalReviews) * 100),
-}));
+const ARABIC_MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+const toArabicDigits = (n: number) => n.toString().replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[+d]);
+const formatArabicDate = (date: Date) => `${ARABIC_MONTHS[date.getMonth()]} ${toArabicDigits(date.getFullYear())}`;
+const initialsFromName = (name: string) =>
+  name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join(".") + ".";
 
 /* ── Rating bar ── */
 function RatingBar({ star, pct, count }: { star: number; pct: number; count: number }) {
@@ -82,7 +27,7 @@ function RatingBar({ star, pct, count }: { star: number; pct: number; count: num
           initial={{ width: 0 }}
           whileInView={{ width: `${pct}%` }}
           viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={revealTransition(0.2)}
           className="h-full bg-accent rounded-full"
         />
       </div>
@@ -91,16 +36,92 @@ function RatingBar({ star, pct, count }: { star: number; pct: number; count: num
   );
 }
 
+type DisplayReview = {
+  id: string;
+  name: string;
+  initials: string;
+  rating: number;
+  text: string;
+  product?: string;
+  date: string;
+  adminReply?: string;
+  verifiedPurchase?: boolean;
+};
+
 export default function ReviewsPage() {
   const { showNotification } = useNotification();
-  const [name, setName]   = useState("");
+  const [name, setName] = useState("");
+  const [productName, setProductName] = useState("");
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(5);
+  const [reviews, setReviews] = useState<DisplayReview[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const loadReviews = async () => {
+    try {
+      const data = await ReviewService.getReviews({ status: 'approved' });
+      const sorted = [...data].sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      setReviews(sorted.map(r => ({
+        id: r.id,
+        name: r.customerName,
+        initials: initialsFromName(r.customerName),
+        rating: r.rating,
+        text: r.content,
+        product: r.productName || undefined,
+        date: formatArabicDate(new Date(r.createdAt)),
+        adminReply: r.adminReply ?? undefined,
+        verifiedPurchase: r.verifiedPurchase,
+      })));
+    } catch {
+      // silently fail — empty state shown
+    }
+  };
+
+  useEffect(() => { loadReviews(); }, []);
+  useEventSubscribeMany(['reviews.changed', 'review.approved'], loadReviews);
+
+  const totalReviews = reviews.length;
+  const avgRating = totalReviews > 0 ? +(reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1) : 5.0;
+  const ratingDist = useMemo(
+    () =>
+      [5, 4, 3, 2, 1].map((star) => ({
+        star,
+        count: reviews.filter((r) => r.rating === star).length,
+        pct: totalReviews > 0 ? Math.round((reviews.filter((r) => r.rating === star).length / totalReviews) * 100) : 0,
+      })),
+    [reviews, totalReviews]
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showNotification("شكراً لمشاركتكِ تجربتكِ مع دار أورا! سيتم مراجعة تعليقكِ قريباً.", "success");
-    setName(""); setReview(""); setRating(5);
+    if (!name.trim() || !review.trim()) return;
+    setSubmitting(true);
+    try {
+      await ReviewService.createReview({
+        productId: '',
+        productName: productName.trim(),
+        productImage: '',
+        customerName: name.trim(),
+        customerEmail: '',
+        rating,
+        title: review.trim().slice(0, 80),
+        content: review.trim(),
+        status: 'pending',
+        verifiedPurchase: false,
+      });
+      showNotification("شكراً لمشاركتكِ! سيظهر تقييمكِ بعد المراجعة.", "success");
+      setName(""); setProductName(""); setReview(""); setRating(5);
+    } catch {
+      showNotification("حدث خطأ. يرجى المحاولة مرة أخرى.", "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -148,10 +169,10 @@ export default function ReviewsPage() {
 
           {/* Big number */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            variants={scrollScaleIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollViewport}
             className="flex flex-col items-center md:items-start gap-3 text-center md:text-right"
           >
             <span className="font-serif text-[5rem] md:text-[7rem] font-light text-text-primary leading-none">
@@ -165,10 +186,11 @@ export default function ReviewsPage() {
 
           {/* Bar chart */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+            variants={scrollFadeIn}
+            custom={0.1}
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollViewport}
             className="flex flex-col gap-3 max-w-md w-full"
           >
             {ratingDist.map((d) => (
@@ -200,11 +222,15 @@ export default function ReviewsPage() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-          {reviews.map((r, i) => (
-            <ReviewCard key={i} index={i} {...r} />
-          ))}
-        </div>
+        {reviews.length === 0 ? (
+          <p className="font-sans text-sm font-light text-text-secondary text-center py-12">لا توجد تقييمات منشورة بعد.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {reviews.map((r, i) => (
+              <ReviewCard key={r.id} index={i} {...r} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Separator */}
@@ -220,10 +246,10 @@ export default function ReviewsPage() {
 
           {/* Text */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            variants={scrollFadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollViewport}
             className="flex flex-col gap-4"
           >
             <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-accent font-bold">
@@ -246,10 +272,11 @@ export default function ReviewsPage() {
           {/* Form */}
           <motion.form
             onSubmit={handleSubmit}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+            variants={scrollFadeUp}
+            custom={0.15}
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollViewport}
             className="flex flex-col gap-5 bg-background-secondary border border-brand-border p-7 md:p-8"
           >
             <div className="flex flex-col gap-2">
@@ -282,6 +309,23 @@ export default function ReviewsPage() {
               />
             </div>
 
+            {/* Product name */}
+            <div className="flex flex-col gap-2">
+              <label className="font-sans text-[10px] uppercase tracking-[0.15em] text-accent font-bold">
+                القطعة التي اشتريتِها (اختياري)
+              </label>
+              <input
+                type="text"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                placeholder="مثال: بلوزة حرير كريمي"
+                dir="rtl"
+                className="h-11 border border-brand-border bg-background-primary px-4 text-sm font-sans
+                           text-text-primary outline-none placeholder:text-text-secondary/40
+                           focus:border-accent transition-colors duration-300"
+              />
+            </div>
+
             {/* Review text */}
             <div className="flex flex-col gap-2">
               <label className="font-sans text-[10px] uppercase tracking-[0.15em] text-accent font-bold">
@@ -302,11 +346,15 @@ export default function ReviewsPage() {
 
             <button
               type="submit"
+              disabled={submitting}
               className="h-12 bg-text-primary text-background-secondary font-sans text-xs font-semibold
-                         hover:bg-accent transition-colors duration-500 w-full mt-1"
+                         hover:bg-accent transition-colors duration-500 w-full mt-1 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              إرسال التقييم
+              {submitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
             </button>
+            <p className="font-sans text-[10px] text-text-secondary/60 text-center">
+              سيظهر تقييمكِ بعد مراجعة فريق دار أورا.
+            </p>
           </motion.form>
         </div>
       </section>

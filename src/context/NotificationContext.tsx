@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, CheckCircle, AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { IconX, IconCircleCheck, IconAlertTriangle, IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
 
 type NotificationType = "success" | "error" | "warning" | "info";
 
@@ -48,21 +48,28 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const getIcon = (type: NotificationType) => {
     switch (type) {
       case "success":
-        return <CheckCircle className="w-4 h-4 text-accent" />;
+        return <IconCircleCheck className="w-4 h-4 text-accent" />;
       case "warning":
-        return <AlertTriangle className="w-4 h-4 text-accent" />;
+        return <IconAlertTriangle className="w-4 h-4 text-amber-600" />;
       case "error":
-        return <AlertCircle className="w-4 h-4 text-accent" />;
+        return <IconAlertCircle className="w-4 h-4 text-red-500" />;
       case "info":
       default:
-        return <Info className="w-4 h-4 text-accent" />;
+        return <IconInfoCircle className="w-4 h-4 text-accent" />;
     }
+  };
+
+  const accentBorderClass: Record<NotificationType, string> = {
+    success: "border-r-accent",
+    warning: "border-r-amber-600",
+    error: "border-r-red-500",
+    info: "border-r-accent",
   };
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       {children}
-      
+
       {/* Toast Render Area */}
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[400px] px-6 pointer-events-none">
         <AnimatePresence mode="wait">
@@ -73,7 +80,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto w-full bg-background-secondary border border-brand-border border-r-4 border-r-accent p-4 shadow-sm flex items-start gap-3 text-right"
+              className={`pointer-events-auto w-full bg-background-secondary border border-brand-border border-r-4 ${accentBorderClass[notification.type]} p-4 shadow-sm flex items-start gap-3 text-right`}
               dir="rtl"
             >
               {/* Accent Icon */}
@@ -94,7 +101,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 className="shrink-0 p-0.5 text-text-secondary hover:text-text-primary transition-colors"
                 aria-label="إغلاق الإشعار"
               >
-                <X className="w-3.5 h-3.5 stroke-[1.5]" />
+                <IconX className="w-3.5 h-3.5 stroke-[1.5]" />
               </button>
             </motion.div>
           )}

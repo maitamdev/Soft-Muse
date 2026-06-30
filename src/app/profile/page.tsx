@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { LuxuryInput } from "@/components/ui/Form";
 import Button from "@/components/ui/Button";
-import { User, Package, Settings, Ruler, Check } from "lucide-react";
+import { IconUser as User, IconPackage as Package, IconSettings as Settings, IconRuler as Ruler, IconCheck as Check } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -89,7 +89,7 @@ export default function ProfilePage() {
                   <div className="relative w-12 h-16 shrink-0 bg-background-primary">
                     <Image
                       src="/images/products/product_evening_gown.png"
-                      alt=""
+                      alt="فستان أورا من الحرير بفتحة كتف راقية"
                       fill
                       sizes="48px"
                       className="object-cover"

@@ -1,22 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { motion } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import { IconPlus as Plus, IconMinus as Minus, IconBrandFacebook, IconBrandInstagram } from "@tabler/icons-react";
 import { useNotification } from "@/context/NotificationContext";
 import { SocialIconButton } from "@/components/ui/AnimatedIcon";
+import { FooterService, FooterSettings } from "@/lib/services/storefront/footer.service";
+import { StoreService } from "@/lib/services/storefront/store.service";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
 
 /* ─────────────── Social SVG icons ─────────────── */
 const SocialIcons = {
-  Instagram: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-      <rect x="2" y="2" width="20" height="20" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  ),
+  Facebook: () => <IconBrandFacebook stroke={1.4} className="w-5 h-5" />,
+  Instagram: () => <IconBrandInstagram stroke={1.4} className="w-5 h-5" />,
   TikTok: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
@@ -27,11 +25,7 @@ const SocialIcons = {
       <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
     </svg>
   ),
-  Youtube: () => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-    </svg>
-  ),
+
   WhatsApp: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -39,29 +33,29 @@ const SocialIcons = {
   ),
 };
 
-/* ─────────────── Data ─────────────── */
-const navData = [
+type NavColumnData = { title: string; links: { label: string; href: string }[] };
+type SocialEntry = { Icon: React.FC; label: string; href: string };
+
+const DEFAULT_NAV_DATA: NavColumnData[] = [
   {
     title: "المتجر",
     links: [
-      { label: "التشكيلة الجديدة", href: "/shop?collection=new" },
       { label: "كل المنتجات",       href: "/shop"                 },
-      { label: "الفساتين الكوتور", href: "/shop?category=dresses"},
-      { label: "أطقم الكتان",       href: "/shop?category=linen"  },
+      { label: "أزياء الشتاء",      href: "/shop?category=winter" },
+      { label: "أزياء الصيف",       href: "/shop?category=summer" },
     ],
   },
   {
     title: "دار أورا",
     links: [
       { label: "قصتنا وحرفيتنا",    href: "/about"        },
-      { label: "آراء العملاء",       href: "/reviews"      },
+      { label: "تتبع طلبكِ",        href: "/tracking"     },
       { label: "تواصلي معنا",        href: "/contact"      },
     ],
   },
   {
     title: "خدمتكِ",
     links: [
-      { label: "تتبع طلبكِ",        href: "/tracking"  },
       { label: "الشحن والتوصيل",    href: "/shipping"   },
       { label: "الاستبدال والإرجاع", href: "/returns"    },
       { label: "الشروط والأحكام",   href: "/terms"      },
@@ -70,12 +64,12 @@ const navData = [
   },
 ];
 
-const socials = [
+const DEFAULT_SOCIALS: SocialEntry[] = [
+  { Icon: SocialIcons.Facebook,  label: "Facebook",  href: "https://www.facebook.com/AuraFashionEgypt" },
+  { Icon: SocialIcons.Instagram, label: "Instagram", href: "https://www.instagram.com/aurafashionegy/" },
   { Icon: SocialIcons.WhatsApp,  label: "WhatsApp",  href: "https://wa.me/201000000000?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA%20AURA" },
-  { Icon: SocialIcons.Instagram, label: "Instagram", href: "https://www.instagram.com/aurabrand.eg" },
   { Icon: SocialIcons.TikTok,    label: "TikTok",    href: "https://www.tiktok.com/@aurabrand.eg" },
   { Icon: SocialIcons.Pinterest, label: "Pinterest", href: "https://www.pinterest.com/aurabrandeg" },
-  { Icon: SocialIcons.Youtube,   label: "YouTube",   href: "https://www.youtube.com/@aurabrandeg" },
 ];
 
 /* ─────────────── Reusable animated link ─────────────── */
@@ -87,7 +81,7 @@ function FooterLink({ label, href }: { label: string; href: string }) {
         className="group relative inline-block font-sans text-xs font-light text-text-secondary hover:text-text-primary transition-colors duration-300 leading-relaxed min-h-[36px] md:min-h-0 flex items-center md:inline-flex"
       >
         {label}
-        <span className="absolute bottom-0 right-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-500 ease-out" />
+        <span className="absolute bottom-0 start-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-500 ease-out" />
       </Link>
     </li>
   );
@@ -137,6 +131,60 @@ function NavColumn({ title, links, delay }: { title: string; links: { label: str
 export default function Footer() {
   const { showNotification } = useNotification();
   const [email, setEmail] = useState("");
+  const [navData, setNavData] = useState<NavColumnData[]>(DEFAULT_NAV_DATA);
+  const [socials, setSocials] = useState<SocialEntry[]>(DEFAULT_SOCIALS);
+  const [newsletterTitle, setNewsletterTitle] = useState('صالون أورا البريدي');
+  const [newsletterSubtitle, setNewsletterSubtitle] = useState('دعوات خاصة وتحديثات الأتيلييه');
+  const [copyrightText, setCopyrightText] = useState('© ٢٠٢٦ دار أورا للأزياء الراقية');
+  const [developerCredit, setDeveloperCredit] = useState('صلاح خالد');
+
+  const SOCIAL_ICON_MAP: Record<string, React.FC> = {
+    facebook: SocialIcons.Facebook,
+    instagram: SocialIcons.Instagram,
+    whatsapp: SocialIcons.WhatsApp,
+    tiktok: SocialIcons.TikTok,
+    pinterest: SocialIcons.Pinterest,
+  };
+
+  const loadFooterData = useCallback(async () => {
+    try {
+      const [footerSettings, storeInfo] = await Promise.all([
+        FooterService.getSettings(),
+        StoreService.getInfo(),
+      ]);
+
+      if (footerSettings.columns?.length) {
+        setNavData(footerSettings.columns
+          .sort((a, b) => a.order - b.order)
+          .map(col => ({
+            title: col.title,
+            links: col.links.map(l => ({ label: l.label, href: l.url })),
+          })));
+      }
+
+      if (footerSettings.newsletterTitle) setNewsletterTitle(footerSettings.newsletterTitle);
+      if (footerSettings.newsletterSubtitle) setNewsletterSubtitle(footerSettings.newsletterSubtitle);
+      if (footerSettings.copyrightText) setCopyrightText(footerSettings.copyrightText);
+      if (footerSettings.developerCredit) setDeveloperCredit(footerSettings.developerCredit);
+
+      if (storeInfo?.socialMedia) {
+        const sm = storeInfo.socialMedia;
+        const built: SocialEntry[] = Object.entries(sm)
+          .filter(([key]) => SOCIAL_ICON_MAP[key] && (sm as any)[key])
+          .map(([key, href]) => ({
+            Icon: SOCIAL_ICON_MAP[key],
+            label: key.charAt(0).toUpperCase() + key.slice(1),
+            href: href as string,
+          }));
+        if (built.length) setSocials(built);
+      }
+    } catch {
+      // keep defaults
+    }
+  }, []);
+
+  useEffect(() => { loadFooterData(); }, [loadFooterData]);
+  useEventSubscribeMany(['website.changed'], loadFooterData);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,10 +229,10 @@ export default function Footer() {
             className="flex flex-col gap-3 w-full md:max-w-[380px]"
           >
             <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-accent font-bold">
-              صالون أورا البريدي
+              {newsletterTitle}
             </span>
             <h3 className="font-serif text-lg md:text-xl font-light text-text-primary leading-snug">
-              دعوات خاصة وتحديثات الأتيلييه
+              {newsletterSubtitle}
             </h3>
             <form
               onSubmit={handleSubscribe}
@@ -247,7 +295,7 @@ export default function Footer() {
           {/* Copyright */}
           <div className="flex flex-col items-center md:items-start gap-2.5">
             <div className="flex flex-col sm:flex-row items-center gap-3 text-[10px] font-sans font-light text-text-secondary">
-              <span>© ٢٠٢٦ دار أورا للأزياء الراقية</span>
+              <span>{copyrightText}</span>
               <span className="hidden sm:block text-[#EAE3D9]">|</span>
               <address className="not-italic flex gap-1">
                 <span>صُممت لتُرى —</span>
@@ -263,8 +311,8 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="font-normal text-text-secondary hover:text-accent opacity-90 hover:opacity-100 transition-all duration-300 relative py-0.5 group focus:outline-none focus-visible:ring-1 focus-visible:ring-accent rounded px-1 -mx-1"
               >
-                صلاح خالد
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent group-hover:w-full transition-all duration-300 ease-out motion-reduce:transition-none" />
+                {developerCredit}
+                <span className="absolute bottom-0 end-0 w-0 h-[1px] bg-accent group-hover:w-full transition-all duration-300 ease-out motion-reduce:transition-none" />
               </a>
             </div>
           </div>

@@ -2,16 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { scrollFadeUp as fadeUp } from "@/lib/animations";
 
-/* ── Shared fade-up variant ── */
-export const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, delay, ease: [0.25, 0.1, 0.25, 1] as const },
-  }),
-};
+export { fadeUp };
 
 /* ─────────────────────────────────────────
    LEGAL PAGE LAYOUT
@@ -187,9 +180,11 @@ interface ReviewCardProps {
   date?: string;
   initials: string;
   index?: number;
+  adminReply?: string;
+  verifiedPurchase?: boolean;
 }
 
-export function ReviewCard({ name, rating, text, product, date, initials, index = 0 }: ReviewCardProps) {
+export function ReviewCard({ name, rating, text, product, date, initials, index = 0, adminReply, verifiedPurchase }: ReviewCardProps) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 28 }}
@@ -210,7 +205,14 @@ export function ReviewCard({ name, rating, text, product, date, initials, index 
           </div>
           <div>
             <p className="font-sans text-sm font-medium text-text-primary">{name}</p>
-            {date && <p className="font-sans text-[10px] text-text-secondary/60 mt-0.5">{date}</p>}
+            <div className="flex items-center gap-2 mt-0.5">
+              {date && <p className="font-sans text-[10px] text-text-secondary/60">{date}</p>}
+              {verifiedPurchase && (
+                <span className="font-sans text-[9px] text-[#4A7C59] font-semibold uppercase tracking-wide bg-[#4A7C59]/10 px-1.5 py-0.5 rounded-sm">
+                  مشترٍ موثّق
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <RatingStars rating={rating} size="sm" />
@@ -226,6 +228,18 @@ export function ReviewCard({ name, rating, text, product, date, initials, index 
         <span className="self-start font-sans text-[10px] uppercase tracking-[0.15em] text-accent font-semibold px-3 py-1 border border-accent/30 bg-accent/5">
           {product}
         </span>
+      )}
+
+      {/* Admin reply */}
+      {adminReply && (
+        <div className="border-t border-brand-border/60 pt-4 mt-1">
+          <p className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.15em] mb-1.5">
+            رد دار أورا
+          </p>
+          <p className="font-sans text-xs font-light text-text-secondary leading-relaxed italic">
+            &ldquo;{adminReply}&rdquo;
+          </p>
+        </div>
       )}
     </motion.article>
   );

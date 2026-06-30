@@ -1,0 +1,138 @@
+'use client';
+
+import React, { useEffect } from 'react';
+import { create } from 'zustand';
+import { businessService } from '@/lib/services/business.service';
+import { adminAr } from '@/lib/i18n/admin-ar';
+import { IconFileText, IconDownload, IconPrinter } from '@tabler/icons-react';
+import { Button } from '@/components/admin/design-system/Button';
+import { formatCurrency } from '@/lib/utils/formatters';
+
+interface ReportState {
+  summary: any;
+  isLoading: boolean;
+  fetchData: () => Promise<void>;
+}
+
+const useReportStore = create<ReportState>((set) => ({
+  summary: null,
+  isLoading: true,
+  fetchData: async () => {
+    try {
+      const summary = await businessService.getFinancialSummary();
+      set({ summary, isLoading: false });
+    } catch (e) {
+      console.error(e);
+      set({ isLoading: false });
+    }
+  }
+}));
+
+export default function PnLPage() {
+  const { summary, isLoading, fetchData } = useReportStore();
+  const t = adminAr.business.pnl;
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (isLoading || !summary) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-5xl mx-auto" dir="rtl">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--admin-text-base)]">{t.title}</h1>
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">{t.subtitle}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <IconPrinter size={16} /> طباعة
+          </Button>
+          <Button variant="outline">
+            <IconDownload size={16} /> تصدير PDF
+          </Button>
+        </div>
+      </div>
+
+      {/* Date Filter Mock */}
+      <div className="flex gap-4 p-4 bg-[var(--admin-bg-surface)] border border-[var(--admin-border-base)] rounded-xl">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-[var(--admin-text-muted)]">من تاريخ</span>
+          <input type="date" className="border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] px-3 py-1.5 text-sm outline-none focus:border-[var(--admin-primary)] bg-[var(--admin-bg-base)] text-[var(--admin-text-base)]" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-[var(--admin-text-muted)]">إلى تاريخ</span>
+          <input type="date" className="border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] px-3 py-1.5 text-sm outline-none focus:border-[var(--admin-primary)] bg-[var(--admin-bg-base)] text-[var(--admin-text-base)]" />
+        </div>
+        <div className="flex items-end">
+          <Button variant="primary" className="py-1.5">تطبيق</Button>
+        </div>
+      </div>
+
+      <div className="bg-[var(--admin-bg-surface)] border border-[var(--admin-border-base)] rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2">
+        <div className="p-6 bg-[var(--admin-bg-base)] border-b border-[var(--admin-border-base)]">
+          <h2 className="text-xl font-bold text-[var(--admin-text-base)]">قائمة الدخل (Profit & Loss Statement)</h2>
+          <p className="text-sm text-[var(--admin-text-muted)]">للفترة المنتهية في {new Date().toLocaleDateString('ar-SA')}</p>
+        </div>
+        
+        <div className="p-6 space-y-6">
+          {/* Revenue */}
+          <div>
+            <h3 className="font-bold text-lg border-b border-[var(--admin-border-base)] pb-2 mb-4 text-[var(--admin-text-base)]">الإيرادات (Revenues)</h3>
+            <div className="flex justify-between py-2 text-[var(--admin-text-subtle)]">
+              <span>إيرادات المبيعات</span>
+              <span>{formatCurrency(summary.totalRevenue)}</span>
+            </div>
+            <div className="flex justify-between py-2 font-bold border-t border-[var(--admin-border-light)] mt-2 pt-2 bg-[var(--admin-bg-base)] px-2 rounded">
+              <span className="text-[var(--admin-text-base)]">إجمالي الإيرادات</span>
+              <span className="text-[var(--admin-text-base)]">{formatCurrency(summary.totalRevenue)}</span>
+            </div>
+          </div>
+
+          {/* COGS */}
+          <div>
+            <h3 className="font-bold text-lg border-b border-[var(--admin-border-base)] pb-2 mb-4 text-[var(--admin-text-base)]">تكلفة البضاعة المباعة (COGS)</h3>
+            <div className="flex justify-between py-2 text-[var(--admin-text-subtle)]">
+              <span>تكلفة المشتريات</span>
+              <span>({formatCurrency(summary.totalCOGS)})</span>
+            </div>
+            <div className="flex justify-between py-2 font-bold border-t border-[var(--admin-border-light)] mt-2 pt-2 bg-[var(--admin-bg-base)] px-2 rounded">
+              <span className="text-[var(--admin-text-base)]">الربح الإجمالي (Gross Profit)</span>
+              <span className="text-[var(--admin-success)]">{formatCurrency(summary.grossProfit)}</span>
+            </div>
+          </div>
+
+          {/* Expenses */}
+          <div>
+            <h3 className="font-bold text-lg border-b border-[var(--admin-border-base)] pb-2 mb-4 text-[var(--admin-text-base)]">المصروفات التشغيلية (Operating Expenses)</h3>
+            <div className="flex justify-between py-2 text-[var(--admin-text-subtle)]">
+              <span>مصروفات أخرى</span>
+              <span>({formatCurrency(summary.totalExpenses)})</span>
+            </div>
+            <div className="flex justify-between py-2 font-bold border-t border-[var(--admin-border-light)] mt-2 pt-2 bg-[var(--admin-bg-base)] px-2 rounded">
+              <span className="text-[var(--admin-text-base)]">إجمالي المصروفات</span>
+              <span className="text-[var(--admin-text-base)]">({formatCurrency(summary.totalExpenses)})</span>
+            </div>
+          </div>
+
+          {/* Net Profit */}
+          <div className="mt-8">
+            <div className="flex justify-between py-4 text-xl font-bold border-y-2 border-[var(--admin-border-strong)] bg-[var(--admin-bg-base)] px-4 rounded">
+              <span className="text-[var(--admin-text-base)]">صافي الربح (Net Profit)</span>
+              <span className={summary.netProfit > 0 ? "text-[var(--admin-success)]" : "text-[var(--admin-danger)]"}>
+                {formatCurrency(summary.netProfit)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -4,9 +4,11 @@ import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import { IconChevronRight as ChevronRight, IconChevronLeft as ChevronLeft, IconArrowLeft as ArrowLeft } from "@tabler/icons-react";
+import { HomepageService, HeroSlide } from "@/lib/services/storefront/homepage.service";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
 
-const HERO_SLIDES = [
+const DEFAULT_SLIDES: HeroSlide[] = [
   {
     id: 1,
     image: "/images/campaign/campaign_4.png",
@@ -37,6 +39,31 @@ export default function HeroSection() {
   const ref = useRef<HTMLElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [slides, setSlides] = useState<HeroSlide[]>(DEFAULT_SLIDES);
+  const [ctaText, setCtaText] = useState('اكتشفي التشكيلة');
+  const [ctaLink, setCtaLink] = useState('/shop');
+  const [secondaryCtaText, setSecondaryCtaText] = useState('قصتنا الفنية');
+  const [secondaryCtaLink, setSecondaryCtaLink] = useState('/about');
+
+  const loadHeroData = async () => {
+    try {
+      const sections = await HomepageService.getSections();
+      const heroSection = sections.find(s => s.type === 'hero');
+      if (heroSection?.settings) {
+        const s = heroSection.settings;
+        if (Array.isArray(s.slides) && s.slides.length > 0) setSlides(s.slides);
+        if (s.ctaText) setCtaText(s.ctaText);
+        if (s.ctaLink) setCtaLink(s.ctaLink);
+        if (s.secondaryCtaText) setSecondaryCtaText(s.secondaryCtaText);
+        if (s.secondaryCtaLink) setSecondaryCtaLink(s.secondaryCtaLink);
+      }
+    } catch {
+      // keep defaults
+    }
+  };
+
+  useEffect(() => { loadHeroData(); }, []);
+  useEventSubscribeMany(['website.changed'], loadHeroData);
 
   // Parallax effects
   const { scrollYProgress } = useScroll({
@@ -49,7 +76,7 @@ export default function HeroSection() {
 
   // Auto-play and progress bar
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setProgress(0);
     const intervalTime = 100; // Update progress every 100ms
     const totalTime = 8000;  // 8 seconds per slide
@@ -58,7 +85,7 @@ export default function HeroSection() {
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          setCurrentIndex((prevIdx) => (prevIdx + 1) % HERO_SLIDES.length);
+          setCurrentIndex((prevIdx) => (prevIdx + 1) % slides.length);
           return 0;
         }
         return prev + step;
@@ -69,11 +96,11 @@ export default function HeroSection() {
   }, [currentIndex]);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
   return (
@@ -93,7 +120,7 @@ export default function HeroSection() {
           {/* Subtle Campaign Counter */}
           <div className="hidden lg:flex justify-between items-center text-[10px] uppercase font-sans tracking-[0.2em] text-text-secondary border-b border-brand-border/60 pb-4">
             <span>AURA ATELIER / COUTURE EDITION</span>
-            <span>0{currentIndex + 1} &mdash; 0{HERO_SLIDES.length}</span>
+            <span>0{currentIndex + 1} &mdash; 0{slides.length}</span>
           </div>
 
           <div className="my-auto py-12 flex flex-col items-start text-right w-full max-w-xl self-end">
@@ -109,35 +136,35 @@ export default function HeroSection() {
                 {/* Campaign Subtitle Badge */}
                 <div className="flex items-center gap-2">
                   <span className="font-sans text-[10px] md:text-[11px] text-accent tracking-[0.3em] font-bold uppercase">
-                    {HERO_SLIDES[currentIndex].label}
+                    {slides[currentIndex].label}
                   </span>
                 </div>
 
                 {/* Big Editorial Title */}
                 <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-text-primary font-light leading-[1.25] tracking-wide">
-                  {HERO_SLIDES[currentIndex].title}
+                  {slides[currentIndex].title}
                 </h1>
                 
                 {/* Secondary English Title */}
                 <span className="font-serif text-[11px] text-text-secondary tracking-[0.4em] uppercase block border-b border-accent/40 pb-2">
-                  {HERO_SLIDES[currentIndex].engTitle}
+                  {slides[currentIndex].engTitle}
                 </span>
 
                 {/* Supporting Copy */}
                 <p className="font-sans text-xs md:text-sm text-text-secondary max-w-lg leading-[1.8] font-light mt-2">
-                  {HERO_SLIDES[currentIndex].subtitle}
+                  {slides[currentIndex].subtitle}
                 </p>
               </motion.div>
             </AnimatePresence>
 
             {/* CTA Actions */}
             <div className="flex flex-row items-center gap-4 w-full mt-8 md:mt-12 pointer-events-auto">
-              <Link href="/shop" className="group flex items-center gap-3 px-8 py-3.5 bg-text-primary text-background-primary font-sans text-[10px] md:text-[11px] uppercase tracking-wider transition-all duration-500 hover:bg-accent hover:text-text-primary">
-                <span>اكتشفي التشكيلة</span>
+              <Link href={ctaLink} className="group flex items-center gap-3 px-8 py-3.5 bg-text-primary text-background-primary font-sans text-[10px] md:text-[11px] uppercase tracking-wider transition-all duration-500 hover:bg-accent hover:text-text-primary">
+                <span>{ctaText}</span>
                 <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-500 group-hover:-translate-x-1.5" />
               </Link>
-              <Link href="/about" className="px-8 py-3.5 border border-brand-border text-text-primary font-sans text-[10px] md:text-[11px] uppercase tracking-wider transition-all duration-500 hover:bg-background-secondary">
-                قصتنا الفنية
+              <Link href={secondaryCtaLink} className="px-8 py-3.5 border border-brand-border text-text-primary font-sans text-[10px] md:text-[11px] uppercase tracking-wider transition-all duration-500 hover:border-accent hover:text-accent">
+                {secondaryCtaText}
               </Link>
             </div>
           </div>
@@ -146,20 +173,26 @@ export default function HeroSection() {
           <div className="flex justify-between items-center w-full pt-4 border-t border-brand-border/40 pointer-events-auto">
             {/* Slide Navigation Links */}
             <div className="flex gap-4 items-center">
-              <button 
-                onClick={prevSlide} 
-                className="w-8 h-8 rounded-full border border-brand-border/80 flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors cursor-pointer"
+              <motion.button
+                onClick={prevSlide}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="w-8 h-8 rounded-full border border-brand-border/80 flex items-center justify-center text-text-secondary hover:text-accent hover:border-accent transition-colors cursor-pointer"
                 aria-label="السابق"
               >
                 <ChevronRight className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={nextSlide} 
-                className="w-8 h-8 rounded-full border border-brand-border/80 flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors cursor-pointer"
+              </motion.button>
+              <motion.button
+                onClick={nextSlide}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="w-8 h-8 rounded-full border border-brand-border/80 flex items-center justify-center text-text-secondary hover:text-accent hover:border-accent transition-colors cursor-pointer"
                 aria-label="التالي"
               >
                 <ChevronLeft className="w-4 h-4" />
-              </button>
+              </motion.button>
             </div>
 
             {/* Luxury Linear Progress Indicator */}
@@ -192,11 +225,10 @@ export default function HeroSection() {
                 transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
               >
                 <Image
-                  src={HERO_SLIDES[currentIndex].image}
-                  alt={HERO_SLIDES[currentIndex].title}
+                  src={slides[currentIndex].image}
+                  alt={slides[currentIndex].title}
                   fill
                   priority
-                  quality={100}
                   className="object-cover object-[center_35%] lg:object-[center_30%]"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />

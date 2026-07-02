@@ -65,16 +65,37 @@ function resolveProductSection(section: HomepageSection, allProducts: any[]): an
   return sorted.slice(0, limit);
 }
 
+function resolveTestimonials(
+  section: HomepageSection | undefined,
+  approvedReviews: { id: string; customerName: string; content: string; rating: number; isPinned?: boolean; isFeatured?: boolean }[]
+): { id: string; name: string; text: string; rating: number }[] {
+  if (!section) return [];
+  const limit = section.settings?.limit ?? 3;
+  return [...approvedReviews]
+    .sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+      return 0;
+    })
+    .slice(0, limit)
+    .map(r => ({ id: r.id, name: r.customerName, text: r.content, rating: r.rating }));
+}
+
 export default function HomePage() {
   const products = useStorefrontProducts();
-  const [sections, setSections] = useState<HomepageSection[]>([]);
-  const [testimonialReviews, setTestimonialReviews] = useState<{ id: string; name: string; text: string; rating: number }[]>([]);
+  // Seeded synchronously from the mock store (already loaded at import time) so the
+  // homepage never paints empty and then pops in its entire content — that gap was
+  // the dominant cause of a very high CLS score.
+  const [sections, setSections] = useState<HomepageSection[]>(() => HomepageService.getSectionsSync());
+  const [testimonialReviews, setTestimonialReviews] = useState<{ id: string; name: string; text: string; rating: number }[]>(() => {
+    const initialSection = HomepageService.getSectionsSync().find(s => s.type === 'testimonials' && s.enabled);
+    return resolveTestimonials(initialSection, ReviewService.getReviewsSync({ status: 'approved' }));
+  });
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
-  useEffect(() => {
-    HomepageService.getSections().then(setSections).catch(() => {});
-  }, []);
   useEventSubscribeMany(['website.changed'], () => {
     HomepageService.getSections().then(setSections).catch(() => {});
   });
@@ -91,20 +112,8 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!testimonialsSection) return;
-    const limit = testimonialsSection.settings?.limit ?? 3;
     ReviewService.getReviews({ status: 'approved' })
-      .then(data => {
-        const sorted = [...data]
-          .sort((a, b) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            if (a.isFeatured && !b.isFeatured) return -1;
-            if (!a.isFeatured && b.isFeatured) return 1;
-            return 0;
-          })
-          .slice(0, limit);
-        setTestimonialReviews(sorted.map(r => ({ id: r.id, name: r.customerName, text: r.content, rating: r.rating })));
-      })
+      .then(data => setTestimonialReviews(resolveTestimonials(testimonialsSection, data)))
       .catch(() => {});
   }, [testimonialsSection]);
 

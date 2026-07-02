@@ -1,0 +1,310 @@
+# Image Verification Report
+
+Generated: 2026-07-02 15:23:44
+
+Overall status: PASS
+
+## Checks
+
+- [PASS] File exists: images/optimized/aura-logo.png
+- [PASS] Not corrupted: images/optimized/aura-logo.png
+- [PASS] File exists: images/webp/aura-logo.webp
+- [PASS] Not corrupted: images/webp/aura-logo.webp
+- [PASS] File exists: images/avif/aura-logo.avif
+- [PASS] Not corrupted: images/avif/aura-logo.avif
+- [PASS] File exists: images/optimized/aura_clothing_label.png
+- [PASS] Not corrupted: images/optimized/aura_clothing_label.png
+- [PASS] File exists: images/webp/aura_clothing_label.webp
+- [PASS] Not corrupted: images/webp/aura_clothing_label.webp
+- [PASS] File exists: images/avif/aura_clothing_label.avif
+- [PASS] Not corrupted: images/avif/aura_clothing_label.avif
+- [PASS] File exists: images/optimized/aura_header_logo.png
+- [PASS] Not corrupted: images/optimized/aura_header_logo.png
+- [PASS] File exists: images/webp/aura_header_logo.webp
+- [PASS] Not corrupted: images/webp/aura_header_logo.webp
+- [PASS] File exists: images/avif/aura_header_logo.avif
+- [PASS] Not corrupted: images/avif/aura_header_logo.avif
+- [PASS] File exists: images/optimized/aura_hero_campaign.png
+- [PASS] Not corrupted: images/optimized/aura_hero_campaign.png
+- [PASS] File exists: images/webp/aura_hero_campaign.webp
+- [PASS] Not corrupted: images/webp/aura_hero_campaign.webp
+- [PASS] File exists: images/avif/aura_hero_campaign.avif
+- [PASS] Not corrupted: images/avif/aura_hero_campaign.avif
+- [PASS] File exists: images/optimized/aura_logo_fallback.png
+- [PASS] Not corrupted: images/optimized/aura_logo_fallback.png
+- [PASS] File exists: images/webp/aura_logo_fallback.webp
+- [PASS] Not corrupted: images/webp/aura_logo_fallback.webp
+- [PASS] File exists: images/avif/aura_logo_fallback.avif
+- [PASS] Not corrupted: images/avif/aura_logo_fallback.avif
+- [PASS] File exists: images/optimized/aura_packaging_mockup.png
+- [PASS] Not corrupted: images/optimized/aura_packaging_mockup.png
+- [PASS] File exists: images/webp/aura_packaging_mockup.webp
+- [PASS] Not corrupted: images/webp/aura_packaging_mockup.webp
+- [PASS] File exists: images/avif/aura_packaging_mockup.avif
+- [PASS] Not corrupted: images/avif/aura_packaging_mockup.avif
+- [PASS] File exists: images/optimized/aura_thumbnail.png
+- [PASS] Not corrupted: images/optimized/aura_thumbnail.png
+- [PASS] File exists: images/webp/aura_thumbnail.webp
+- [PASS] Not corrupted: images/webp/aura_thumbnail.webp
+- [PASS] File exists: images/avif/aura_thumbnail.avif
+- [PASS] Not corrupted: images/avif/aura_thumbnail.avif
+- [PASS] File exists: images/optimized/github-cover.png
+- [PASS] Not corrupted: images/optimized/github-cover.png
+- [PASS] File exists: images/webp/github-cover.webp
+- [PASS] Not corrupted: images/webp/github-cover.webp
+- [PASS] File exists: images/avif/github-cover.avif
+- [PASS] Not corrupted: images/avif/github-cover.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_1.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_1.png
+- [PASS] File exists: images/webp/images/campaign/campaign_1.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_1.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_1.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_1.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_2.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_2.png
+- [PASS] File exists: images/webp/images/campaign/campaign_2.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_2.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_2.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_2.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_3.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_3.png
+- [PASS] File exists: images/webp/images/campaign/campaign_3.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_3.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_3.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_3.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_4.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_4.png
+- [PASS] File exists: images/webp/images/campaign/campaign_4.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_4.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_4.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_4.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_5.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_5.png
+- [PASS] File exists: images/webp/images/campaign/campaign_5.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_5.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_5.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_5.avif
+- [PASS] File exists: images/optimized/images/campaign/campaign_6.png
+- [PASS] Not corrupted: images/optimized/images/campaign/campaign_6.png
+- [PASS] File exists: images/webp/images/campaign/campaign_6.webp
+- [PASS] Not corrupted: images/webp/images/campaign/campaign_6.webp
+- [PASS] File exists: images/avif/images/campaign/campaign_6.avif
+- [PASS] Not corrupted: images/avif/images/campaign/campaign_6.avif
+- [PASS] File exists: images/optimized/images/detail/detail_fabric.png
+- [PASS] Not corrupted: images/optimized/images/detail/detail_fabric.png
+- [PASS] File exists: images/webp/images/detail/detail_fabric.webp
+- [PASS] Not corrupted: images/webp/images/detail/detail_fabric.webp
+- [PASS] File exists: images/avif/images/detail/detail_fabric.avif
+- [PASS] Not corrupted: images/avif/images/detail/detail_fabric.avif
+- [PASS] File exists: images/optimized/images/flatlay/flatlay_1.png
+- [PASS] Not corrupted: images/optimized/images/flatlay/flatlay_1.png
+- [PASS] File exists: images/webp/images/flatlay/flatlay_1.webp
+- [PASS] Not corrupted: images/webp/images/flatlay/flatlay_1.webp
+- [PASS] File exists: images/avif/images/flatlay/flatlay_1.avif
+- [PASS] Not corrupted: images/avif/images/flatlay/flatlay_1.avif
+- [PASS] File exists: images/optimized/images/flatlay/flatlay_2.png
+- [PASS] Not corrupted: images/optimized/images/flatlay/flatlay_2.png
+- [PASS] File exists: images/webp/images/flatlay/flatlay_2.webp
+- [PASS] Not corrupted: images/webp/images/flatlay/flatlay_2.webp
+- [PASS] File exists: images/avif/images/flatlay/flatlay_2.avif
+- [PASS] Not corrupted: images/avif/images/flatlay/flatlay_2.avif
+- [PASS] File exists: images/optimized/images/lifestyle/lifestyle_interior.png
+- [PASS] Not corrupted: images/optimized/images/lifestyle/lifestyle_interior.png
+- [PASS] File exists: images/webp/images/lifestyle/lifestyle_interior.webp
+- [PASS] Not corrupted: images/webp/images/lifestyle/lifestyle_interior.webp
+- [PASS] File exists: images/avif/images/lifestyle/lifestyle_interior.avif
+- [PASS] Not corrupted: images/avif/images/lifestyle/lifestyle_interior.avif
+- [PASS] File exists: images/optimized/images/products/product_evening_gown.png
+- [PASS] Not corrupted: images/optimized/images/products/product_evening_gown.png
+- [PASS] File exists: images/webp/images/products/product_evening_gown.webp
+- [PASS] Not corrupted: images/webp/images/products/product_evening_gown.webp
+- [PASS] File exists: images/avif/images/products/product_evening_gown.avif
+- [PASS] Not corrupted: images/avif/images/products/product_evening_gown.avif
+- [PASS] File exists: images/optimized/images/products/product_leather_bag.png
+- [PASS] Not corrupted: images/optimized/images/products/product_leather_bag.png
+- [PASS] File exists: images/webp/images/products/product_leather_bag.webp
+- [PASS] Not corrupted: images/webp/images/products/product_leather_bag.webp
+- [PASS] File exists: images/avif/images/products/product_leather_bag.avif
+- [PASS] Not corrupted: images/avif/images/products/product_leather_bag.avif
+- [PASS] File exists: images/optimized/images/products/product_linen_set.png
+- [PASS] Not corrupted: images/optimized/images/products/product_linen_set.png
+- [PASS] File exists: images/webp/images/products/product_linen_set.webp
+- [PASS] Not corrupted: images/webp/images/products/product_linen_set.webp
+- [PASS] File exists: images/avif/images/products/product_linen_set.avif
+- [PASS] Not corrupted: images/avif/images/products/product_linen_set.avif
+- [PASS] File exists: images/optimized/images/products/product_necklace.png
+- [PASS] Not corrupted: images/optimized/images/products/product_necklace.png
+- [PASS] File exists: images/webp/images/products/product_necklace.webp
+- [PASS] Not corrupted: images/webp/images/products/product_necklace.webp
+- [PASS] File exists: images/avif/images/products/product_necklace.avif
+- [PASS] Not corrupted: images/avif/images/products/product_necklace.avif
+- [PASS] File exists: images/optimized/images/products/product_silk_blouse.png
+- [PASS] Not corrupted: images/optimized/images/products/product_silk_blouse.png
+- [PASS] File exists: images/webp/images/products/product_silk_blouse.webp
+- [PASS] Not corrupted: images/webp/images/products/product_silk_blouse.webp
+- [PASS] File exists: images/avif/images/products/product_silk_blouse.avif
+- [PASS] Not corrupted: images/avif/images/products/product_silk_blouse.avif
+- [PASS] File exists: images/optimized/images/products/product_stiletto.png
+- [PASS] Not corrupted: images/optimized/images/products/product_stiletto.png
+- [PASS] File exists: images/webp/images/products/product_stiletto.webp
+- [PASS] Not corrupted: images/webp/images/products/product_stiletto.webp
+- [PASS] File exists: images/avif/images/products/product_stiletto.avif
+- [PASS] Not corrupted: images/avif/images/products/product_stiletto.avif
+- [PASS] File exists: images/optimized/images/products/product_winter_coat.png
+- [PASS] Not corrupted: images/optimized/images/products/product_winter_coat.png
+- [PASS] File exists: images/webp/images/products/product_winter_coat.webp
+- [PASS] Not corrupted: images/webp/images/products/product_winter_coat.webp
+- [PASS] File exists: images/avif/images/products/product_winter_coat.avif
+- [PASS] Not corrupted: images/avif/images/products/product_winter_coat.avif
+- [PASS] Aspect ratio preserved: images/optimized/aura-logo.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura-logo.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura-logo.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura-logo.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura-logo.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura-logo.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_clothing_label.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_clothing_label.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_clothing_label.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_clothing_label.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_clothing_label.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_clothing_label.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_header_logo.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_header_logo.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_header_logo.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_header_logo.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_header_logo.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_header_logo.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_hero_campaign.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_hero_campaign.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_hero_campaign.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_hero_campaign.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_hero_campaign.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_hero_campaign.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_logo_fallback.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_logo_fallback.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_logo_fallback.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_logo_fallback.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_logo_fallback.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_logo_fallback.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_packaging_mockup.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_packaging_mockup.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_packaging_mockup.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_packaging_mockup.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_packaging_mockup.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_packaging_mockup.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/aura_thumbnail.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/aura_thumbnail.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/aura_thumbnail.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/aura_thumbnail.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/aura_thumbnail.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/aura_thumbnail.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/github-cover.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/github-cover.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/github-cover.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/github-cover.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/github-cover.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/github-cover.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_1.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_1.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_1.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_1.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_1.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_1.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_2.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_2.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_2.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_2.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_2.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_2.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_3.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_3.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_3.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_3.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_3.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_3.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_4.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_4.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_4.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_4.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_4.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_4.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_5.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_5.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_5.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_5.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_5.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_5.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/campaign/campaign_6.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/campaign/campaign_6.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/campaign/campaign_6.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/campaign/campaign_6.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/campaign/campaign_6.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/campaign/campaign_6.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/detail/detail_fabric.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/detail/detail_fabric.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/detail/detail_fabric.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/detail/detail_fabric.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/detail/detail_fabric.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/detail/detail_fabric.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/flatlay/flatlay_1.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/flatlay/flatlay_1.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/flatlay/flatlay_1.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/flatlay/flatlay_1.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/flatlay/flatlay_1.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/flatlay/flatlay_1.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/flatlay/flatlay_2.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/flatlay/flatlay_2.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/flatlay/flatlay_2.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/flatlay/flatlay_2.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/flatlay/flatlay_2.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/flatlay/flatlay_2.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/lifestyle/lifestyle_interior.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/lifestyle/lifestyle_interior.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/lifestyle/lifestyle_interior.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/lifestyle/lifestyle_interior.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/lifestyle/lifestyle_interior.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/lifestyle/lifestyle_interior.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_evening_gown.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_evening_gown.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_evening_gown.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_evening_gown.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_evening_gown.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_evening_gown.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_leather_bag.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_leather_bag.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_leather_bag.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_leather_bag.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_leather_bag.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_leather_bag.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_linen_set.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_linen_set.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_linen_set.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_linen_set.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_linen_set.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_linen_set.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_necklace.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_necklace.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_necklace.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_necklace.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_necklace.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_necklace.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_silk_blouse.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_silk_blouse.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_silk_blouse.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_silk_blouse.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_silk_blouse.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_silk_blouse.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_stiletto.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_stiletto.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_stiletto.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_stiletto.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_stiletto.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_stiletto.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/optimized/images/products/product_winter_coat.png: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/optimized/images/products/product_winter_coat.png: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/webp/images/products/product_winter_coat.webp: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/webp/images/products/product_winter_coat.webp: expected (1024, 1024), got (1024, 1024)
+- [PASS] Aspect ratio preserved: images/avif/images/products/product_winter_coat.avif: orig 1024x1024 vs 1024x1024
+- [PASS] Dimensions match resized target: images/avif/images/products/product_winter_coat.avif: expected (1024, 1024), got (1024, 1024)
+- [PASS] No duplicated filenames across manifest
+- [PASS] Manifest structure valid JSON with all referenced files

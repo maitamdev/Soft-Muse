@@ -35,15 +35,26 @@ const DEFAULT_SLIDES: HeroSlide[] = [
   }
 ];
 
+function readHeroSettings() {
+  const heroSection = HomepageService.getSectionsSync().find(s => s.type === 'hero');
+  return heroSection?.settings ?? null;
+}
+
 export default function HeroSection() {
   const ref = useRef<HTMLElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [slides, setSlides] = useState<HeroSlide[]>(DEFAULT_SLIDES);
-  const [ctaText, setCtaText] = useState('اكتشفي التشكيلة');
-  const [ctaLink, setCtaLink] = useState('/shop');
-  const [secondaryCtaText, setSecondaryCtaText] = useState('قصتنا الفنية');
-  const [secondaryCtaLink, setSecondaryCtaLink] = useState('/about');
+  // Seeded synchronously (settings are already in memory) so the hero never
+  // renders defaults and then swaps to CMS content after mount — that swap
+  // can reflow the mobile layout, which has no fixed height.
+  const initialSettings = readHeroSettings();
+  const [slides, setSlides] = useState<HeroSlide[]>(
+    Array.isArray(initialSettings?.slides) && initialSettings.slides.length > 0 ? initialSettings.slides : DEFAULT_SLIDES
+  );
+  const [ctaText, setCtaText] = useState(initialSettings?.ctaText || 'اكتشفي التشكيلة');
+  const [ctaLink, setCtaLink] = useState(initialSettings?.ctaLink || '/shop');
+  const [secondaryCtaText, setSecondaryCtaText] = useState(initialSettings?.secondaryCtaText || 'قصتنا الفنية');
+  const [secondaryCtaLink, setSecondaryCtaLink] = useState(initialSettings?.secondaryCtaLink || '/about');
 
   const loadHeroData = async () => {
     try {
@@ -62,7 +73,6 @@ export default function HeroSection() {
     }
   };
 
-  useEffect(() => { loadHeroData(); }, []);
   useEventSubscribeMany(['website.changed'], loadHeroData);
 
   // Parallax effects

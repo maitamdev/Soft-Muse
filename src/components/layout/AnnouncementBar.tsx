@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { StoreService, AnnouncementBarSettings } from '@/lib/services/storefront/store.service';
 import { useEventSubscribeMany } from '@/hooks/useEventBus';
@@ -11,7 +11,9 @@ import { useEventSubscribeMany } from '@/hooks/useEventBus';
  * Store Settings page). Hides itself when disabled or when text is empty.
  */
 export function AnnouncementBar() {
-  const [bar, setBar] = useState<AnnouncementBarSettings | null>(null);
+  const [bar, setBar] = useState<AnnouncementBarSettings | null>(
+    () => StoreService.getInfoSync().announcementBar ?? null
+  );
 
   const load = useCallback(async () => {
     try {
@@ -22,7 +24,7 @@ export function AnnouncementBar() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  // Initial value is seeded synchronously above; only live CMS edits need a re-fetch.
   useEventSubscribeMany(['website.changed'], load);
 
   if (!bar?.enabled || !bar.text.trim()) return null;

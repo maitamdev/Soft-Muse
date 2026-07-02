@@ -73,6 +73,11 @@ if (!mockStoreInfo.announcementBar) {
 
 export const StoreService = {
   async getInfo(): Promise<StoreInfo> {
+    return this.getInfoSync();
+  },
+
+  /** Synchronous counterpart of `getInfo`, for seeding initial render state without an async gap (avoids a CLS-causing pop-in of the announcement bar). */
+  getInfoSync(): StoreInfo {
     return { ...mockStoreInfo };
   },
 

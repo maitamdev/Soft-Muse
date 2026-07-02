@@ -1,6 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/admin/providers/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "تسجيل الدخول | AURA Admin",
@@ -8,9 +7,9 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow",
 };
 
-// ThemeProvider is mounted in this server layout (not inside the client screen) so
-// next-themes' no-flash inline script is emitted in the server HTML — same pattern
-// as the dashboard layout — preventing a light/dark flash on first paint.
+// ThemeProvider is mounted once in the shared parent layout
+// (src/app/admin/layout.tsx) so it stays mounted across client-side
+// navigation between this segment and /admin/(dashboard). See that file for why.
 export default function AdminLoginLayout({ children }: { children: React.ReactNode }) {
-  return <ThemeProvider>{children}</ThemeProvider>;
+  return <>{children}</>;
 }

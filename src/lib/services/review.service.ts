@@ -103,6 +103,11 @@ const persistReviews = () => mockStorage.write('reviews', MOCK_REVIEWS);
 export const ReviewService = {
   async getReviews(filters?: { status?: Review['status']; productId?: string; isFeatured?: boolean }): Promise<Review[]> {
     await new Promise(resolve => setTimeout(resolve, 300));
+    return this.getReviewsSync(filters);
+  },
+
+  /** Synchronous counterpart of `getReviews`, for seeding initial render state (avoids a delayed pop-in of storefront testimonials). */
+  getReviewsSync(filters?: { status?: Review['status']; productId?: string; isFeatured?: boolean }): Review[] {
     let data = [...MOCK_REVIEWS];
     if (filters?.status) data = data.filter(r => r.status === filters.status);
     if (filters?.productId) data = data.filter(r => r.productId === filters.productId);

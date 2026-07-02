@@ -1,0 +1,127 @@
+{
+  "aura-logo.png": {
+    "optimized": "images/optimized/aura-logo.png",
+    "webp": "images/webp/aura-logo.webp",
+    "avif": "images/avif/aura-logo.avif"
+  },
+  "aura_clothing_label.png": {
+    "optimized": "images/optimized/aura_clothing_label.png",
+    "webp": "images/webp/aura_clothing_label.webp",
+    "avif": "images/avif/aura_clothing_label.avif"
+  },
+  "aura_header_logo.png": {
+    "optimized": "images/optimized/aura_header_logo.png",
+    "webp": "images/webp/aura_header_logo.webp",
+    "avif": "images/avif/aura_header_logo.avif"
+  },
+  "aura_hero_campaign.png": {
+    "optimized": "images/optimized/aura_hero_campaign.png",
+    "webp": "images/webp/aura_hero_campaign.webp",
+    "avif": "images/avif/aura_hero_campaign.avif"
+  },
+  "aura_logo_fallback.png": {
+    "optimized": "images/optimized/aura_logo_fallback.png",
+    "webp": "images/webp/aura_logo_fallback.webp",
+    "avif": "images/avif/aura_logo_fallback.avif"
+  },
+  "aura_packaging_mockup.png": {
+    "optimized": "images/optimized/aura_packaging_mockup.png",
+    "webp": "images/webp/aura_packaging_mockup.webp",
+    "avif": "images/avif/aura_packaging_mockup.avif"
+  },
+  "aura_thumbnail.png": {
+    "optimized": "images/optimized/aura_thumbnail.png",
+    "webp": "images/webp/aura_thumbnail.webp",
+    "avif": "images/avif/aura_thumbnail.avif"
+  },
+  "github-cover.png": {
+    "optimized": "images/optimized/github-cover.png",
+    "webp": "images/webp/github-cover.webp",
+    "avif": "images/avif/github-cover.avif"
+  },
+  "images/campaign/campaign_1.png": {
+    "optimized": "images/optimized/images/campaign/campaign_1.png",
+    "webp": "images/webp/images/campaign/campaign_1.webp",
+    "avif": "images/avif/images/campaign/campaign_1.avif"
+  },
+  "images/campaign/campaign_2.png": {
+    "optimized": "images/optimized/images/campaign/campaign_2.png",
+    "webp": "images/webp/images/campaign/campaign_2.webp",
+    "avif": "images/avif/images/campaign/campaign_2.avif"
+  },
+  "images/campaign/campaign_3.png": {
+    "optimized": "images/optimized/images/campaign/campaign_3.png",
+    "webp": "images/webp/images/campaign/campaign_3.webp",
+    "avif": "images/avif/images/campaign/campaign_3.avif"
+  },
+  "images/campaign/campaign_4.png": {
+    "optimized": "images/optimized/images/campaign/campaign_4.png",
+    "webp": "images/webp/images/campaign/campaign_4.webp",
+    "avif": "images/avif/images/campaign/campaign_4.avif"
+  },
+  "images/campaign/campaign_5.png": {
+    "optimized": "images/optimized/images/campaign/campaign_5.png",
+    "webp": "images/webp/images/campaign/campaign_5.webp",
+    "avif": "images/avif/images/campaign/campaign_5.avif"
+  },
+  "images/campaign/campaign_6.png": {
+    "optimized": "images/optimized/images/campaign/campaign_6.png",
+    "webp": "images/webp/images/campaign/campaign_6.webp",
+    "avif": "images/avif/images/campaign/campaign_6.avif"
+  },
+  "images/detail/detail_fabric.png": {
+    "optimized": "images/optimized/images/detail/detail_fabric.png",
+    "webp": "images/webp/images/detail/detail_fabric.webp",
+    "avif": "images/avif/images/detail/detail_fabric.avif"
+  },
+  "images/flatlay/flatlay_1.png": {
+    "optimized": "images/optimized/images/flatlay/flatlay_1.png",
+    "webp": "images/webp/images/flatlay/flatlay_1.webp",
+    "avif": "images/avif/images/flatlay/flatlay_1.avif"
+  },
+  "images/flatlay/flatlay_2.png": {
+    "optimized": "images/optimized/images/flatlay/flatlay_2.png",
+    "webp": "images/webp/images/flatlay/flatlay_2.webp",
+    "avif": "images/avif/images/flatlay/flatlay_2.avif"
+  },
+  "images/lifestyle/lifestyle_interior.png": {
+    "optimized": "images/optimized/images/lifestyle/lifestyle_interior.png",
+    "webp": "images/webp/images/lifestyle/lifestyle_interior.webp",
+    "avif": "images/avif/images/lifestyle/lifestyle_interior.avif"
+  },
+  "images/products/product_evening_gown.png": {
+    "optimized": "images/optimized/images/products/product_evening_gown.png",
+    "webp": "images/webp/images/products/product_evening_gown.webp",
+    "avif": "images/avif/images/products/product_evening_gown.avif"
+  },
+  "images/products/product_leather_bag.png": {
+    "optimized": "images/optimized/images/products/product_leather_bag.png",
+    "webp": "images/webp/images/products/product_leather_bag.webp",
+    "avif": "images/avif/images/products/product_leather_bag.avif"
+  },
+  "images/products/product_linen_set.png": {
+    "optimized": "images/optimized/images/products/product_linen_set.png",
+    "webp": "images/webp/images/products/product_linen_set.webp",
+    "avif": "images/avif/images/products/product_linen_set.avif"
+  },
+  "images/products/product_necklace.png": {
+    "optimized": "images/optimized/images/products/product_necklace.png",
+    "webp": "images/webp/images/products/product_necklace.webp",
+    "avif": "images/avif/images/products/product_necklace.avif"
+  },
+  "images/products/product_silk_blouse.png": {
+    "optimized": "images/optimized/images/products/product_silk_blouse.png",
+    "webp": "images/webp/images/products/product_silk_blouse.webp",
+    "avif": "images/avif/images/products/product_silk_blouse.avif"
+  },
+  "images/products/product_stiletto.png": {
+    "optimized": "images/optimized/images/products/product_stiletto.png",
+    "webp": "images/webp/images/products/product_stiletto.webp",
+    "avif": "images/avif/images/products/product_stiletto.avif"
+  },
+  "images/products/product_winter_coat.png": {
+    "optimized": "images/optimized/images/products/product_winter_coat.png",
+    "webp": "images/webp/images/products/product_winter_coat.webp",
+    "avif": "images/avif/images/products/product_winter_coat.avif"
+  }
+}

@@ -210,6 +210,17 @@ mockSections = mockStorage.read('storefront.homepage', mockSections);
 
 export const HomepageService = {
   async getSections(): Promise<HomepageSection[]> {
+    return this.getSectionsSync();
+  },
+
+  /**
+   * Synchronous read of the same data `getSections` resolves with. The mock
+   * store is already loaded into memory at import time, so components can
+   * seed their initial state with this instead of starting empty and
+   * populating one tick later via useEffect — the latter causes the entire
+   * homepage to pop in after first paint (a large CLS regression).
+   */
+  getSectionsSync(): HomepageSection[] {
     return [...mockSections].sort((a, b) => a.order - b.order);
   },
 

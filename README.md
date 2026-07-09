@@ -2,6 +2,16 @@
 
 ![AURA Cover](public/github-cover.png)
 
+<p align="center">
+  <a href="https://aura-fashion-virid.vercel.app"><img src="https://img.shields.io/badge/Live_Demo-aura--fashion--virid.vercel.app-0B7D57?style=flat-square&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=nextdotjs" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
+</p>
+
+**🔗 Live Demo: [aura-fashion-virid.vercel.app](https://aura-fashion-virid.vercel.app)** — storefront at `/`, admin ERP at `/admin`.
+
 ## Project Overview
 
 AURA is a comprehensive, enterprise-grade luxury fashion e-commerce platform that integrates a high-end storefront with a complete internal ERP and Admin Dashboard. 
@@ -106,15 +116,19 @@ aura-brand/
 
 ## Technology Stack
 
-* **Core Framework**: [Next.js 14+](https://nextjs.org/) (App Router)
-* **Library**: [React 18](https://react.dev/)
+* **Core Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+* **Library**: [React 19](https://react.dev/)
 * **Language**: [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 * **Styling**: [Tailwind CSS](https://tailwindcss.com/) & Vanilla CSS modules
 * **Animations**: [Framer Motion](https://www.framer.com/motion/)
-* **Icons**: [Tabler Icons](https://tabler-icons.com/) & [Lucide React](https://lucide.dev/)
-* **State Management**: React Context API
+* **Icons**: [Tabler Icons](https://tabler-icons.com/) & React Icons
+* **State Management**: React Context API (storefront) + [Zustand](https://zustand-demo.pmnd.rs/) stores (admin business modules)
+* **Validation**: [Zod](https://zod.dev/) schemas (finance, procurement, base entities)
+* **Charts**: [Recharts](https://recharts.org/) (analytics & revenue dashboards)
+* **Drag & Drop**: [dnd-kit](https://dndkit.com/) (sortable admin lists)
 * **Event Architecture**: Custom Pub/Sub EventBus
-* **Persistence**: Local Storage API (Mock DB)
+* **Persistence**: Swappable storage adapter — currently a localStorage mock DB with simulated latency, designed for zero-component-change backend migration
+* **Security**: [isomorphic-dompurify](https://github.com/kkomelin/isomorphic-dompurify) XSS sanitization for CMS-authored HTML
 * **Code Quality**: ESLint, Prettier
 * **Toast Notifications**: Sonner
 
@@ -260,17 +274,19 @@ The architecture is strictly decoupled; the `Service Layer` acts as an adapter, 
 
 ## Screenshots
 
-### Storefront
+Screenshots live in [`docs/screenshots/`](docs/screenshots/). Until the full set is captured, the fastest way to evaluate AURA is the **[live demo](https://aura-fashion-virid.vercel.app)** — browse the storefront at `/`, then open `/admin` for the ERP.
 
-![Homepage Placeholder](https://via.placeholder.com/800x450/0B1220/FFFFFF?text=Homepage)
-![Product Detail Placeholder](https://via.placeholder.com/800x450/0B1220/FFFFFF?text=Product+Details)
-![Checkout Flow Placeholder](https://via.placeholder.com/800x450/0B1220/FFFFFF?text=Checkout+Flow)
+<!-- Screenshot slots — capture from the live demo at 1440px width, dark theme:
+  docs/screenshots/storefront-home.png       — homepage hero + featured collections
+  docs/screenshots/storefront-product.png    — product detail with gallery + size guide
+  docs/screenshots/storefront-checkout.png   — multi-step checkout wizard
+  docs/screenshots/storefront-rtl.png        — Arabic RTL storefront view
+  docs/screenshots/admin-overview.png        — ERP dashboard KPI cards
+  docs/screenshots/admin-orders.png          — order pipeline
+  docs/screenshots/admin-cms.png             — Website Manager homepage builder
+-->
 
-### Admin Dashboard
 
-![Dashboard Overview Placeholder](https://via.placeholder.com/800x450/0F172A/FFFFFF?text=ERP+Dashboard)
-![Order Management Placeholder](https://via.placeholder.com/800x450/0F172A/FFFFFF?text=Order+Management)
-![Website Manager Placeholder](https://via.placeholder.com/800x450/0F172A/FFFFFF?text=Website+Manager)
 
 ---
 

@@ -3,14 +3,14 @@
 ![AURA Cover](public/github-cover.png)
 
 <p align="center">
-  <a href="https://aura-fashion-virid.vercel.app"><img src="https://img.shields.io/badge/Live_Demo-aura--fashion--virid.vercel.app-0B7D57?style=flat-square&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <a href="https://aura-brand-virid.vercel.app"><img src="https://img.shields.io/badge/Live_Demo-aura--brand--virid.vercel.app-0B7D57?style=flat-square&logo=vercel&logoColor=white" alt="Live Demo" /></a>
   <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=nextdotjs" alt="Next.js 16" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
 </p>
 
-**🔗 Live Demo: [aura-fashion-virid.vercel.app](https://aura-fashion-virid.vercel.app)** — storefront at `/`, admin ERP at `/admin`.
+**🔗 Live Demo: [aura-brand-virid.vercel.app](https://aura-brand-virid.vercel.app)** — storefront at `/`, admin ERP at `/admin`.
 
 ## Project Overview
 
@@ -274,7 +274,7 @@ The architecture is strictly decoupled; the `Service Layer` acts as an adapter, 
 
 ## Screenshots
 
-Screenshots live in [`docs/screenshots/`](docs/screenshots/). Until the full set is captured, the fastest way to evaluate AURA is the **[live demo](https://aura-fashion-virid.vercel.app)** — browse the storefront at `/`, then open `/admin` for the ERP.
+Screenshots live in [`docs/screenshots/`](docs/screenshots/). Until the full set is captured, the fastest way to evaluate AURA is the **[live demo](https://aura-brand-virid.vercel.app)** — browse the storefront at `/`, then open `/admin` for the ERP.
 
 <!-- Screenshot slots — capture from the live demo at 1440px width, dark theme:
   docs/screenshots/storefront-home.png       — homepage hero + featured collections

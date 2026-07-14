@@ -23,15 +23,16 @@ export function useStorefrontProducts(): Product[] {
     void load();
     if (!isSupabaseConfigured) return;
 
-    const channel = createClient()
-      .channel("storefront-products")
-      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "product_images" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, load)
-      .subscribe();
+    const supabase = createClient();
+    const channel = supabase.channel(`storefront-products:${crypto.randomUUID()}`);
+
+    channel.on("postgres_changes", { event: "*", schema: "public", table: "products" }, load);
+    channel.on("postgres_changes", { event: "*", schema: "public", table: "product_images" }, load);
+    channel.on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, load);
+    channel.subscribe();
 
     return () => {
-      void createClient().removeChannel(channel);
+      void supabase.removeChannel(channel);
     };
   }, [load]);
 

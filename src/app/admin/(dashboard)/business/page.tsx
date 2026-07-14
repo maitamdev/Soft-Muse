@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { create } from 'zustand';
-import { businessService } from '@/lib/services/business.service';
+import { businessService } from '@/lib/services/business-supabase.service';
 import {
  IconTrendingUp, IconPackage, IconReceipt, IconArrowUpRight, IconArrowDownRight,
  IconCurrencyDollar, IconWallet, IconBuildingSkyscraper, IconFileText

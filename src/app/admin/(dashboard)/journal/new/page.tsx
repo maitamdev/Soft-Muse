@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { JournalService } from '@/lib/services/journal.service';
+import { SupabaseJournalService as JournalService } from '@/lib/services/journal-supabase.service';
 import { RichTextEditor } from '@/components/admin/ui/RichTextEditor';
 import { MediaPicker } from '@/components/admin/ui/MediaPicker';
 import { Media } from '@/data/mock/media';

@@ -1,7 +1,7 @@
 import { Profile, mockProfile, updateMockProfile } from '@/data/mock/profile';
 import { eventBus } from '@/lib/events/EventBus';
 
-export const ProfileService = {
+export const MockProfileService = {
  async getProfile(): Promise<Profile> {
  return new Promise((resolve) => {
  setTimeout(() => resolve(mockProfile), 300);
@@ -47,3 +47,5 @@ export const ProfileService = {
  });
  }
 };
+
+export { SupabaseProfileService as ProfileService } from './profile-supabase.service';

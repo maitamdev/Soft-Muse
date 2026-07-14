@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { JournalService } from '@/lib/services/journal.service';
+import { SupabaseJournalService as JournalService } from '@/lib/services/journal-supabase.service';
 import { Article } from '@/data/mock/journal';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils/formatters';

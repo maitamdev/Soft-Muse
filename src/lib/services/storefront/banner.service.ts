@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export interface Banner {
  id: string;
@@ -45,40 +45,45 @@ let mockBanners: Banner[] = [
  }
 ];
 
-mockBanners = mockStorage.read('storefront.banners', mockBanners);
-const persistBanners = () => mockStorage.write('storefront.banners', mockBanners);
+const hydrateBanners = async () => { mockBanners = await loadStorefrontSetting('storefront.banners', mockBanners); };
+const persistBanners = async () => { mockBanners = await saveStorefrontSetting('storefront.banners', mockBanners); };
 
 export const BannerService = {
  async getBanners(): Promise<Banner[]> {
+ await hydrateBanners();
  return [...mockBanners].sort((a, b) => b.priority - a.priority);
  },
 
  async getBanner(id: string): Promise<Banner | undefined> {
+ await hydrateBanners();
  return mockBanners.find(b => b.id === id);
  },
 
  async addBanner(banner: Omit<Banner, 'id'>): Promise<Banner> {
+ await hydrateBanners();
  const newBanner = { ...banner, id: `bn-${Date.now()}` };
  mockBanners.push(newBanner);
- persistBanners();
+ await persistBanners();
  eventBus.emit('website.changed', { area: 'banners' });
  return newBanner;
  },
 
  async updateBanner(id: string, updates: Partial<Banner>): Promise<Banner> {
+ await hydrateBanners();
  const idx = mockBanners.findIndex(b => b.id === id);
  if (idx > -1) {
  mockBanners[idx] = { ...mockBanners[idx], ...updates };
- persistBanners();
+ await persistBanners();
  eventBus.emit('website.changed', { area: 'banners' });
  return mockBanners[idx];
  }
- throw new Error('Banner not found');
+ throw new Error('Không tìm thấy banner.');
  },
 
  async deleteBanner(id: string): Promise<void> {
+ await hydrateBanners();
  mockBanners = mockBanners.filter(b => b.id !== id);
- persistBanners();
+ await persistBanners();
  eventBus.emit('website.changed', { area: 'banners' });
  }
 };

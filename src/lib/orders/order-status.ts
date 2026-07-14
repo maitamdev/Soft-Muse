@@ -46,111 +46,136 @@ export const WORKFLOW_STATUSES: OrderStatus[] = [...ORDER_STATUS_SEQUENCE,
 /** Statuses that take an order off the happy path. */
 export const TERMINAL_STATUSES: OrderStatus[] = ['cancelled', 'returned', 'refunded'];
 
+/**
+ * Allowed lifecycle transitions. Keeping this in the client as well as in the
+ * database lets the UI hide impossible actions while PostgreSQL remains the
+ * final authority.
+ */
+export const ALLOWED_ORDER_TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
+ pending: ['confirmed', 'cancelled'],
+ confirmed: ['preparing', 'cancelled'],
+ preparing: ['ready_to_ship', 'cancelled'],
+ ready_to_ship: ['shipped', 'cancelled'],
+ shipped: ['out_for_delivery', 'returned'],
+ out_for_delivery: ['delivered', 'returned'],
+ delivered: ['returned'],
+ returned: ['refunded'],
+ cancelled: [],
+ refunded: [],
+ processing: ['ready_to_ship', 'cancelled'],
+ packed: ['shipped', 'cancelled'],
+ ready: ['shipped', 'cancelled'],
+};
+
+export function getAllowedNextStatuses(status: OrderStatus): OrderStatus[] {
+ return ALLOWED_ORDER_TRANSITIONS[status] ?? [];
+}
+
 export const ORDER_STATUS_META: Record<OrderStatus, OrderStatusMeta> = {
  pending: {
  key: 'pending',
- label: '',
- timelineLabel: 'đãĐơn hàng',
- description: 'đếnatelier AURA ',
+ label: 'Chờ xác nhận',
+ timelineLabel: 'Đã tiếp nhận đơn hàng',
+ description: 'Soft Muse đã nhận được đơn hàng của bạn.',
  badge: 'warning',
- notification: 'đã thành công từ AURA.',
+ notification: 'Đơn hàng đã được tiếp nhận thành công.',
  },
  confirmed: {
  key: 'confirmed',
- label: 'đã',
- timelineLabel: 'đãĐơn hàng',
- description: 'đãKích cỡ ',
+ label: 'Đã xác nhận',
+ timelineLabel: 'Đã xác nhận đơn hàng',
+ description: 'Sản phẩm và thông tin giao hàng đã được xác nhận.',
  badge: 'info',
- notification: 'đã từatelier AURA, trong.',
+ notification: 'Đơn hàng đã được Soft Muse xác nhận.',
  },
  preparing: {
  key: 'preparing',
- label: '',
- timelineLabel: '',
- description: 'trongatelier TP. Hồ Chí Minh',
+ label: 'Đang chuẩn bị',
+ timelineLabel: 'Đang chuẩn bị hàng',
+ description: 'Đơn hàng đang được đóng gói tại Soft Muse.',
  badge: 'primary',
- notification: 'trongatelier AURA.',
+ notification: 'Đơn hàng đang được chuẩn bị.',
  },
  ready_to_ship: {
  key: 'ready_to_ship',
- label: 'Vận chuyển',
- timelineLabel: 'Vận chuyển',
- description: 'đãVận chuyển',
+ label: 'Sẵn sàng giao',
+ timelineLabel: 'Sẵn sàng bàn giao',
+ description: 'Đơn hàng đã đóng gói và sẵn sàng bàn giao cho đơn vị vận chuyển.',
  badge: 'primary',
- notification: 'Vận chuyển giao hàng.',
+ notification: 'Đơn hàng đã sẵn sàng để giao.',
  },
  shipped: {
  key: 'shipped',
  label: 'Đã gửi hàng',
  timelineLabel: 'Đã gửi hàng',
- description: 'Vận chuyểntrong với giao hàng',
+ description: 'Đơn hàng đã được bàn giao cho đơn vị vận chuyển.',
  badge: 'info',
- notification: 'đãVận chuyển trong.',
+ notification: 'Đơn hàng đang trên đường vận chuyển.',
  },
  out_for_delivery: {
  key: 'out_for_delivery',
- label: '',
- timelineLabel: '',
- description: 'giao hàng trong đến',
+ label: 'Đang giao hàng',
+ timelineLabel: 'Đang giao hàng',
+ description: 'Nhân viên giao hàng đang chuyển đơn đến địa chỉ của bạn.',
  badge: 'info',
- notification: 'giao hàng trong.',
+ notification: 'Đơn hàng đang được giao đến bạn.',
  },
  delivered: {
  key: 'delivered',
- label: 'đã',
- timelineLabel: 'đã',
- description: 'đãVận chuyểnthành công đến',
+ label: 'Đã giao',
+ timelineLabel: 'Giao hàng thành công',
+ description: 'Đơn hàng đã được giao thành công.',
  badge: 'success',
- notification: 'đã thành công. vớiAURA.',
+ notification: 'Giao hàng thành công. Cảm ơn bạn đã chọn Soft Muse.',
  },
  cancelled: {
  key: 'cancelled',
  label: 'Đã hủy',
- timelineLabel: 'đãHủy',
- description: 'đãHủy nàyĐơn hàng',
+ timelineLabel: 'Đơn hàng đã hủy',
+ description: 'Đơn hàng này đã được hủy.',
  badge: 'danger',
- notification: 'đãHủy.Yêu cầu hỗ trợ vớiAURA.',
+ notification: 'Đơn hàng đã được hủy. Vui lòng liên hệ Soft Muse nếu cần hỗ trợ.',
  },
  returned: {
  key: 'returned',
- label: '',
- timelineLabel: 'đã',
- description: 'đã nàyĐơn hàng',
+ label: 'Đã trả hàng',
+ timelineLabel: 'Đã nhận hàng trả',
+ description: 'Hàng trả đã được tiếp nhận.',
  badge: 'neutral',
- notification: 'đã.AURA Thao tác.',
+ notification: 'Soft Muse đã tiếp nhận hàng trả.',
  },
  refunded: {
  key: 'refunded',
- label: '',
- timelineLabel: 'đã',
- description: 'đã nàyĐơn hàng',
+ label: 'Đã hoàn tiền',
+ timelineLabel: 'Đã hoàn tiền',
+ description: 'Khoản thanh toán đã được hoàn lại.',
  badge: 'neutral',
- notification: 'đã.',
+ notification: 'Đơn hàng đã được hoàn tiền.',
  },
  // Legacy aliases kept so previously-persisted orders never break lookups.
  processing: {
  key: 'processing',
- label: '',
- timelineLabel: '',
- description: 'trongatelier TP. Hồ Chí Minh',
+ label: 'Đang chuẩn bị',
+ timelineLabel: 'Đang chuẩn bị hàng',
+ description: 'Đơn hàng đang được đóng gói tại Soft Muse.',
  badge: 'primary',
- notification: 'trongatelier AURA.',
+ notification: 'Đơn hàng đang được chuẩn bị.',
  },
  packed: {
  key: 'packed',
- label: 'Vận chuyển',
- timelineLabel: 'Vận chuyển',
- description: 'đãVận chuyển',
+ label: 'Sẵn sàng giao',
+ timelineLabel: 'Sẵn sàng bàn giao',
+ description: 'Đơn hàng đã được đóng gói.',
  badge: 'primary',
- notification: 'Vận chuyển.',
+ notification: 'Đơn hàng đã sẵn sàng để giao.',
  },
  ready: {
  key: 'ready',
- label: 'Vận chuyển',
- timelineLabel: 'Vận chuyển',
- description: 'đãVận chuyển',
+ label: 'Sẵn sàng giao',
+ timelineLabel: 'Sẵn sàng bàn giao',
+ description: 'Đơn hàng đã được đóng gói.',
  badge: 'primary',
- notification: 'Vận chuyển.',
+ notification: 'Đơn hàng đã sẵn sàng để giao.',
  },
 };
 
@@ -238,11 +263,11 @@ export function buildCustomerTimeline(order: Pick<Order, 'status' | 'timeline'>)
  });
 }
 
-/** Estimated delivery window: 5 business-ish days from creation, formatted in Arabic. */
+/** Estimated delivery window: five days from creation, formatted for Vietnam. */
 export function estimateDelivery(order: Pick<Order, 'createdAt' | 'date'>): string {
  const base = new Date(order.createdAt || order.date || Date.now());
  base.setDate(base.getDate() + 5);
- return base.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+ return base.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 /** Normalise an order number for tolerant lookup (case/symbol-insensitive). */

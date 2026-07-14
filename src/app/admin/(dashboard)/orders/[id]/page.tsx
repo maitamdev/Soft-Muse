@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { adminAr } from '@/lib/i18n/admin-ar';
 import { OrderService } from '@/lib/services/order.service';
 import { Order, OrderStatus, OrderPaymentStatus } from '@/data/mock/orders';
-import { getStatusMeta, WORKFLOW_STATUSES } from '@/lib/orders/order-status';
+import { getStatusMeta, getAllowedNextStatuses } from '@/lib/orders/order-status';
+import { usePermissions } from '@/lib/auth/PermissionContext';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 import { toast } from 'sonner';
 
@@ -35,6 +36,9 @@ import {
 export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
  const { id: orderId } = use(params);
  const router = useRouter();
+ const { can } = usePermissions();
+ const canWrite = can('orders', 'write');
+ const canDelete = can('orders', 'delete');
  const [order, setOrder] = useState<Order | null>(null);
  const [loading, setLoading] = useState(true);
  
@@ -70,8 +74,8 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  } else {
  toast.error(adminAr.toasts.unexpectedError);
  }
- } catch {
- toast.error(adminAr.toasts.unexpectedError);
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : adminAr.toasts.unexpectedError);
  } finally {
  setLoading(false);
  }
@@ -93,8 +97,8 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  setOrder(updated);
  setStatusValue(updated.status);
  toast.success(adminAr.toasts.dataSaved);
- } catch {
- toast.error(adminAr.toasts.unexpectedError);
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : adminAr.toasts.unexpectedError);
  } finally {
  setUpdatingStatus(false);
  }
@@ -107,8 +111,8 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  const updated = await OrderService.updatePaymentStatus(order.id, paymentStatus);
  setOrder(updated);
  toast.success(adminAr.toasts.dataSaved);
- } catch {
- toast.error(adminAr.toasts.unexpectedError);
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : adminAr.toasts.unexpectedError);
  } finally {
  setUpdatingPayment(false);
  }
@@ -121,7 +125,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  const updated = await OrderService.addInternalNote(order.id, internalNote);
  setOrder(updated);
  setInternalNote('');
- toast.success('Thêm ');
+ toast.success('Đã thêm ghi chú nội bộ.');
  } catch {
  toast.error(adminAr.toasts.unexpectedError);
  } finally {
@@ -136,7 +140,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  const updated = await OrderService.addCustomerUpdate(order.id, customerUpdate.trim());
  setOrder(updated);
  setCustomerUpdate('');
- toast.success('đã');
+ toast.success('Đã cập nhật thông báo cho khách hàng.');
  } catch {
  toast.error(adminAr.toasts.unexpectedError);
  } finally {
@@ -176,15 +180,15 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
  const handleCancelOrder = async () => {
  if (!order) return;
- if (!confirm('từHủy nàyĐơn hàng؟ từTồn kho.')) return;
+ if (!confirm('Hủy đơn hàng này? Tồn kho sẽ được hoàn lại tự động.')) return;
  setCancelling(true);
  try {
  const updated = await OrderService.cancelOrder(order.id);
  setOrder(updated);
  setStatusValue(updated.status);
- toast.success('đãHủy Đơn hàng');
- } catch {
- toast.error(adminAr.toasts.unexpectedError);
+ toast.success('Đã hủy đơn hàng và hoàn kho.');
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : adminAr.toasts.unexpectedError);
  } finally {
  setCancelling(false);
  }
@@ -192,14 +196,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
  const handleDeleteOrder = async () => {
  if (!order) return;
- if (!confirm('Xóa Đơn hàng vĩnh viễnً. ؟')) return;
+ if (!confirm('Lưu trữ đơn hàng này? Đơn hàng sẽ không còn xuất hiện trong danh sách mặc định.')) return;
  setDeleting(true);
  try {
  await OrderService.deleteOrder(order.id);
- toast.success('đãXóa Đơn hàng');
+ toast.success('Đã lưu trữ đơn hàng.');
  router.push('/admin/orders');
- } catch {
- toast.error(adminAr.toasts.unexpectedError);
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : adminAr.toasts.unexpectedError);
  setDeleting(false);
  }
  };
@@ -212,23 +216,23 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
  if (!order) {
  return (
- <div className="text-center py-20 flex flex-col items-center"> <h2 className="text-2xl font-bold mb-4 text-[var(--admin-text-base)]">Đơn hàng không</h2> <Button variant="secondary" onClick={() => router.push('/admin/orders')}>đếnĐơn hàng</Button> </div>
+ <div className="text-center py-20 flex flex-col items-center"> <h2 className="text-2xl font-bold mb-4 text-[var(--admin-text-base)]">Không tìm thấy đơn hàng</h2> <Button variant="secondary" onClick={() => router.push('/admin/orders')}>Quay lại danh sách</Button> </div>
  );
  }
 
  const paymentMethodMap: Record<string, string> = {
- cod: '',
- card: '/',
- vodafone_cash: '',
- bank_transfer: ''
+ cod: 'Thanh toán khi nhận hàng',
+ card: 'Thẻ',
+ bank_transfer: 'Chuyển khoản ngân hàng'
  };
 
  const getPaymentBadge = (status: OrderPaymentStatus) => {
  switch (status) {
  case 'paid': return <Badge variant="success">Đã thanh toán</Badge>;
  case 'unpaid': return <Badge variant="warning">Chưa thanh toán</Badge>;
- case 'refunded': return <Badge variant="neutral"></Badge>;
- case 'partially_refunded': return <Badge variant="warning"></Badge>;
+ case 'partial': return <Badge variant="warning">Thanh toán một phần</Badge>;
+ case 'refunded': return <Badge variant="neutral">Đã hoàn tiền</Badge>;
+ case 'partially_refunded': return <Badge variant="warning">Hoàn tiền một phần</Badge>;
  }
  };
 
@@ -246,14 +250,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  Vận chuyển
  </Button> <Button variant="secondary" onClick={handlePrintInvoice} leftIcon={<IconPrinter size={18} />}>
  In </Button>
- {order.status !== 'cancelled' && order.status !== 'delivered' && (
+ {canWrite && getAllowedNextStatuses(order.status).includes('cancelled') && (
  <Button variant="warning" onClick={handleCancelOrder} disabled={cancelling} isLoading={cancelling} leftIcon={<IconBan size={18} />}>
  Hủy Đơn hàng
  </Button>
  )}
- <Button variant="danger" onClick={handleDeleteOrder} disabled={deleting} isLoading={deleting} leftIcon={<IconTrash size={18} />}>
- Xóa
- </Button> </>
+ {canDelete && ['delivered', 'cancelled', 'refunded'].includes(order.status) && <Button variant="danger" onClick={handleDeleteOrder} disabled={deleting} isLoading={deleting} leftIcon={<IconTrash size={18} />}>
+ Lưu trữ
+ </Button>} </>
  }
  /> <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
  {/* Main Column */}
@@ -290,11 +294,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  value={paymentStatus} 
  onChange={(e) => setPaymentStatus(e.target.value as OrderPaymentStatus)} 
  className="w-full h-10 px-3 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="paid">Đã thanh toán</option> <option value="unpaid">Chưa thanh toán</option> <option value="refunded"></option> <option value="partially_refunded"></option> </select> </div> <Button 
+ > <option value="paid">Đã thanh toán</option> <option value="unpaid">Chưa thanh toán</option> <option value="partial">Thanh toán một phần</option> <option value="refunded">Đã hoàn tiền</option> <option value="partially_refunded">Hoàn tiền một phần</option> </select> </div> <Button
  onClick={handleUpdatePayment}
  isLoading={updatingPayment}
- disabled={paymentStatus === order.paymentStatus}
- >Thao tác</Button> </div> </Card>
+ disabled={!canWrite || paymentStatus === order.paymentStatus}
+ >Cập nhật thanh toán</Button> </div> </Card>
 
  {/* Customer-facing Update */}
  <Card className="p-5 space-y-4"> <div className="flex items-center justify-between"> <h2 className="font-semibold flex items-center gap-2 text-[var(--admin-text-base)]"> <IconMessage size={18} className="text-[var(--admin-primary)]" /> </h2> <span className="text-xs text-[var(--admin-text-muted)]">trênTheo dõi đơn hàng</span> </div>
@@ -355,16 +359,17 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  onChange={(e) => setStatusValue(e.target.value as OrderStatus)}
  className="w-full h-10 px-3 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
  >
- {WORKFLOW_STATUSES.map((s) => (
+ <option value={order.status}>{getStatusMeta(order.status).label} (hiện tại)</option>
+ {getAllowedNextStatuses(order.status).map((s) => (
  <option key={s} value={s}>{getStatusMeta(s).label}</option>
  ))}
  </select> <Button
  onClick={handleUpdateStatus}
  isLoading={updatingStatus}
- disabled={statusValue === order.status}
+ disabled={!canWrite || statusValue === order.status}
  className="w-full"
  >
- Đơn hàng
+ Cập nhật trạng thái
  </Button> </div> </Card>
 
  {/* Customer */}

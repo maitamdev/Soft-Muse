@@ -122,7 +122,7 @@ class SupabaseOrderRepository implements IOrderRepository {
   }
 
   async getOrders(filters?: OrderFilters): Promise<Order[]> {
-    let query = createClient().from("orders").select(orderSelect).order("created_at", { ascending: false });
+    let query = createClient().from("orders").select(orderSelect).is("archived_at", null).order("created_at", { ascending: false });
     if (filters?.search) query = query.or(`order_number.ilike.%${filters.search}%,customer_name.ilike.%${filters.search}%`);
     if (filters?.status && filters.status !== "all") query = query.eq("status", filters.status);
     if (filters?.paymentStatus && filters.paymentStatus !== "all") query = query.eq("payment_status", filters.paymentStatus);
@@ -212,13 +212,13 @@ class SupabaseOrderRepository implements IOrderRepository {
   async cancelOrder(id: string, reason?: string) { return this.updateOrderStatus(id, "cancelled", reason || "Đơn hàng đã hủy"); }
 
   async deleteOrder(id: string): Promise<void> {
-    const { error } = await createClient().from("orders").delete().eq("id", id);
-    if (error) throw new Error(`Không thể xóa đơn hàng: ${error.message}`);
+    const { error } = await createClient().rpc("archive_order", { target_order_id: id });
+    if (error) throw new Error(`Không thể lưu trữ đơn hàng: ${error.message}`);
     eventBus.emit("order.deleted", id);
   }
 
   async updatePaymentStatus(id: string, paymentStatus: OrderPaymentStatus): Promise<Order> {
-    const { error } = await createClient().from("orders").update({ payment_status: paymentStatus }).eq("id", id);
+    const { error } = await createClient().rpc("change_order_payment_status", { target_order_id: id, next_status: paymentStatus });
     if (error) throw new Error(error.message);
     const order = await this.getOrder(id);
     if (!order) throw new Error("Không tìm thấy đơn hàng.");
@@ -241,13 +241,15 @@ class SupabaseOrderRepository implements IOrderRepository {
   }
 
   async deleteMultiple(ids: string[]): Promise<void> {
-    const { error } = await createClient().from("orders").delete().in("id", ids);
+    const results = await Promise.all(ids.map((id) => createClient().rpc("archive_order", { target_order_id: id })));
+    const error = results.find((result) => result.error)?.error;
     if (error) throw new Error(error.message);
     eventBus.emit("orders.bulk_deleted", ids);
   }
 
   async markAsPaidMultiple(ids: string[]): Promise<void> {
-    const { error } = await createClient().from("orders").update({ payment_status: "paid" }).in("id", ids);
+    const results = await Promise.all(ids.map((id) => createClient().rpc("change_order_payment_status", { target_order_id: id, next_status: "paid" })));
+    const error = results.find((result) => result.error)?.error;
     if (error) throw new Error(error.message);
     eventBus.emit("orders.bulk_updated", ids);
   }

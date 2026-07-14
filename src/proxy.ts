@@ -28,8 +28,8 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   let isStaff = false;
   if (user && pathname.startsWith("/admin")) {
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    isStaff = Boolean(profile && ["admin", "manager", "editor"].includes(profile.role));
+    const { data: profile } = await supabase.from("profiles").select("role, is_active").eq("id", user.id).maybeSingle();
+    isStaff = Boolean(profile?.is_active && ["admin", "manager", "editor"].includes(profile.role));
   }
 
   if (pathname === "/admin/login" && isStaff) return NextResponse.redirect(new URL("/admin", request.url));

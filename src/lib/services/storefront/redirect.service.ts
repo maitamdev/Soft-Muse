@@ -1,4 +1,4 @@
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export interface Redirect {
  id: string;
@@ -14,33 +14,37 @@ let mockRedirects: Redirect[] = [
  { id: 'rd-2', oldUrl: '/about', newUrl: '/pages/about-us', type: 301, status: 'active', hits: 45 },
 ];
 
-mockRedirects = mockStorage.read('storefront.redirects', mockRedirects);
-const persistRedirects = () => mockStorage.write('storefront.redirects', mockRedirects);
+const hydrateRedirects = async () => { mockRedirects = await loadStorefrontSetting('storefront.redirects', mockRedirects); };
+const persistRedirects = async () => { mockRedirects = await saveStorefrontSetting('storefront.redirects', mockRedirects); };
 
 export const RedirectService = {
  async getAll(): Promise<Redirect[]> {
+ await hydrateRedirects();
  return [...mockRedirects];
  },
 
  async addRedirect(redirect: Omit<Redirect, 'id' | 'hits'>): Promise<Redirect> {
+ await hydrateRedirects();
  const newRedirect: Redirect = { ...redirect, id: `rd-${Date.now()}`, hits: 0 };
  mockRedirects.push(newRedirect);
- persistRedirects();
+ await persistRedirects();
  return newRedirect;
  },
 
  async updateRedirect(id: string, updates: Partial<Redirect>): Promise<Redirect> {
+ await hydrateRedirects();
  const idx = mockRedirects.findIndex(r => r.id === id);
  if (idx > -1) {
  mockRedirects[idx] = { ...mockRedirects[idx], ...updates };
- persistRedirects();
+ await persistRedirects();
  return mockRedirects[idx];
  }
- throw new Error('Redirect not found');
+ throw new Error('Không tìm thấy chuyển hướng.');
  },
 
  async deleteRedirect(id: string): Promise<void> {
+ await hydrateRedirects();
  mockRedirects = mockRedirects.filter(r => r.id !== id);
- persistRedirects();
+ await persistRedirects();
  }
 };

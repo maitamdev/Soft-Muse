@@ -10,7 +10,7 @@ export interface Session {
 }
 
 export interface ProfilePreferences {
- language: 'ar' | 'en';
+ language: 'vi' | 'en';
  theme: 'light' | 'dark' | 'system';
  emailNotifications: boolean;
  pushNotifications: boolean;
@@ -39,7 +39,7 @@ export let mockProfile: Profile = {
  phone: '+201000000000',
  bio: 'Quản trị hệ thống AURA. vềQuản lý sản phẩm vàĐơn hàng và khách hàng.',
  preferences: {
- language: 'ar',
+ language: 'vi',
  theme: 'system',
  emailNotifications: true,
  pushNotifications: false,

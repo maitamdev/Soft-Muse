@@ -1,6 +1,6 @@
 import { Settings, mockSettings, updateMockSettings } from '@/data/mock/settings';
 
-export const SettingsService = {
+const MockSettingsService = {
  async getSettings(): Promise<Settings> {
  return new Promise((resolve) => {
  setTimeout(() => resolve(mockSettings), 300);
@@ -21,3 +21,5 @@ export const SettingsService = {
  });
  }
 };
+
+export { SupabaseSettingsService as SettingsService } from './settings-supabase.service';

@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export type SEOPage =
  | 'global' | 'homepage' | 'shop' | 'about'
@@ -133,7 +133,6 @@ const DEFAULT_SEO: SEOSettings[] = [
 ];
 
 let mockSEO: SEOSettings[] = [...DEFAULT_SEO];
-mockSEO = mockStorage.read('storefront.seo', mockSEO);
 
 // Backfill any pages added after the first save
 for (const def of DEFAULT_SEO) {
@@ -142,37 +141,45 @@ for (const def of DEFAULT_SEO) {
  }
 }
 
-const persistSEO = () => mockStorage.write('storefront.seo', mockSEO);
+const hydrateSEO = async () => {
+ mockSEO = await loadStorefrontSetting('storefront.seo', mockSEO);
+ for (const definition of DEFAULT_SEO) if (!mockSEO.find((item) => item.page === definition.page)) mockSEO.push({ ...definition });
+};
+const persistSEO = async () => { mockSEO = await saveStorefrontSetting('storefront.seo', mockSEO); };
 
 export const SEOService = {
  async getAll(): Promise<SEOSettings[]> {
+ await hydrateSEO();
  return [...mockSEO];
  },
 
  async getByPage(page: SEOPage): Promise<SEOSettings | undefined> {
+ await hydrateSEO();
  return mockSEO.find(s => s.page === page);
  },
 
  async update(id: string, updates: Partial<SEOSettings>): Promise<SEOSettings> {
+ await hydrateSEO();
  const idx = mockSEO.findIndex(s => s.id === id);
  if (idx > -1) {
  mockSEO[idx] = { ...mockSEO[idx], ...updates };
- persistSEO();
+ await persistSEO();
  eventBus.emit('website.changed', { area: 'seo' });
  return mockSEO[idx];
  }
  const newSettings: SEOSettings = { id, ...updates } as SEOSettings;
  mockSEO.push(newSettings);
- persistSEO();
+ await persistSEO();
  eventBus.emit('website.changed', { area: 'seo' });
  return newSettings;
  },
 
  async upsert(page: SEOPage, updates: Partial<SEOSettings>): Promise<SEOSettings> {
+ await hydrateSEO();
  const idx = mockSEO.findIndex(s => s.page === page);
  if (idx > -1) {
  mockSEO[idx] = { ...mockSEO[idx], ...updates };
- persistSEO();
+ await persistSEO();
  eventBus.emit('website.changed', { area: 'seo' });
  return mockSEO[idx];
  }
@@ -188,12 +195,13 @@ export const SEOService = {
  jsonLd: false, ...updates,
  };
  mockSEO.push(newEntry);
- persistSEO();
+ await persistSEO();
  eventBus.emit('website.changed', { area: 'seo' });
  return newEntry;
  },
 
  async getSEOScore(): Promise<{ score: number; brokenLinks: number }> {
+ await hydrateSEO();
  const filled = mockSEO.filter(s => s.title && s.description && s.ogImage).length;
  const score = Math.round((filled / mockSEO.length) * 100);
  return { score, brokenLinks: 0 };

@@ -1,7 +1,7 @@
 import { Article, mockArticles, updateMockArticles } from '@/data/mock/journal';
 import { defaultSEOData } from '@/data/mock/shared';
 
-export const JournalService = {
+const MockJournalService = {
  async getArticles(): Promise<Article[]> {
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -92,3 +92,5 @@ export const JournalService = {
  });
  }
 };
+
+export { SupabaseJournalService as JournalService } from './journal-supabase.service';

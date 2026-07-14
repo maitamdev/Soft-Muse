@@ -97,42 +97,21 @@ class SupabaseProductRepository implements IProductRepository {
 
   private async replaceRelations(productId: string, product: Partial<Product>) {
     const supabase = createClient();
-    const [imagesDelete, variantsDelete] = await Promise.all([
-      supabase.from("product_images").delete().eq("product_id", productId),
-      supabase.from("product_variants").delete().eq("product_id", productId),
-    ]);
-    if (imagesDelete.error) throw new Error(imagesDelete.error.message);
-    if (variantsDelete.error) throw new Error(variantsDelete.error.message);
-
-    if (product.images?.length) {
-      const { error } = await supabase.from("product_images").insert(
-        product.images.map((url, sortOrder) => ({ product_id: productId, url, alt_text: product.name ?? "", sort_order: sortOrder })),
-      );
-      if (error) throw new Error(`Không thể lưu ảnh: ${error.message}`);
-    }
-
-    if (product.variants?.length) {
-      const { error } = await supabase.from("product_variants").insert(
-        product.variants.map((variant) => ({
-          product_id: productId,
-          sku: variant.sku,
-          color: variant.color,
-          size: variant.size,
-          price: variant.price,
-          cost: variant.cost ?? 0,
-          stock: variant.stock,
-          weight: variant.weight ?? 0,
-          image_url: variant.image ?? null,
-          status: variant.status ?? "active",
-        })),
-      );
-      if (error) throw new Error(`Không thể lưu biến thể: ${error.message}`);
-    }
+    const { error } = await supabase.rpc("replace_product_relations", {
+      target_product_id: productId,
+      image_payload: (product.images ?? []).map((url, sortOrder) => ({ url, altText: product.name ?? "", sortOrder })),
+      variant_payload: (product.variants ?? []).map((variant) => ({
+        sku: variant.sku, color: variant.color, size: variant.size, price: variant.price,
+        cost: variant.cost ?? 0, stock: variant.stock, weight: variant.weight ?? 0,
+        image: variant.image ?? null, status: variant.status ?? "active",
+      })),
+    });
+    if (error) throw new Error(`Không thể lưu ảnh và biến thể: ${error.message}`);
   }
 
   async deleteProduct(id: string): Promise<void> {
-    const { error } = await createClient().from("products").delete().eq("id", id);
-    if (error) throw new Error(`Không thể xóa sản phẩm: ${error.message}`);
+    const { error } = await createClient().from("products").update({ status: "archived" }).eq("id", id);
+    if (error) throw new Error(`Không thể lưu trữ sản phẩm: ${error.message}`);
     eventBus.emit("products.changed");
   }
 
@@ -145,8 +124,8 @@ class SupabaseProductRepository implements IProductRepository {
   }
 
   async deleteMultiple(ids: string[]): Promise<void> {
-    const { error } = await createClient().from("products").delete().in("id", ids);
-    if (error) throw new Error(`Không thể xóa sản phẩm: ${error.message}`);
+    const { error } = await createClient().from("products").update({ status: "archived" }).in("id", ids);
+    if (error) throw new Error(`Không thể lưu trữ sản phẩm: ${error.message}`);
     eventBus.emit("products.changed");
   }
 

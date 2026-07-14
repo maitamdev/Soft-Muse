@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconDeviceFloppy as Save, IconArrowRight as ArrowRight, IconShoppingCart as ShoppingCart, IconCurrencyDollar as DollarSign, IconCalendar as Calendar, IconFileText as FileText, IconPlus as Plus, IconTrash as Trash2 } from '@tabler/icons-react';
 import { PurchaseOrder, Supplier } from '@/data/mock/business';
-import { businessService } from '@/lib/services/business.service';
+import { businessService } from '@/lib/services/business-supabase.service';
 import { ProductService } from '@/lib/services/product.service';
 import { formatCurrency } from '@/lib/utils/formatters';
 import { toast } from 'sonner';

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { adminAr } from '@/lib/i18n/admin-ar';
-import { NotificationService } from '@/lib/services/notification.service';
+import { SupabaseNotificationService as NotificationService } from '@/lib/services/notification-supabase.service';
 import { Notification } from '@/data/mock/notifications';
 import { toast } from 'sonner';
 import Link from 'next/link';

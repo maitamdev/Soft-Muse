@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { adminAr } from '@/lib/i18n/admin-ar';
-import { ProfileService } from '@/lib/services/profile.service';
+import { SupabaseProfileService as ProfileService } from '@/lib/services/profile-supabase.service';
 import { Profile } from '@/data/mock/profile';
 import { AuthService } from '@/lib/services/auth.service';
 import { usePermissions } from '@/lib/auth/PermissionContext';
-import { UsersService, MockStaffMember, MockRole, PERMISSION_MODULES_AR } from '@/lib/services/users.service';
+import type { MockStaffMember, MockRole } from '@/lib/services/users.service';
+import { PERMISSION_MODULES_AR } from '@/lib/services/users-supabase.service';
 import { AvatarUpload } from '@/components/admin/ui/AvatarUpload';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
@@ -57,13 +58,8 @@ export default function ProfilePage() {
  try {
  const data = await ProfileService.getProfile();
  setProfile(data);
- // Pull the authenticated user's role/account facts for the read-only account panel.
- const [staff, role] = await Promise.all([
- UsersService.getStaffMember(currentUser.id),
- UsersService.getRole(currentUser.roleId),
- ]);
- setStaffRecord(staff ?? null);
- setRoleRecord(role ?? null);
+ setStaffRecord(null);
+ setRoleRecord(null);
  } catch {
  toast.error(adminAr.toasts.unexpectedError);
  } finally {
@@ -87,13 +83,6 @@ export default function ProfilePage() {
  // Keep the underlying user record (used by auth + RBAC) in sync.
  if (user) {
  try {
- await UsersService.updateStaff(user.id, {
- nameAr: profile.name,
- username: profile.username,
- email: profile.email,
- phone: profile.phone || null,
- avatarUrl: profile.avatar || null,
- });
  AuthService.updateCurrentUser({
  name: profile.name,
  username: profile.username,
@@ -138,8 +127,8 @@ export default function ProfilePage() {
  setSaving(true);
  try {
  if (!user) throw new Error(',Đăng nhập từMới');
- await UsersService.changePassword(user.id, currentPass, newPass);
- toast.success('đãCập nhật mật khẩu thành công');
+ await ProfileService.updatePassword(currentPass, newPass);
+ toast.success('Đã cập nhật mật khẩu thành công.');
  setCurrentPass('');
  setNewPass('');
  setConfirmPass('');
@@ -212,7 +201,6 @@ export default function ProfilePage() {
  if (user) {
  try {
  await ProfileService.updateProfile({ avatar });
- await UsersService.updateStaff(user.id, { avatarUrl: avatar || null });
  AuthService.updateCurrentUser({ avatarUrl: avatar || null });
  } catch (err: any) {
  toast.error(err?.message || 'trongẢnh đại diện');
@@ -252,7 +240,7 @@ export default function ProfilePage() {
  )}
 
  {activeTab === 'security' && (
- <form onSubmit={handleSaveSecurity} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl"> <div className="border-b border-[var(--admin-border-light)] pb-4"> <h3 className="text-xl font-bold text-[var(--admin-text-base)]">{adminAr.profile.tabs.security}</h3> <p className="text-sm text-[var(--admin-text-muted)] mt-1">Cập nhật mật khẩu.</p> </div> <div className="bg-[var(--admin-info)]/10 border border-[var(--admin-info)]/20 p-4 rounded-[var(--admin-radius-md)] mb-6"> <p className="text-sm text-[var(--admin-info)] font-medium">Mật khẩu hiện tại (Mock) :<strong>password123</strong></p> </div> <div className="space-y-5"> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.currentPass}</label> <Input type="password" required value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} /> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.newPass}</label> <Input type="password" required value={newPass} onChange={(e) => setNewPass(e.target.value)} /> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.confirmPass}</label> <Input type="password" required value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} /> </div> </div> <div className="flex justify-end pt-6 border-t border-[var(--admin-border-light)]"> <Button type="submit" isLoading={saving} leftIcon={<IconShield size={18} />}>
+ <form onSubmit={handleSaveSecurity} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl"> <div className="border-b border-[var(--admin-border-light)] pb-4"> <h3 className="text-xl font-bold text-[var(--admin-text-base)]">{adminAr.profile.tabs.security}</h3> <p className="text-sm text-[var(--admin-text-muted)] mt-1">Cập nhật mật khẩu Supabase Auth. Mật khẩu mới cần ít nhất 8 ký tự, gồm chữ và số.</p> </div> <div className="space-y-5"> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.currentPass}</label> <Input type="password" autoComplete="current-password" required value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} /> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.newPass}</label> <Input type="password" autoComplete="new-password" required minLength={8} value={newPass} onChange={(e) => setNewPass(e.target.value)} /> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">{adminAr.profile.security.confirmPass}</label> <Input type="password" autoComplete="new-password" required minLength={8} value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} /> </div> </div> <div className="flex justify-end pt-6 border-t border-[var(--admin-border-light)]"> <Button type="submit" isLoading={saving} leftIcon={<IconShield size={18} />}>
  {saving ? adminAr.table.loading : adminAr.profile.security.updatePass}
  </Button> </div> </form>
  )}
@@ -260,9 +248,9 @@ export default function ProfilePage() {
  {activeTab === 'preferences' && (
  <form onSubmit={handleSavePreferences} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl"> <div className="border-b border-[var(--admin-border-light)] pb-4"> <h3 className="text-xl font-bold text-[var(--admin-text-base)]"></h3> <p className="text-sm text-[var(--admin-text-muted)] mt-1">Thông báo.</p> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]"></label> <select
  value={profile.preferences.language}
- onChange={(e) => setProfile({ ...profile, preferences: { ...profile.preferences, language: e.target.value as 'ar' | 'en' } })}
+ onChange={(e) => setProfile({ ...profile, preferences: { ...profile.preferences, language: e.target.value as 'vi' | 'en' } })}
  className="h-10 px-3 w-full bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="ar"></option> <option value="en">English</option> </select> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]"></label> <select
+ > <option value="vi">Tiếng Việt</option> <option value="en">English</option> </select> </div> <div> <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text-base)]">Giao diện</label> <select
  value={profile.preferences.theme}
  onChange={(e) => {
  const theme = e.target.value as 'light' | 'dark' | 'system';

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { create } from 'zustand';
-import { businessService } from '@/lib/services/business.service';
+import { businessService } from '@/lib/services/business-supabase.service';
 import { adminAr } from '@/lib/i18n/admin-ar';
 import { IconFileText, IconDownload, IconPrinter } from '@tabler/icons-react';
 import { Button } from '@/components/admin/design-system/Button';

@@ -17,10 +17,12 @@ function PageGuard({ children }: { children: React.ReactNode }) {
  const { canAccessModule, loaded, effectiveRole } = usePermissions();
  const mod = moduleForPath(pathname);
 
- if (loaded && !canAccessModule(mod)) {
+ if (!loaded) return <div className="min-h-[50vh]" aria-busy="true" />;
+
+ if (!canAccessModule(mod)) {
  return (
- <div className="flex flex-col items-center justify-center text-center py-24 gap-4"> <div className="w-16 h-16 rounded-full bg-[var(--admin-danger-muted)] text-[var(--admin-danger)] flex items-center justify-center"> <IconLock size={30} /> </div> <h2 className="text-xl font-bold text-[var(--admin-text-base)]">không</h2> <p className="text-sm text-[var(--admin-text-muted)] max-w-sm">
- ({effectiveRole?.nameAr ?? '—'}) không hiển thị này trang. với.</p> </div>
+ <div className="flex flex-col items-center justify-center text-center py-24 gap-4"> <div className="w-16 h-16 rounded-full bg-[var(--admin-danger-muted)] text-[var(--admin-danger)] flex items-center justify-center"> <IconLock size={30} /> </div> <h2 className="text-xl font-bold text-[var(--admin-text-base)]">Bạn không có quyền truy cập</h2> <p className="text-sm text-[var(--admin-text-muted)] max-w-sm">
+ Vai trò hiện tại ({effectiveRole?.nameAr ?? '—'}) không được phép xem trang này. Hãy liên hệ quản trị viên nếu bạn cần thêm quyền.</p> </div>
  );
  }
  return <>{children}</>;

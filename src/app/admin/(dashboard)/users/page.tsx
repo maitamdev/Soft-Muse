@@ -7,7 +7,8 @@ import {
  IconUserPlus, IconEdit, IconTrash, IconShieldCheck,
  IconClock, IconArrowUpRight, IconUser, IconMail, IconPhone, IconPower,
 } from '@tabler/icons-react';
-import { UsersService, MockStaffMember, MockRole } from '@/lib/services/users.service';
+import { SupabaseUsersService as UsersService } from '@/lib/services/users-supabase.service';
+import type { MockStaffMember, MockRole } from '@/lib/services/users.service';
 import { KpiCard } from '@/components/admin/design-system/KpiCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/admin/design-system/Card';
 import { Badge } from '@/components/admin/design-system/Badge';

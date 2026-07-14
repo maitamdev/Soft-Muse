@@ -6,7 +6,7 @@ export interface MediaFilters {
  type?: string;
 }
 
-export const MediaService = {
+export const MockMediaService = {
  async getMedia(filters?: MediaFilters): Promise<Media[]> {
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -106,3 +106,6 @@ export const MediaService = {
  });
  }
 };
+
+export { SupabaseMediaService as MediaService } from './media-supabase.service';
+export type { MediaFilters as SupabaseMediaFilters, MediaUploadOptions } from './media-supabase.service';

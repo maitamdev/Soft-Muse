@@ -83,15 +83,20 @@ export const AuthService = {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("full_name, role, avatar_url")
+      .select("full_name, role, avatar_url, is_active, login_count")
       .eq("id", data.user.id)
       .single();
 
-    if (profileError || !profile || !["admin", "manager", "editor"].includes(profile.role)) {
+    if (profileError || !profile?.is_active || !["admin", "manager", "editor"].includes(profile.role)) {
       await supabase.auth.signOut();
       throw new AuthError("account_inactive", "Tài khoản không có quyền truy cập quản trị.");
     }
 
+    const { error: loginAuditError } = await supabase.rpc("record_admin_login");
+    if (loginAuditError) {
+      await supabase.auth.signOut();
+      throw new AuthError("unknown", loginAuditError.message);
+    }
     return cacheSession(data.session, profile);
   },
 

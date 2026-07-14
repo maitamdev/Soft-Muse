@@ -412,4 +412,6 @@ export class MockBusinessRepository implements IBusinessRepository {
  }
 }
 
-export const businessService = new MockBusinessRepository();
+// Kept for compatibility with existing imports while production data now lives
+// in Supabase instead of a browser-local mock database.
+export { businessService } from './business-supabase.service';

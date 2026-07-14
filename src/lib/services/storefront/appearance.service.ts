@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export interface StoreAppearance {
  logoUrl: string;
@@ -40,16 +40,16 @@ let mockAppearance: StoreAppearance = {
  }
 };
 
-mockAppearance = mockStorage.read('storefront.appearance', mockAppearance);
-
 export const AppearanceService = {
  async getSettings(): Promise<StoreAppearance> {
+ mockAppearance = await loadStorefrontSetting('storefront.appearance', mockAppearance);
  return { ...mockAppearance };
  },
 
  async updateSettings(updates: Partial<StoreAppearance>): Promise<StoreAppearance> {
+ mockAppearance = await loadStorefrontSetting('storefront.appearance', mockAppearance);
  mockAppearance = { ...mockAppearance, ...updates };
- mockStorage.write('storefront.appearance', mockAppearance);
+ mockAppearance = await saveStorefrontSetting('storefront.appearance', mockAppearance);
  eventBus.emit('website.changed', { area: 'appearance' });
  return { ...mockAppearance };
  }

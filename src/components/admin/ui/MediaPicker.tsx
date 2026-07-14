@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { MediaService, MediaFilters } from '@/lib/services/media.service';
+import React, { useState, useEffect, useRef } from 'react';
+import { SupabaseMediaService as MediaService, type MediaFilters } from '@/lib/services/media-supabase.service';
 import { Media } from '@/data/mock/media';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,7 @@ interface MediaPickerProps {
 }
 
 export function MediaPicker({ open, onClose, onSelect, multiple = false, allowedTypes }: MediaPickerProps) {
+ const uploadRef = useRef<HTMLInputElement>(null);
  const [mediaItems, setMediaItems] = useState<Media[]>([]);
  const [folders, setFolders] = useState<string[]>([]);
  const [loading, setLoading] = useState(true);
@@ -57,8 +58,8 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  finalData = data.filter(m => allowedTypes.some(type => m.mimeType.includes(type)));
  }
  setMediaItems(finalData);
- } catch {
- toast.error('trong tảiThư viện media');
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : 'Không thể tải thư viện media.');
  } finally {
  setLoading(false);
  }
@@ -68,8 +69,8 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  try {
  const f = await MediaService.getFolders();
  setFolders(f);
- } catch (e) {
- console.error(e);
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : 'Không thể tải thư mục.');
  }
  }
 
@@ -102,30 +103,25 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  onClose();
  };
 
- const handleUploadMock = async () => {
- const mockFile: Partial<Media> = {
- fileName: `mock_upload_${Date.now()}.jpg`,
- originalName: 'new_image.jpg',
- alt: 'ảnhMới',
- mimeType: 'image/jpeg',
- folder: filters.folder !== 'all' ? filters.folder : 'uncategorized',
- };
- 
+ const handleUpload = async (files: FileList | null) => {
+ if (!files?.length) return;
  setLoading(true);
  try {
- await MediaService.uploadMedia(mockFile);
- toast.success('đã thành công ()');
- loadMedia();
- } catch {
- toast.error('Đã xảy ra lỗi ');
+ for (const file of Array.from(files)) await MediaService.uploadMedia(file, { folder: filters.folder !== 'all' ? filters.folder : 'uncategorized' });
+ toast.success(`Đã tải lên ${files.length} tệp.`);
+ await loadMedia();
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : 'Tải tệp thất bại.');
  setLoading(false);
+ } finally {
+ if (uploadRef.current) uploadRef.current.value = '';
  }
  };
 
  return (
  <AnimatePresence>
  {open && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4"> <motion.div 
+ <div className="fixed inset-0 z-50 flex items-center justify-center p-4"> <input ref={uploadRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif,application/pdf" multiple={multiple} className="sr-only" onChange={(event) => void handleUpload(event.target.files)} /> <motion.div
  initial={{ opacity: 0 }}
  animate={{ opacity: 1 }}
  exit={{ opacity: 0 }}
@@ -147,22 +143,22 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  {/* Toolbar */}
  <div className="px-6 py-4 border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-base)] flex flex-wrap gap-4 items-center justify-between"> <div className="flex gap-4 flex-1"> <div className="w-64 max-w-full"> <Input 
  icon={<IconSearch size={18} />}
- placeholder="Tìm kiếm trong." 
+ placeholder="Tìm theo tên hoặc mô tả"
  value={filters.search}
  onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
  /> </div> <select
  value={filters.folder}
  onChange={e => setFilters(prev => ({ ...prev, folder: e.target.value }))}
  className="px-4 py-2 border border-[var(--admin-border-base)] bg-[var(--admin-bg-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:border-[var(--admin-primary)] focus:ring-1 focus:ring-[var(--admin-primary)] min-w-[150px] text-[var(--admin-text-base)]"
- > <option value="all">Tất cả </option>
+ > <option value="all">Tất cả thư mục</option>
  {folders.map(f => (
  <option key={f} value={f}>{f}</option>
  ))}
  </select> </div> <Button 
- onClick={handleUploadMock}
+ onClick={() => uploadRef.current?.click()}
  leftIcon={<IconUpload size={18} />}
  >
- Mới
+ Tải tệp lên
  </Button> </div>
 
  {/* Grid Content */}
@@ -170,7 +166,7 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  {loading ? (
  <div className="flex justify-center items-center h-full"> <div className="w-8 h-8 border-4 border-[var(--admin-primary)] border-t-transparent rounded-full animate-spin"></div> </div>
  ) : mediaItems.length === 0 ? (
- <div className="flex flex-col items-center justify-center h-full text-[var(--admin-text-muted)]"> <IconFile size={48} className="mb-4 text-[var(--admin-border-strong)]" stroke={1.5} /> <p>Không có Tìm kiếm</p> </div>
+ <div className="flex flex-col items-center justify-center h-full text-[var(--admin-text-muted)]"> <IconFile size={48} className="mb-4 text-[var(--admin-border-strong)]" stroke={1.5} /> <p>Không tìm thấy tệp phù hợp.</p> </div>
  ) : (
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
  {mediaItems.map(media => {
@@ -203,7 +199,7 @@ export function MediaPicker({ open, onClose, onSelect, multiple = false, allowed
  </p> <div className="flex gap-3"> <Button variant="secondary" onClick={onClose}>Hủy</Button> <Button 
  onClick={handleConfirm}
  disabled={selectedIds.size === 0}
- >Thao tác</Button> </div> </div> </motion.div> </div>
+ >Chọn tệp</Button> </div> </div> </motion.div> </div>
  )}
  </AnimatePresence>
  );

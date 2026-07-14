@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { adminAr } from '@/lib/i18n/admin-ar';
-import { SettingsService } from '@/lib/services/settings.service';
+import { SupabaseSettingsService as SettingsService } from '@/lib/services/settings-supabase.service';
 import { Settings } from '@/data/mock/settings';
 import { ImageUpload } from '@/components/admin/ui/ImageUpload';
 import { toast } from 'sonner';

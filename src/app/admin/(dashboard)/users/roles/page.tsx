@@ -7,7 +7,8 @@ import {
  IconShieldCheck, IconPlus, IconEdit, IconTrash,
  IconChevronRight, IconLock, IconCheck, IconX,
 } from '@tabler/icons-react';
-import { UsersService, MockRole, PERMISSION_MODULES_AR } from '@/lib/services/users.service';
+import { SupabaseUsersService as UsersService, PERMISSION_MODULES_AR } from '@/lib/services/users-supabase.service';
+import type { MockRole } from '@/lib/services/users.service';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/admin/design-system/Card';
 import { Badge } from '@/components/admin/design-system/Badge';
 import { Button } from '@/components/admin/design-system/Button';
@@ -136,8 +137,8 @@ export default function RolesPage() {
  title={t.title}
  description={t.subtitle}
  actions={
- <Button variant="primary" size="md" leftIcon={<IconPlus size={18} />} onClick={openCreate}>
- {t.addRole}
+ <Button variant="secondary" size="md" leftIcon={<IconLock size={18} />} onClick={openCreate} disabled title="Vai trò được đồng bộ với RLS bằng migration">
+ Vai trò hệ thống
  </Button>
  }
  /> </StaggerItem> <StaggerItem className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -166,7 +167,7 @@ export default function RolesPage() {
  {/* Permission Matrix */}
  <div className="xl:col-span-2">
  {displayRole ? (
- <Card className="overflow-hidden"> <CardHeader className="flex flex-row items-center justify-between border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] pb-4"> <div className="flex items-center gap-3"> <IconShieldCheck size={20} className="text-[var(--admin-primary)]" /> <div> <CardTitle>{displayRole.nameAr}</CardTitle> <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">{displayRole.descriptionAr}</p> </div> </div> <div className="flex items-center gap-2"> <Button variant="secondary" size="sm" leftIcon={<IconEdit size={14} />} onClick={() => openEdit(displayRole)}>
+ <Card className="overflow-hidden"> <CardHeader className="flex flex-row items-center justify-between border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] pb-4"> <div className="flex items-center gap-3"> <IconShieldCheck size={20} className="text-[var(--admin-primary)]" /> <div> <CardTitle>{displayRole.nameAr}</CardTitle> <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">{displayRole.descriptionAr}</p> </div> </div> <div className="flex items-center gap-2"> <Button variant="secondary" size="sm" leftIcon={<IconEdit size={14} />} onClick={() => openEdit(displayRole)} disabled={displayRole.isSystem} title="Quyền hệ thống được quản lý bằng migration">
  {t.editRole}
  </Button>
  {!displayRole.isSystem && (

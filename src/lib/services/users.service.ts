@@ -188,7 +188,7 @@ function persistUsers() {
  mockStorage.write('users.credentials', MOCK_CREDENTIALS);
 }
 
-export const UsersService = {
+export const MockUsersService = {
  async getStaff(): Promise<MockStaffMember[]> {
  await new Promise(r => setTimeout(r, 400));
  return [...MOCK_STAFF];
@@ -412,3 +412,5 @@ export const UsersService = {
  eventBus.emit('users.changed');
  },
 };
+
+export { SupabaseUsersService as UsersService } from './users-supabase.service';

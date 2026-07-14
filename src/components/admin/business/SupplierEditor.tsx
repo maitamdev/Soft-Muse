@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconDeviceFloppy as Save, IconArrowRight as ArrowRight, IconUser as User, IconMapPin as MapPin, IconBriefcase as Briefcase, IconFileText as FileText } from '@tabler/icons-react';
 import { Supplier } from '@/data/mock/business';
-import { businessService } from '@/lib/services/business.service';
+import { businessService } from '@/lib/services/business-supabase.service';
 import { toast } from 'sonner';
 
 interface SupplierEditorProps {

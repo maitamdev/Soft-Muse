@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export type HomepageSectionType =
  | 'hero'
@@ -206,10 +206,12 @@ let mockSections: HomepageSection[] = [
  },
 ];
 
-mockSections = mockStorage.read('storefront.homepage', mockSections);
+const hydrateHomepage = async () => { mockSections = await loadStorefrontSetting('storefront.homepage', mockSections); };
+const persistHomepage = async () => { mockSections = await saveStorefrontSetting('storefront.homepage', mockSections); };
 
 export const HomepageService = {
  async getSections(): Promise<HomepageSection[]> {
+ await hydrateHomepage();
  return this.getSectionsSync();
  },
 
@@ -226,12 +228,13 @@ export const HomepageService = {
 
  async updateSections(sections: HomepageSection[]): Promise<HomepageSection[]> {
  mockSections = [...sections];
- mockStorage.write('storefront.homepage', mockSections);
+ await persistHomepage();
  eventBus.emit('website.changed', { area: 'homepage' });
  return this.getSections();
  },
 
  async addSection(type: HomepageSectionType, title?: string): Promise<HomepageSection> {
+ await hydrateHomepage();
  const maxOrder = mockSections.reduce((m, s) => Math.max(m, s.order), -1);
  const section: HomepageSection = {
  id: `sec-${type}-${Date.now()}`,
@@ -243,14 +246,15 @@ export const HomepageService = {
  settings: { ...DEFAULT_SECTION_SETTINGS[type] },
  };
  mockSections = [...mockSections, section];
- mockStorage.write('storefront.homepage', mockSections);
+ await persistHomepage();
  eventBus.emit('website.changed', { area: 'homepage' });
  return section;
  },
 
  async duplicateSection(id: string): Promise<HomepageSection> {
+ await hydrateHomepage();
  const original = mockSections.find(s => s.id === id);
- if (!original) throw new Error('Section not found');
+ if (!original) throw new Error('Không tìm thấy khu vực trang chủ.');
  const maxOrder = mockSections.reduce((m, s) => Math.max(m, s.order), -1);
  const copy: HomepageSection = { ...original,
  id: `sec-${original.type}-${Date.now()}`,
@@ -259,25 +263,27 @@ export const HomepageService = {
  settings: JSON.parse(JSON.stringify(original.settings ?? {})),
  };
  mockSections = [...mockSections, copy];
- mockStorage.write('storefront.homepage', mockSections);
+ await persistHomepage();
  eventBus.emit('website.changed', { area: 'homepage' });
  return copy;
  },
 
  async updateSection(id: string, updates: Partial<HomepageSection>): Promise<HomepageSection> {
+ await hydrateHomepage();
  const idx = mockSections.findIndex(s => s.id === id);
  if (idx > -1) {
  mockSections[idx] = { ...mockSections[idx], ...updates };
- mockStorage.write('storefront.homepage', mockSections);
+ await persistHomepage();
  eventBus.emit('website.changed', { area: 'homepage' });
  return mockSections[idx];
  }
- throw new Error('Section not found');
+ throw new Error('Không tìm thấy khu vực trang chủ.');
  },
 
  async deleteSection(id: string): Promise<void> {
+ await hydrateHomepage();
  mockSections = mockSections.filter(s => s.id !== id);
- mockStorage.write('storefront.homepage', mockSections);
+ await persistHomepage();
  eventBus.emit('website.changed', { area: 'homepage' });
  },
 

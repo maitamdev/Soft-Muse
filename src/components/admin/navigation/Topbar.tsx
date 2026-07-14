@@ -8,7 +8,7 @@ import {
  IconBell, IconMenu2, IconSearch, IconChevronLeft,
  IconUser, IconSettings, IconLogout,
 } from "@tabler/icons-react";
-import { NotificationService } from "@/lib/services/notification.service";
+import { SupabaseNotificationService as NotificationService } from "@/lib/services/notification-supabase.service";
 import { AuthService, AuthenticatedUser } from "@/lib/services/auth.service";
 import { usePermissions } from "@/lib/auth/PermissionContext";
 import { Button } from "../design-system/Button";

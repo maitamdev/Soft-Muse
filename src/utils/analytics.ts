@@ -1,62 +1,37 @@
-/**
- * AURA Premium Analytics Placeholder Module
- * Handles demo-mode tracking event logging for partner presentation.
- * Logs are color-coded in the console to match AURA's luxury aesthetic.
- */
+import { createClient } from '@/lib/supabase/client';
 
-const LOG_PREFIX_STYLE = "color: #FFFFFF; background: #8E6B4B; padding: 2px 6px; font-weight: bold; border-radius: 2px;";
-const LOG_CONTENT_STYLE = "color: #8E6B4B; font-weight: bold;";
-const LOG_DATA_STYLE = "color: #111111; font-family: monospace; font-size: 11px;";
+type EventType = 'page_view' | 'product_view' | 'add_to_cart' | 'checkout_start' | 'purchase';
+
+function sessionId(): string | null {
+ if (typeof window === 'undefined' || navigator.doNotTrack === '1') return null;
+ const key = 'soft_muse_analytics_session';
+ let value = window.sessionStorage.getItem(key);
+ if (!value) { value = crypto.randomUUID(); window.sessionStorage.setItem(key, value); }
+ return value;
+}
+
+function device() {
+ if (typeof window === 'undefined') return 'desktop';
+ if (window.innerWidth < 768) return 'mobile';
+ if (window.innerWidth < 1100) return 'tablet';
+ return 'desktop';
+}
+
+async function track(eventType: EventType, metadata: Record<string, unknown> = {}, path?: string) {
+ const session = sessionId();
+ if (!session) return;
+ try {
+  await createClient().from('analytics_events').insert({ event_type: eventType, session_id: session,
+   path: path ?? window.location.pathname, device: device(), metadata });
+ } catch {
+  // Analytics must never block the storefront transaction or navigation.
+ }
+}
 
 export const analytics = {
- trackProductView: (id: string, title: string, price: number) => {
- console.log(
- `%c[AURA Analytics]%c Product View Event`,
- LOG_PREFIX_STYLE,
- LOG_CONTENT_STYLE
- );
- console.log(
- `%cID: ${id}\nTitle: ${title}\nGiá: ${price} VND`,
- LOG_DATA_STYLE
- );
- },
-
- trackAddToCart: (id: string, title: string, price: number, size: string, color: string, quantity: number) => {
- console.log(
- `%c[AURA Analytics]%c Add to Cart Event`,
- LOG_PREFIX_STYLE,
- LOG_CONTENT_STYLE
- );
- console.log(
- `%cItem Added:\n- ID: ${id}\n- Title: ${title}\n- Giá: ${price} VND\n- Size: ${size}\n- Color: ${color}\n- Qty: ${quantity}`,
- LOG_DATA_STYLE
- );
- },
-
- trackCheckoutStart: (cartLength: number, subtotal: number) => {
- console.log(
- `%c[AURA Analytics]%c Checkout Initiated`,
- LOG_PREFIX_STYLE,
- LOG_CONTENT_STYLE
- );
- console.log(
- `%cTotal items in cart: ${cartLength}\nTạm tính: ${subtotal} VND`,
- LOG_DATA_STYLE
- );
- },
-
- trackPurchaseSuccess: (orderId: string, cartItems: { title: string; color?: string; size?: string; quantity: number }[], subtotal: number, paymentMethod: string) => {
- console.log(
- `%c[AURA Analytics]%c Purchase Complete Event`,
- LOG_PREFIX_STYLE,
- LOG_CONTENT_STYLE
- );
- const itemDetails = cartItems
- .map((item) => ` * ${item.title} (${item.color}/${item.size}) x${item.quantity}`)
- .join("\n");
- console.log(
- `%cOrder Details:\n- Order ID: ${orderId}\n- Items:\n${itemDetails}\n- Total Tạm tính: ${subtotal} VND\n- Payment Method: ${paymentMethod}`,
- LOG_DATA_STYLE
- );
- }
+ trackPageView: (path: string) => { void track('page_view', {}, path); },
+ trackProductView: (id: string, title: string, price: number) => { void track('product_view', { productId: id, title, price }); },
+ trackAddToCart: (id: string, title: string, price: number, size: string, color: string, quantity: number) => { void track('add_to_cart', { productId: id, title, price, size, color, quantity }); },
+ trackCheckoutStart: (cartLength: number, subtotal: number) => { void track('checkout_start', { cartLength, subtotal }); },
+ trackPurchaseSuccess: (orderId: string, cartItems: { title: string; color?: string; size?: string; quantity: number }[], subtotal: number, paymentMethod: string) => { void track('purchase', { orderId, itemCount: cartItems.reduce((sum, item) => sum + item.quantity, 0), subtotal, paymentMethod }); },
 };

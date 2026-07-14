@@ -78,7 +78,7 @@ export function mapProductRow(row: ProductRow): Product {
     costPrice: number(row.cost_price),
     sku: String(row.sku ?? ""),
     barcode: String(row.barcode ?? ""),
-    stock: number(row.stock),
+    stock: variants.length ? variants.reduce((sum, variant) => sum + variant.stock, 0) : number(row.stock),
     lowStockLimit: number(row.low_stock_limit),
     material: String(row.material ?? ""),
     weight: number(row.weight),

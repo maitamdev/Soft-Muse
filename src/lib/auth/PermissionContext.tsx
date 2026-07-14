@@ -17,9 +17,11 @@ const PERMISSION_TO_MODULE: Record<string, PermissionModule> = {
 };
 
 const ROUTE_MODULE: Array<[string, PermissionModule | null]> = [
-  ["/admin/profile", null], ["/admin/analytics", "analytics"], ["/admin/orders", "orders"],
+  ["/admin/profile", null], ["/admin/users", "system"], ["/admin/settings", "settings"],
+  ["/admin/business", "finance"], ["/admin/website", "storefront"], ["/admin/soft-muse", "storefront"],
+  ["/admin/journal", "storefront"], ["/admin/analytics", "analytics"], ["/admin/orders", "orders"],
   ["/admin/customers", "customers"], ["/admin/products", "products"], ["/admin/categories", "products"],
-  ["/admin/collections", "products"], ["/admin/reviews", "products"], ["/admin/inventory", "inventory"],
+  ["/admin/brands", "products"], ["/admin/collections", "products"], ["/admin/reviews", "products"], ["/admin/inventory", "inventory"],
   ["/admin/coupons", "marketing"], ["/admin", "dashboard"],
 ];
 
@@ -37,9 +39,10 @@ function roleFor(user: AuthenticatedUser | null): AdminRole | null {
   if (!user) return null;
   const isAdmin = user.isSuperAdmin;
   const isManager = user.roleId === "role_2";
+  const editorRead = ["dashboard", "products", "storefront"];
   const permissions = Object.fromEntries(modules.map((module) => [module, {
-    read: isAdmin || isManager || ["dashboard", "products", "orders", "customers", "inventory"].includes(module),
-    write: isAdmin || isManager || ["products", "orders"].includes(module),
+    read: isAdmin || (isManager && module !== "system") || editorRead.includes(module),
+    write: isAdmin || (isManager && module !== "system") || ["products", "storefront"].includes(module),
     delete: isAdmin,
     impersonation: false,
   }])) as Record<string, ModulePermission>;
@@ -74,7 +77,7 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 
   const role = useMemo(() => roleFor(user), [user]);
   const can = useCallback((module: PermissionModule, action: PermissionAction = "read") => {
-    if (!loaded) return true;
+    if (!loaded) return false;
     const permission = role?.permissions[module];
     if (!permission) return false;
     return action === "impersonation" ? false : Boolean(permission[action]);

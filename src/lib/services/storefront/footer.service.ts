@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { loadStorefrontSetting, saveStorefrontSetting } from './settings-storage';
 
 export interface FooterColumn {
  id: string;
@@ -64,16 +64,16 @@ let mockFooter: FooterSettings = {
  ]
 };
 
-mockFooter = mockStorage.read('storefront.footer', mockFooter);
-
 export const FooterService = {
  async getSettings(): Promise<FooterSettings> {
+ mockFooter = await loadStorefrontSetting('storefront.footer', mockFooter);
  return { ...mockFooter };
  },
 
  async updateSettings(updates: Partial<FooterSettings>): Promise<FooterSettings> {
+ mockFooter = await loadStorefrontSetting('storefront.footer', mockFooter);
  mockFooter = { ...mockFooter, ...updates };
- mockStorage.write('storefront.footer', mockFooter);
+ mockFooter = await saveStorefrontSetting('storefront.footer', mockFooter);
  eventBus.emit('website.changed', { area: 'footer' });
  return { ...mockFooter };
  }

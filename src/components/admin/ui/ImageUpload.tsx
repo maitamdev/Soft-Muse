@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IconPhotoPlus, IconTrash, IconLoader2 } from "@tabler/icons-react";
+import { IconLink, IconLoader2, IconPhotoPlus, IconPlus, IconTrash } from "@tabler/icons-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface ImageUploadProps {
@@ -11,10 +11,43 @@ interface ImageUploadProps {
   label?: string;
 }
 
+function normalizeImageUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("/")) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
 export function ImageUpload({ images, onChange, multiple = false, label = "Tải ảnh sản phẩm" }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
+
+  const addImageUrl = () => {
+    setError("");
+    const url = normalizeImageUrl(imageUrl);
+
+    if (!url) {
+      setError("Vui lòng nhập link ảnh hợp lệ, ví dụ https://... hoặc /images/...");
+      return;
+    }
+
+    if (images.includes(url)) {
+      setError("Link ảnh này đã có trong danh sách.");
+      return;
+    }
+
+    onChange(multiple ? [...images, url] : [url]);
+    setImageUrl("");
+  };
 
   const upload = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -55,6 +88,7 @@ export function ImageUpload({ images, onChange, multiple = false, label = "Tải
         className="sr-only"
         onChange={(event) => void upload(event.target.files)}
       />
+
       <button
         type="button"
         disabled={uploading}
@@ -67,12 +101,40 @@ export function ImageUpload({ images, onChange, multiple = false, label = "Tải
         </span>
         <span className="text-xs text-[var(--admin-text-muted)]">JPG, PNG, WebP hoặc AVIF, tối đa 10 MB</span>
       </button>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <label className="relative flex-1">
+          <IconLink size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
+          <input
+            type="text"
+            value={imageUrl}
+            onChange={(event) => setImageUrl(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                addImageUrl();
+              }
+            }}
+            placeholder="Dán link ảnh: https://... hoặc /images/..."
+            className="h-11 w-full border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] pl-9 pr-3 text-sm text-[var(--admin-text-base)] outline-none transition-colors placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-primary)]"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={addImageUrl}
+          className="inline-flex h-11 items-center justify-center gap-2 border border-[var(--admin-border-base)] bg-[var(--admin-bg-base)] px-4 text-sm font-semibold text-[var(--admin-text-base)] transition-colors hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)]"
+        >
+          <IconPlus size={17} />
+          Thêm link
+        </button>
+      </div>
+
       {error && <p className="text-sm text-[var(--admin-danger)]">{error}</p>}
 
       {images.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {images.map((src, index) => (
-            <div key={src} className="group relative aspect-[3/4] overflow-hidden border border-[var(--admin-border-base)] bg-[var(--admin-bg-subtle)]">
+            <div key={`${src}-${index}`} className="group relative aspect-[3/4] overflow-hidden border border-[var(--admin-border-base)] bg-[var(--admin-bg-subtle)]">
               <img src={src} alt={`Ảnh sản phẩm ${index + 1}`} className="h-full w-full object-cover" />
               <button
                 type="button"

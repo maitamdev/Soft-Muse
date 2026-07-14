@@ -21,17 +21,8 @@ export default function Navbar() {
  const { cart, wishlist, cartCount, cartSubtotal, isCartOpen, setCartOpen, removeFromCart, updateQuantity } = useStore();
  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
  const [isSearchOpen, setSearchOpen] = useState(false);
- const [scrolled, setScrolled] = useState(false);
  const pathname = usePathname();
  const products = useStorefrontProducts();
-
- useEffect(() => {
- const handleScroll = () => {
- setScrolled(window.scrollY > 20);
- };
- window.addEventListener("scroll", handleScroll, { passive: true });
- return () => window.removeEventListener("scroll", handleScroll);
- }, []);
 
  // Search overlay state
  const [searchQuery, setSearchQuery] = useState("");
@@ -183,18 +174,12 @@ export default function Navbar() {
  useEventSubscribeMany(['website.changed'], () => { loadNavLinks(); loadStoreInfo(); });
 
  return (
- <>
+ <div className="relative z-50">
  {/* 1. HEADER WRAPPER */}
  <header
- className={`sticky top-0 z-50 w-full border-b transition-all duration-500 ${
- scrolled
- ? "bg-background-secondary/85 backdrop-blur-md border-brand-border/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]"
- : "bg-background-secondary border-brand-border/20"
- }`}
+ className="relative z-50 w-full border-b border-brand-border/20 bg-background-secondary"
  > <div
- className={`max-w-[1440px] mx-auto px-4 md:px-12 flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr] transition-all duration-500 ${
- scrolled ? "h-16 md:h-[76px]" : "h-16 md:h-[96px]"
- }`}
+ className="h-16 md:h-[96px] max-w-[1440px] mx-auto px-4 md:px-12 flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]"
  >
  
  {/* LEFT: Menu links on Desktop / Menu Button on Mobile */}
@@ -380,13 +365,13 @@ export default function Navbar() {
  animate={{ opacity: 0.4 }}
  exit={{ opacity: 0 }}
  onClick={closeSearch}
- className="fixed inset-0 bg-text-primary/20 z-40"
+ className="absolute inset-x-0 top-0 h-screen bg-text-primary/20 z-40"
  /> <motion.div
  initial={{ opacity: 0, y: -20 }}
  animate={{ opacity: 1, y: 0 }}
  exit={{ opacity: 0, y: -20 }}
  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
- className="fixed top-24 left-0 right-0 bg-background-secondary border-b border-brand-border z-40 py-8 px-6 shadow-md max-h-[85vh] overflow-y-auto"
+ className="absolute top-16 md:top-24 left-0 right-0 bg-background-secondary border-b border-brand-border z-50 py-8 px-6 shadow-md max-h-[calc(100vh-6rem)] overflow-y-auto"
  role="dialog"
  aria-modal="true"
  aria-label="Tìm kiếm"
@@ -627,7 +612,7 @@ export default function Navbar() {
  {cartCount}
  </motion.span>
  )}
- <span className="text-[9px] font-sans"></span> </button> </nav> </>
+ <span className="text-[9px] font-sans"></span> </button> </nav> </div>
  );
 }
 

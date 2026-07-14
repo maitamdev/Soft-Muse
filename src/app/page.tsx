@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Button from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/Card";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
@@ -36,23 +37,63 @@ const testimonials = [
 
 export default function HomePage() {
   const content = usePageContent(HOME_CONTENT);
+  const reduceMotion = useReducedMotion();
   const products = useStorefrontProducts();
+  const [heroSlide, setHeroSlide] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const newArrivals = products.filter((product) => product.newArrival).slice(0, 4);
   const bestSellers = products.filter((product) => product.bestSeller).slice(0, 4);
+  const heroImages = useMemo(() => Array.from(new Set([
+    content.home_hero_image,
+    content.home_hero_image_2,
+    content.home_hero_image_3,
+    content.home_hero_image_4,
+  ].filter(Boolean))), [content.home_hero_image, content.home_hero_image_2, content.home_hero_image_3, content.home_hero_image_4]);
+
+  useEffect(() => {
+    if (heroPaused || reduceMotion || heroImages.length < 2) return;
+    const timer = window.setInterval(() => setHeroSlide(current => (current + 1) % heroImages.length), 5200);
+    return () => window.clearInterval(timer);
+  }, [heroImages.length, heroPaused, reduceMotion]);
+
+  useEffect(() => {
+    setHeroSlide(current => Math.min(current, Math.max(heroImages.length - 1, 0)));
+    heroImages.slice(1).forEach(src => { const image = new window.Image(); image.src = src; });
+  }, [heroImages]);
 
   return (
     <div className="w-full bg-background-primary flex flex-col items-center">
-      <section className="relative w-full min-h-[calc(100vh-88px)] overflow-hidden bg-background-secondary border-b border-brand-border">
-        <Image
-          src={content.home_hero_image}
-          alt="Soft Muse công sở nữ"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[58%_10%] md:object-[56%_10%] saturate-[1.04] contrast-[1.04]"
-        />
+      <section
+        className="relative w-full min-h-[calc(100vh-88px)] overflow-hidden bg-background-secondary border-b border-brand-border"
+        onMouseEnter={() => setHeroPaused(true)}
+        onMouseLeave={() => setHeroPaused(false)}
+        onFocusCapture={() => setHeroPaused(true)}
+        onBlurCapture={() => setHeroPaused(false)}
+        aria-roledescription="carousel"
+        aria-label="Bộ sưu tập Soft Muse"
+      >
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            key={heroImages[heroSlide]}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, scale: reduceMotion ? 1 : 1.025 }}
+            exit={{ opacity: 0 }}
+            transition={{ opacity: { duration: 0.9, ease: "easeInOut" }, scale: { duration: 6.2, ease: "linear" } }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroImages[heroSlide] ?? content.home_hero_image}
+              alt={`Thời trang công sở nữ Soft Muse ${heroSlide + 1}`}
+              fill
+              priority={heroSlide === 0}
+              quality={95}
+              sizes="100vw"
+              className="object-cover object-[58%_16%] md:object-[56%_18%] saturate-[1.04] contrast-[1.06]"
+            />
+          </motion.div>
+        </AnimatePresence>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,17,17,0.82)_0%,rgba(17,17,17,0.62)_32%,rgba(17,17,17,0.22)_56%,rgba(17,17,17,0)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(17,17,17,0.18)_0%,rgba(17,17,17,0)_36%)]" />
         <div className="relative z-10 min-h-[calc(100vh-88px)] max-w-[1280px] mx-auto px-6 md:px-12 flex items-center">
@@ -81,6 +122,15 @@ export default function HomePage() {
             </div>
           </motion.div>
         </div>
+        {heroImages.length > 1 && <div className="absolute bottom-6 left-0 right-0 z-20 mx-auto flex max-w-[1280px] items-center justify-between px-6 md:bottom-8 md:px-12">
+          <div className="flex items-center gap-2" role="tablist" aria-label="Chọn ảnh banner">
+            {heroImages.map((_, index) => <button key={index} type="button" role="tab" aria-selected={heroSlide === index} aria-label={`Xem ảnh ${index + 1}`} onClick={() => setHeroSlide(index)} className={`h-1 transition-all duration-500 ${heroSlide === index ? "w-12 bg-white" : "w-7 bg-white/45 hover:bg-white/75"}`} />)}
+          </div>
+          <div className="hidden gap-2 sm:flex">
+            <button type="button" aria-label="Ảnh trước" onClick={() => setHeroSlide(current => (current - 1 + heroImages.length) % heroImages.length)} className="grid h-10 w-10 place-items-center border border-white/60 bg-black/15 text-white backdrop-blur-sm transition-colors hover:bg-black/35"><IconChevronLeft size={19} /></button>
+            <button type="button" aria-label="Ảnh tiếp theo" onClick={() => setHeroSlide(current => (current + 1) % heroImages.length)} className="grid h-10 w-10 place-items-center border border-white/60 bg-black/15 text-white backdrop-blur-sm transition-colors hover:bg-black/35"><IconChevronRight size={19} /></button>
+          </div>
+        </div>}
       </section>
 
       <motion.section

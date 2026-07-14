@@ -12,4 +12,5 @@ export const CollectionService = {
   async createCollection(input: Omit<Collection, "id" | "createdAt" | "updatedAt">) { const { data, error } = await createClient().from("collections").insert(row(input)).select("*").single(); if (error) throw new Error(error.message); return map(data); },
   async updateCollection(id: string, input: Partial<Collection>) { const { data, error } = await createClient().from("collections").update(row(input)).eq("id", id).select("*").single(); if (error) throw new Error(error.message); return map(data); },
   async softDelete(id: string) { const { error } = await createClient().from("collections").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); },
+  async hardDelete(id: string) { const { error } = await createClient().from("collections").delete().eq("id", id); if (error) throw new Error(error.message); },
 };

@@ -40,7 +40,7 @@ export default function CollectionsPage() {
  const handleDeleteSelected = async () => {
  setIsBulkDeleting(true);
  try {
- await Promise.all(selectedIds.map(id => CollectionService.softDelete(String(id))));
+ await Promise.all(selectedIds.map(id => CollectionService.hardDelete(String(id))));
  toast.success("đãXóa Bộ sưu tập");
  setSelectedIds([]);
  loadCollections();
@@ -55,7 +55,7 @@ export default function CollectionsPage() {
  const confirmRowDelete = async () => {
  if (!deleteDialog.id) return;
  try {
- await CollectionService.softDelete(deleteDialog.id);
+ await CollectionService.hardDelete(deleteDialog.id);
  toast.success("đãXóa Bộ sưu tập");
  loadCollections();
  } catch (error) {

@@ -49,7 +49,7 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[56%_38%] saturate-[1.04] contrast-[1.04]"
+          className="object-cover object-[58%_10%] md:object-[56%_10%] saturate-[1.04] contrast-[1.04]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,17,17,0.82)_0%,rgba(17,17,17,0.62)_32%,rgba(17,17,17,0.22)_56%,rgba(17,17,17,0)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(17,17,17,0.18)_0%,rgba(17,17,17,0)_36%)]" />

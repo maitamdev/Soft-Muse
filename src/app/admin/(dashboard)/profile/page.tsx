@@ -158,7 +158,7 @@ export default function ProfilePage() {
  const tabs = [
  { id: 'personal', label: adminAr.profile.tabs.personalInfo, icon: IconUser },
  { id: 'security', label: adminAr.profile.tabs.security, icon: IconShield },
- { id: 'preferences', label: '', icon: IconAdjustmentsHorizontal },
+ { id: 'preferences', label: 'Tùy chọn', icon: IconAdjustmentsHorizontal },
  { id: 'sessions', label: adminAr.profile.tabs.sessions, icon: IconDevices },
  ];
 

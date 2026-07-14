@@ -1,283 +1,117 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import {
- IconArrowUpRight, IconArrowDownRight, IconArrowsExchange,
- IconAdjustments, IconChevronRight, IconPencil, IconTrash,
-} from '@tabler/icons-react';
-import { InventoryService, InventoryMovement } from '@/lib/services/inventory.service';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/admin/design-system/Card';
-import { Badge } from '@/components/admin/design-system/Badge';
-import { Button } from '@/components/admin/design-system/Button';
-import { Modal } from '@/components/admin/design-system/Modal';
-import { Input } from '@/components/admin/design-system/Input';
-import { TextArea } from '@/components/admin/design-system/TextArea';
-import { PageHeader } from '@/components/admin/design-system/Layout';
-import { DataTable, Column } from '@/components/admin/design-system/DataTable';
-import { StaggerContainer, StaggerItem } from '@/components/admin/ui/motion';
-import { adminAr } from '@/lib/i18n/admin-ar';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { toast } from "sonner";
+import { IconAdjustments, IconArrowDownRight, IconArrowUpRight, IconChevronRight, IconRefresh } from "@tabler/icons-react";
+import { ProductService } from "@/lib/services/product.service";
+import { InventoryService, type InventoryMovement } from "@/lib/services/inventory.service";
+import type { Product } from "@/data/mock/products";
+import { Badge } from "@/components/admin/design-system/Badge";
+import { Button } from "@/components/admin/design-system/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/design-system/Card";
+import { DataTable, type Column } from "@/components/admin/design-system/DataTable";
+import { Modal } from "@/components/admin/design-system/Modal";
+import { PageHeader } from "@/components/admin/design-system/Layout";
+import { Input } from "@/components/admin/design-system/Input";
+import { TextArea } from "@/components/admin/design-system/TextArea";
 
-const TYPE_CONFIG: Record<InventoryMovement['type'], { label: string; variant: 'success' | 'danger' | 'primary' | 'warning' }> = {
- receive: { label: '', variant: 'success' },
- deduct: { label: '', variant: 'danger' },
- return: { label: '', variant: 'primary' },
- adjustment: { label: '', variant: 'warning' },
- transfer_in: { label: '', variant: 'success' },
- transfer_out: { label: '', variant: 'danger' },
+const TYPE_CONFIG: Record<InventoryMovement["type"], { label: string; variant: "success" | "danger" | "primary" | "warning" }> = {
+  receive: { label: "Nhập kho", variant: "success" },
+  deduct: { label: "Xuất kho", variant: "danger" },
+  return: { label: "Hoàn kho", variant: "primary" },
+  adjustment: { label: "Điều chỉnh", variant: "warning" },
+  transfer_in: { label: "Chuyển vào", variant: "success" },
+  transfer_out: { label: "Chuyển ra", variant: "danger" },
 };
 
 export default function StockMovementsPage() {
- const t = adminAr.inventory;
- const [movements, setMovements] = useState<InventoryMovement[]>([]);
- const [loading, setLoading] = useState(true);
- const [search, setSearch] = useState('');
- const [adjustModal, setAdjustModal] = useState(false);
- const [adjustProductId, setAdjustProductId] = useState('');
- const [adjustQty, setAdjustQty] = useState('');
- const [adjustReason, setAdjustReason] = useState('');
- const [saving, setSaving] = useState(false);
- const [editTarget, setEditTarget] = useState<InventoryMovement | null>(null);
- const [editQty, setEditQty] = useState('');
- const [editReason, setEditReason] = useState('');
- const [deleteTarget, setDeleteTarget] = useState<InventoryMovement | null>(null);
+  const [movements, setMovements] = useState<InventoryMovement[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [adjustOpen, setAdjustOpen] = useState(false);
+  const [productId, setProductId] = useState("");
+  const [variantId, setVariantId] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [reason, setReason] = useState("");
+  const [reverseTarget, setReverseTarget] = useState<InventoryMovement | null>(null);
+  const [reverseReason, setReverseReason] = useState("");
+  const [saving, setSaving] = useState(false);
 
- const load = useCallback(async () => {
- setLoading(true);
- try {
- setMovements(await InventoryService.getMovements());
- } catch {
- toast.error('trong tảiBiến động tồn kho');
- } finally {
- setLoading(false);
- }
- }, []);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [movementData, productData] = await Promise.all([InventoryService.getMovements(), ProductService.getProducts()]);
+      setMovements(movementData);
+      setProducts(productData);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không thể tải biến động tồn kho.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
 
- useEffect(() => { load(); }, [load]);
+  const selectedProduct = products.find((product) => product.id === productId);
+  const reversedIds = useMemo(() => new Set(movements.filter((item) => item.referenceType === "adjustment" && item.referenceId).map((item) => item.referenceId)), [movements]);
+  const filtered = movements.filter((movement) => {
+    const term = search.trim().toLowerCase();
+    return !term || `${movement.productName ?? ""} ${movement.productId} ${movement.reason}`.toLowerCase().includes(term);
+  });
 
- const handleAdjust = async () => {
- const qty = parseInt(adjustQty, 10);
- if (!adjustProductId.trim()) { toast.error('sản phẩm'); return; }
- if (isNaN(qty)) { toast.error(''); return; }
- if (!adjustReason.trim()) { toast.error('Lý do điều chỉnh'); return; }
- setSaving(true);
- try {
- await InventoryService.adjustStock(adjustProductId, undefined, qty, adjustReason);
- toast.success('đãĐiều chỉnh tồn kho');
- setAdjustModal(false);
- setAdjustProductId(''); setAdjustQty(''); setAdjustReason('');
- load();
- } catch {
- toast.error('trongĐiều chỉnh tồn kho');
- } finally {
- setSaving(false);
- }
- };
+  const submitAdjustment = async () => {
+    const parsed = Number.parseInt(quantity, 10);
+    if (!productId) return toast.error("Vui lòng chọn sản phẩm.");
+    if (selectedProduct?.variants.length && !variantId) return toast.error("Vui lòng chọn biến thể.");
+    if (!Number.isInteger(parsed) || parsed === 0) return toast.error("Số lượng điều chỉnh phải là số nguyên khác 0.");
+    if (reason.trim().length < 2) return toast.error("Vui lòng nhập lý do điều chỉnh.");
+    setSaving(true);
+    try {
+      await InventoryService.adjustStock(productId, variantId || undefined, parsed, reason.trim());
+      toast.success("Đã ghi nhận điều chỉnh tồn kho.");
+      setAdjustOpen(false); setProductId(""); setVariantId(""); setQuantity(""); setReason("");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không thể điều chỉnh tồn kho.");
+    } finally { setSaving(false); }
+  };
 
- const handleEdit = async () => {
- if (!editTarget) return;
- const qty = parseInt(editQty, 10);
- if (isNaN(qty) || qty === 0) { toast.error(''); return; }
- if (!editReason.trim()) { toast.error(''); return; }
- setSaving(true);
- try {
- await InventoryService.updateMovement(editTarget.id, { quantity: qty, reason: editReason });
- toast.success('đãSửa ');
- setEditTarget(null);
- load();
- } catch {
- toast.error('trongSửa ');
- } finally {
- setSaving(false);
- }
- };
+  const reverseAdjustment = async () => {
+    if (!reverseTarget) return;
+    setSaving(true);
+    try {
+      await InventoryService.reverseMovement(reverseTarget.id, reverseReason.trim() || `Hoàn tác điều chỉnh: ${reverseTarget.reason}`);
+      toast.success("Đã hoàn tác điều chỉnh bằng một bút toán đối ứng.");
+      setReverseTarget(null); setReverseReason("");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không thể hoàn tác điều chỉnh.");
+    } finally { setSaving(false); }
+  };
 
- const handleDelete = async () => {
- if (!deleteTarget) return;
- setSaving(true);
- try {
- await InventoryService.deleteMovement(deleteTarget.id);
- toast.success('đãXóa trênTồn kho');
- setDeleteTarget(null);
- load();
- } catch (e) {
- toast.error(e instanceof Error ? e.message : 'trongXóa ');
- } finally {
- setSaving(false);
- }
- };
+  const columns: Column<InventoryMovement>[] = [
+    { header: "Sản phẩm", accessor: "productId", render: (_, row) => <div><p className="font-semibold text-[var(--admin-text-base)]">{row.productName || row.productId}</p>{row.variantId && <p className="mt-1 text-xs font-mono text-[var(--admin-text-muted)]">Biến thể: {row.variantId}</p>}</div> },
+    { header: "Loại", accessor: "type", render: (_, row) => <Badge variant={TYPE_CONFIG[row.type].variant}>{TYPE_CONFIG[row.type].label}</Badge> },
+    { header: "Số lượng", accessor: "quantity", render: (_, row) => <span className={`inline-flex items-center gap-1 font-bold ${row.quantity > 0 ? "text-[var(--admin-success)]" : "text-[var(--admin-danger)]"}`}>{row.quantity > 0 ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}{row.quantity > 0 ? "+" : ""}{row.quantity}</span> },
+    { header: "Trước → sau", accessor: "balanceAfter", render: (_, row) => <span className="tabular-nums text-[var(--admin-text-muted)]">{row.balanceBefore} → {row.balanceAfter}</span> },
+    { header: "Lý do", accessor: "reason" },
+    { header: "Thời gian", accessor: "date", type: "date" },
+    { header: "Thao tác", accessor: "id", render: (_, row) => row.type === "adjustment" && !row.referenceId && !reversedIds.has(row.id) ? <Button variant="ghost" size="sm" leftIcon={<IconRefresh size={14} />} onClick={() => { setReverseTarget(row); setReverseReason(""); }}>Hoàn tác</Button> : null },
+  ];
 
- const columns: Column<InventoryMovement>[] = [
- {
- header: 'sản phẩm /',
- accessor: 'productId',
- type: 'custom',
- render: (_, row) => (
- <div className="flex flex-col"> <span className="font-semibold text-[var(--admin-text-base)]">{row.productId}</span>
- {row.variantId && <span className="text-xs text-[var(--admin-text-subtle)] font-mono">{row.variantId}</span>}
- </div>
- ),
- },
- {
- header: '',
- accessor: 'type',
- type: 'custom',
- render: (_, row) => (
- <Badge variant={TYPE_CONFIG[row.type].variant} size="sm">
- {TYPE_CONFIG[row.type].label}
- </Badge>
- ),
- },
- {
- header: 'Số lượng',
- accessor: 'quantity',
- type: 'custom',
- render: (_, row) => (
- <div className={`flex items-center gap-1 font-bold tabular-nums ${row.quantity > 0 ? 'text-[var(--admin-success)]' : 'text-[var(--admin-danger)]'}`}>
- {row.quantity > 0 ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}
- {Math.abs(row.quantity)}
- </div>
- ),
- },
- { header: 'Lý do', accessor: 'reason' },
- {
- header: 'Ngày',
- accessor: 'date',
- type: 'custom',
- render: (_, row) => (
- <span className="text-[var(--admin-text-muted)] text-xs">
- {new Date(row.date).toLocaleString('vi-VN')}
- </span>
- ),
- },
- {
- header: '',
- accessor: 'userId',
- type: 'custom',
- render: (_, row) => (
- <span className="text-xs text-[var(--admin-text-subtle)] font-mono">{row.userId}</span>
- ),
- },
- {
- header: 'Thao tác',
- accessor: 'id',
- type: 'custom',
- render: (_, row) => (
- row.type === 'adjustment' ? (
- <div className="flex items-center gap-1"> <Button
- variant="ghost"
- size="sm"
- leftIcon={<IconPencil size={14} />}
- onClick={() => { setEditTarget(row); setEditQty(String(row.quantity)); setEditReason(row.reason); }}
- >
- Sửa
- </Button> <Button
- variant="ghost"
- size="sm"
- leftIcon={<IconTrash size={14} />}
- onClick={() => setDeleteTarget(row)}
- >
- Xóa
- </Button> </div>
- ) : (
- <span className="text-xs text-[var(--admin-text-subtle)]"></span>
- )
- ),
- },
- ];
+  return <div className="space-y-6 pb-12">
+    <div className="flex items-center gap-2 text-sm text-[var(--admin-text-muted)]"><Link href="/admin/inventory">Tồn kho</Link><IconChevronRight size={14} /><span>Biến động tồn kho</span></div>
+    <PageHeader title="Biến động tồn kho" description="Nhật ký kho bất biến; sai sót được sửa bằng bút toán hoàn tác để giữ lịch sử đối soát." actions={<Button leftIcon={<IconAdjustments size={18} />} onClick={() => setAdjustOpen(true)}>Điều chỉnh kho</Button>} />
+    <Card><CardHeader><CardTitle>Nhật ký nhập, xuất và điều chỉnh</CardTitle></CardHeader><CardContent className="p-0"><DataTable columns={columns} data={filtered} isLoading={loading} searchQuery={search} onSearchChange={setSearch} pageSize={20} /></CardContent></Card>
 
- const filtered = movements.filter(m =>
- !search ||
- m.productId.toLowerCase().includes(search.toLowerCase()) ||
- m.reason.toLowerCase().includes(search.toLowerCase())
- );
-
- return (
- <StaggerContainer className="space-y-6 pb-12"> <StaggerItem> <div className="flex items-center gap-2 text-sm text-[var(--admin-text-muted)] mb-2"> <Link href="/admin/inventory" className="hover:text-[var(--admin-primary)] transition-colors">Tồn kho</Link> <IconChevronRight size={14} /> <span className="text-[var(--admin-text-base)] font-medium">{t.stockMovements}</span> </div> <PageHeader
- title={t.stockMovements}
- description={t.stockMovementsSubtitle}
- actions={
- <Button
- variant="primary"
- size="md"
- leftIcon={<IconAdjustments size={18} />}
- onClick={() => { setAdjustModal(true); setAdjustProductId(''); setAdjustQty(''); setAdjustReason(''); }}
- > </Button>
- }
- /> </StaggerItem> <StaggerItem> <Card> <CardHeader className="flex flex-row items-center justify-between border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] pb-4"> <div className="flex items-center gap-3"> <IconArrowsExchange size={20} className="text-[var(--admin-primary)]" /> <CardTitle>Biến động tồn kho</CardTitle> </div> <span className="text-sm font-medium text-[var(--admin-text-muted)] bg-[var(--admin-bg-elevated)] border border-[var(--admin-border-base)] px-3 py-1 rounded-full">
- {filtered.length} </span> </CardHeader> <CardContent className="p-0"> <DataTable
- columns={columns}
- data={filtered}
- isLoading={loading}
- searchQuery={search}
- onSearchChange={setSearch}
- pageSize={20}
- className="border-0 shadow-none rounded-none [&_th]:bg-[var(--admin-bg-surface)]"
- /> </CardContent> </Card> </StaggerItem>
-
- {/* Manual Adjustment Modal */}
- <Modal
- isOpen={adjustModal}
- onClose={() => setAdjustModal(false)}
- title="tồn kho"
- size="sm"
- footer={
- <div className="flex justify-end gap-3"> <Button variant="ghost" onClick={() => setAdjustModal(false)}>Hủy</Button> <Button variant="primary" onClick={handleAdjust} disabled={saving} isLoading={saving}>Thao tác</Button> </div>
- }
- > <div className="space-y-4 py-1"> <Input
- label="sản phẩm (Product ID)"
- placeholder=":prod_1"
- value={adjustProductId}
- onChange={e => setAdjustProductId(e.target.value)}
- /> <Input
- label={adminAr.inventory.adjustmentQty}
- type="number"
- placeholder="Thêm, "
- value={adjustQty}
- onChange={e => setAdjustQty(e.target.value)}
- /> <TextArea
- label={adminAr.inventory.adjustmentReason}
- placeholder="Lý do điều chỉnh."
- value={adjustReason}
- onChange={e => setAdjustReason(e.target.value)}
- rows={3}
- /> </div> </Modal>
-
- {/* Edit Adjustment Modal */}
- <Modal
- isOpen={!!editTarget}
- onClose={() => setEditTarget(null)}
- title="Sửa Điều chỉnh tồn kho"
- size="sm"
- footer={
- <div className="flex justify-end gap-3"> <Button variant="ghost" onClick={() => setEditTarget(null)}>Hủy</Button> <Button variant="primary" onClick={handleEdit} disabled={saving} isLoading={saving}>Lưu Sửa</Button> </div>
- }
- > <div className="space-y-4 py-1"> <div> <p className="text-sm text-[var(--admin-text-muted)] mb-1">sản phẩm</p> <p className="font-semibold text-[var(--admin-text-base)]">{editTarget?.productName ?? editTarget?.productId}</p> </div> <Input
- label={adminAr.inventory.adjustmentQty}
- type="number"
- placeholder="Thêm, "
- value={editQty}
- onChange={e => setEditQty(e.target.value)}
- /> <TextArea
- label={adminAr.inventory.adjustmentReason}
- placeholder="Lý do điều chỉnh."
- value={editReason}
- onChange={e => setEditReason(e.target.value)}
- rows={3}
- /> </div> </Modal>
-
- {/* Delete Adjustment Confirmation */}
- <Modal
- isOpen={!!deleteTarget}
- onClose={() => setDeleteTarget(null)}
- title="Xóa Điều chỉnh tồn kho"
- size="sm"
- footer={
- <div className="flex justify-end gap-3"> <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Hủy</Button> <Button variant="danger" onClick={handleDelete} disabled={saving} isLoading={saving}>Xóa</Button> </div>
- }
- > <p className="text-sm text-[var(--admin-text-muted)] py-2">
- Xóa này trênTồn kho. Không thể hoàn tác thao tác này.
- </p> </Modal> </StaggerContainer>
- );
+    <Modal isOpen={adjustOpen} onClose={() => setAdjustOpen(false)} title="Điều chỉnh tồn kho" size="sm" footer={<div className="flex justify-end gap-3"><Button variant="ghost" onClick={() => setAdjustOpen(false)}>Hủy</Button><Button isLoading={saving} onClick={() => void submitAdjustment()}>Lưu điều chỉnh</Button></div>}>
+      <div className="space-y-4"><label className="flex flex-col gap-1 text-sm font-medium">Sản phẩm<select value={productId} onChange={(event) => { setProductId(event.target.value); setVariantId(""); }} className="h-11 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-3"><option value="">Chọn sản phẩm</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name} · {product.sku}</option>)}</select></label>
+      {selectedProduct?.variants.length ? <label className="flex flex-col gap-1 text-sm font-medium">Biến thể<select value={variantId} onChange={(event) => setVariantId(event.target.value)} className="h-11 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-3"><option value="">Chọn biến thể</option>{selectedProduct.variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.color} / {variant.size} · tồn {variant.stock}</option>)}</select></label> : null}
+      <Input label="Số lượng thay đổi" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} hint="Số dương để nhập thêm, số âm để xuất bớt." /><TextArea label="Lý do" value={reason} onChange={(event) => setReason(event.target.value)} rows={3} /></div>
+    </Modal>
+    <Modal isOpen={!!reverseTarget} onClose={() => setReverseTarget(null)} title="Hoàn tác điều chỉnh kho" size="sm" footer={<div className="flex justify-end gap-3"><Button variant="ghost" onClick={() => setReverseTarget(null)}>Hủy</Button><Button variant="warning" isLoading={saving} onClick={() => void reverseAdjustment()}>Xác nhận hoàn tác</Button></div>}>
+      <div className="space-y-4"><p className="text-sm text-[var(--admin-text-muted)]">Hệ thống sẽ tạo bút toán đối ứng {reverseTarget ? -reverseTarget.quantity : 0}. Nhật ký gốc vẫn được giữ để đối soát.</p><TextArea label="Lý do hoàn tác" value={reverseReason} onChange={(event) => setReverseReason(event.target.value)} rows={3} /></div>
+    </Modal>
+  </div>;
 }

@@ -32,6 +32,10 @@ const persistDisplay = async () => { await saveStorefrontSetting("storefront.col
 
 function ensureDefaults(collections: Collection[]) {
  let changed = false;
+ const validIds = new Set(collections.map((collection) => collection.id));
+ Object.keys(displayState).forEach((id) => {
+ if (!validIds.has(id)) { delete displayState[id]; changed = true; }
+ });
  collections.forEach((c, idx) => {
  if (!displayState[c.id]) {
  displayState[c.id] = {

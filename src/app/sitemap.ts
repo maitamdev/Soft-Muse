@@ -10,10 +10,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
  const routes = [
  '',
  '/shop',
+ '/collections',
+ '/new-arrivals',
+ '/bestsellers',
+ '/sale',
  '/winter-fashion',
  '/summer-fashion',
  '/about',
  '/journal',
+ '/reviews',
+ '/contact',
+ '/shipping',
+ '/returns',
+ '/terms',
+ '/privacy',
  ].map((route) => ({
  url: `${baseUrl}${route}`,
  lastModified: new Date(),
@@ -22,8 +32,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
  }));
 
  // Product routes
+ const now = new Date().toISOString();
  const { data: products } = isSupabaseConfigured
- ? await (await createClient()).from('products').select('id, updated_at').eq('status', 'published')
+ ? await (await createClient()).from('products').select('id, updated_at').eq('status', 'published').or(`publish_at.is.null,publish_at.lte.${now}`).or(`hide_at.is.null,hide_at.gt.${now}`)
  : { data: [] };
  const productRoutes = (products ?? []).map((product) => ({
  url: `${baseUrl}/product/${product.id}`,

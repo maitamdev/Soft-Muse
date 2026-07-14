@@ -21,9 +21,13 @@ function mapAddress(row: Record<string, unknown>): CustomerAddress {
     fullName: String(row.recipient_name ?? ""),
     phone: String(row.phone ?? ""),
     street: String(row.address_line ?? ""),
+    building: String(row.building ?? ""),
+    floor: String(row.floor ?? ""),
+    apartment: String(row.apartment ?? ""),
     area: String(row.ward ?? ""),
     city: [row.district, row.province].filter(Boolean).join(", "),
-    country: "Việt Nam",
+    postalCode: String(row.postal_code ?? ""),
+    country: String(row.country ?? "Việt Nam"),
     isDefault: Boolean(row.is_default),
   };
 }
@@ -153,7 +157,8 @@ export const CustomerService = {
     if (address.isDefault) await createClient().from("customer_addresses").update({ is_default: false }).eq("customer_id", customerId);
     const { error } = await createClient().from("customer_addresses").insert({
       customer_id: customerId, label: address.label, recipient_name: address.fullName ?? "", phone: address.phone ?? "",
-      address_line: address.street, ward: address.area ?? "", district: "", province: address.city, is_default: address.isDefault,
+      address_line: address.street, building: address.building ?? "", floor: address.floor ?? "", apartment: address.apartment ?? "",
+      ward: address.area ?? "", district: "", province: address.city, postal_code: address.postalCode ?? "", country: address.country || "Việt Nam", is_default: address.isDefault,
     });
     if (error) throw new Error(error.message);
     const customer = await this.getCustomer(customerId);
@@ -165,7 +170,8 @@ export const CustomerService = {
     if (updates.isDefault) await createClient().from("customer_addresses").update({ is_default: false }).eq("customer_id", customerId);
     const { error } = await createClient().from("customer_addresses").update({
       label: updates.label, recipient_name: updates.fullName, phone: updates.phone, address_line: updates.street,
-      ward: updates.area, province: updates.city, is_default: updates.isDefault,
+      building: updates.building, floor: updates.floor, apartment: updates.apartment,
+      ward: updates.area, province: updates.city, postal_code: updates.postalCode, country: updates.country, is_default: updates.isDefault,
     }).eq("id", addressId).eq("customer_id", customerId);
     if (error) throw new Error(error.message);
     const customer = await this.getCustomer(customerId);

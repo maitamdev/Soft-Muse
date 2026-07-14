@@ -13,6 +13,7 @@ import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { heroFadeUp, scrollViewport } from "@/lib/animations";
 import { HOME_CONTENT, usePageContent } from "@/hooks/usePageContent";
+import { NewsletterService } from "@/lib/services/newsletter.service";
 
 const testimonials = [
   {
@@ -38,6 +39,8 @@ export default function HomePage() {
   const [heroPaused, setHeroPaused] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [newsletterError, setNewsletterError] = useState("");
+  const [newsletterSaving, setNewsletterSaving] = useState(false);
   const newArrivals = products.filter((product) => product.newArrival).slice(0, 4);
   const bestSellers = products.filter((product) => product.bestSeller).slice(0, 4);
   const homepageCategories = useMemo(() => {
@@ -252,9 +255,13 @@ export default function HomePage() {
           ) : (
             <form
               className="flex flex-col sm:flex-row gap-3 w-full max-w-md"
-              onSubmit={(event) => {
+              onSubmit={async (event) => {
                 event.preventDefault();
-                if (newsletterEmail.trim()) setNewsletterSubmitted(true);
+                if (!newsletterEmail.trim()) return;
+                setNewsletterSaving(true); setNewsletterError("");
+                try { await NewsletterService.subscribe(newsletterEmail); setNewsletterSubmitted(true); }
+                catch (error) { setNewsletterError(error instanceof Error ? error.message : "Không thể đăng ký lúc này."); }
+                finally { setNewsletterSaving(false); }
               }}
             >
               <input
@@ -265,11 +272,12 @@ export default function HomePage() {
                 placeholder="Email của bạn"
                 className="flex-1 h-12 border border-brand-border bg-background-primary px-4 text-sm font-sans text-text-primary outline-none placeholder:text-text-secondary/40 focus:border-accent transition-colors duration-300"
               />
-              <Button type="submit" variant="primary" className="h-12 px-6 shrink-0">
-                Đăng ký
+              <Button type="submit" variant="primary" disabled={newsletterSaving} className="h-12 px-6 shrink-0">
+                {newsletterSaving ? "Đang lưu..." : "Đăng ký"}
               </Button>
             </form>
           )}
+          {newsletterError && <p className="text-sm text-red-600">{newsletterError}</p>}
         </div>
       </section>
 

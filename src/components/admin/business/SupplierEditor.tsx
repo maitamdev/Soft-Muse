@@ -54,7 +54,7 @@ export function SupplierEditor({ id }: SupplierEditorProps) {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.name || !formData.contactPerson) {
- toast.error('');
+ toast.error('Vui lòng kiểm tra các trường bắt buộc của nhà cung cấp.');
  return;
  }
 

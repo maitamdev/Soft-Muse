@@ -20,7 +20,11 @@ async function getProduct(id: string): Promise<Product | undefined> {
  .eq("status", "published")
  .maybeSingle();
  if (error || !data) return undefined;
- return mapProductRow(data);
+ const product = mapProductRow(data);
+ const now = Date.now();
+ if (product.publishAt && new Date(product.publishAt).getTime() > now) return undefined;
+ if (product.hideAt && new Date(product.hideAt).getTime() <= now) return undefined;
+ return product;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -96,11 +100,6 @@ export default async function ProductPage({ params }: PageProps) {
  ? "https://schema.org/OutOfStock"
  : "https://schema.org/InStock",
  "itemCondition": "https://schema.org/NewCondition"
- },
- "aggregateRating": {
- "@type": "AggregateRating",
- "ratingValue": "4.9",
- "reviewCount": "24"
  }
  };
 

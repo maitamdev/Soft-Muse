@@ -8,6 +8,7 @@ import {
  IconArrowsExchange, IconAdjustments, IconSearch, IconArrowUpRight,
 } from '@tabler/icons-react';
 import { ProductService } from '@/lib/services/product.service';
+import type { ProductVariant } from '@/data/mock/products';
 import { KpiCard } from '@/components/admin/design-system/KpiCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/admin/design-system/Card';
 import { Badge } from '@/components/admin/design-system/Badge';
@@ -30,6 +31,8 @@ interface StockProduct {
  category: string;
  stock: number;
  costPrice: number;
+ lowStockLimit: number;
+ variants: ProductVariant[];
  status: 'in_stock' | 'low_stock' | 'out_of_stock';
 }
 
@@ -43,6 +46,7 @@ export default function InventoryPage() {
  const [adjustType, setAdjustType] = useState<'receive' | 'deduct' | 'adjustment'>('receive');
  const [adjustQty, setAdjustQty] = useState('');
  const [adjustReason, setAdjustReason] = useState('');
+ const [adjustVariantId, setAdjustVariantId] = useState('');
  const [saving, setSaving] = useState(false);
 
  const load = useCallback(async () => {
@@ -56,11 +60,13 @@ export default function InventoryPage() {
  category: p.category,
  stock: p.stock ?? 0,
  costPrice: (p as any).costPrice ?? 0,
- status: (p.stock ?? 0) <= 0 ? 'out_of_stock' : (p.stock ?? 0) <= 10 ? 'low_stock' : 'in_stock',
+ lowStockLimit: p.lowStockLimit ?? 5,
+ variants: p.variants ?? [],
+ status: (p.stock ?? 0) <= 0 ? 'out_of_stock' : (p.stock ?? 0) <= (p.lowStockLimit ?? 5) ? 'low_stock' : 'in_stock',
  }));
  setProducts(mapped);
  } catch {
- toast.error('trong tảiTồn kho');
+ toast.error('Không thể tải dữ liệu tồn kho.');
  } finally {
  setLoading(false);
  }
@@ -84,8 +90,9 @@ export default function InventoryPage() {
  const handleAdjust = async () => {
  if (!adjustModal.product) return;
  const qty = parseInt(adjustQty, 10);
- if (isNaN(qty) || qty === 0) { toast.error(''); return; }
- if (!adjustReason.trim()) { toast.error(''); return; }
+ if (isNaN(qty) || qty === 0) { toast.error('Số lượng phải là số nguyên khác 0.'); return; }
+ if (!adjustReason.trim()) { toast.error('Vui lòng nhập lý do điều chỉnh.'); return; }
+ if (adjustModal.product.variants.length && !adjustVariantId) { toast.error('Vui lòng chọn biến thể cần điều chỉnh.'); return; }
  setSaving(true);
  try {
  const signed =
@@ -94,22 +101,20 @@ export default function InventoryPage() {
  : qty;
  await InventoryService.recordMovement({
  productId: adjustModal.product.id,
+ variantId: adjustVariantId || undefined,
  type: adjustType,
  quantity: signed,
  reason: adjustReason,
  referenceType: 'adjustment',
  });
- toast.success(
- adjustType === 'receive' ? 'đãTồn kho thành công'
- : adjustType === 'deduct' ? 'đãTồn kho thành công'
- : 'đãĐiều chỉnh tồn kho thành công'
- );
+ toast.success('Đã cập nhật tồn kho thành công.');
  setAdjustModal({ open: false });
  setAdjustQty('');
  setAdjustReason('');
+ setAdjustVariantId('');
  load();
- } catch {
- toast.error('trongTồn kho');
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : 'Không thể cập nhật tồn kho.');
  } finally {
  setSaving(false);
  }
@@ -119,7 +124,7 @@ export default function InventoryPage() {
  s === 'in_stock' ? 'success' : s === 'low_stock' ? 'warning' : 'danger';
 
  const statusLabel = (s: StockProduct['status']) =>
- s === 'in_stock' ? '' : s === 'low_stock' ? '' : '';
+ s === 'in_stock' ? 'Còn hàng' : s === 'low_stock' ? 'Sắp hết' : 'Hết hàng';
 
  return (
  <StaggerContainer className="space-y-6 pb-12"> <StaggerItem> <PageHeader
@@ -206,7 +211,7 @@ export default function InventoryPage() {
  variant="ghost"
  size="sm"
  leftIcon={<IconAdjustments size={14} />}
- onClick={() => { setAdjustModal({ open: true, product: p }); setAdjustType('receive'); setAdjustQty(''); setAdjustReason(''); }}
+ onClick={() => { setAdjustModal({ open: true, product: p }); setAdjustType('receive'); setAdjustQty(''); setAdjustReason(''); setAdjustVariantId(''); }}
  >
  tồn kho</Button> </td> </tr>
  ))}
@@ -226,8 +231,8 @@ export default function InventoryPage() {
  footer={
  <div className="flex justify-end gap-3"> <Button variant="ghost" onClick={() => setAdjustModal({ open: false })}>Hủy</Button> <Button variant="primary" onClick={handleAdjust} disabled={saving} isLoading={saving}>Lưu </Button> </div>
  }
- > <div className="space-y-4 py-1"> <div> <p className="text-sm text-[var(--admin-text-muted)] mb-1">Tồn kho hiện tại</p> <p className="text-2xl font-bold text-[var(--admin-text-base)] tabular-nums">{adjustModal.product?.stock ?? 0} </p> </div> <div> <p className="text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Loại giao dịch</p> <div className="flex gap-1 bg-[var(--admin-bg-elevated)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] p-1">
- {([['receive',''],['deduct',''],['adjustment','']] as const).map(([val, label]) => (
+ > <div className="space-y-4 py-1"> <div> <p className="text-sm text-[var(--admin-text-muted)] mb-1">Tồn kho hiện tại</p> <p className="text-2xl font-bold text-[var(--admin-text-base)] tabular-nums">{adjustModal.product?.stock ?? 0}</p> </div>{adjustModal.product?.variants.length ? <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--admin-text-subtle)]">Biến thể<select value={adjustVariantId} onChange={(event) => setAdjustVariantId(event.target.value)} className="h-11 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-3 text-sm"><option value="">Chọn biến thể</option>{adjustModal.product.variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.color} / {variant.size} · {variant.sku} · tồn {variant.stock}</option>)}</select></label> : null}<div> <p className="text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Loại giao dịch</p> <div className="flex gap-1 bg-[var(--admin-bg-elevated)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] p-1">
+ {([['receive','Nhập kho'],['deduct','Xuất kho'],['adjustment','Điều chỉnh']] as const).map(([val, label]) => (
  <button
  key={val}
  type="button"

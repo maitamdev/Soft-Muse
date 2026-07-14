@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { eventBus } from "@/lib/events/EventBus";
 
 export interface CategorySEO { title: string; description: string; }
 export interface Category {
@@ -56,7 +57,7 @@ function row(data: Partial<Category>) {
 export const CategoryService = {
   async getCategories(): Promise<Category[]> { const { data, error } = await createClient().from("categories").select("*").order("sort_order"); if (error) throw new Error(error.message); return (data ?? []).map(map); },
   async getCategory(id: string) { const { data, error } = await createClient().from("categories").select("*").eq("id", id).maybeSingle(); if (error) throw new Error(error.message); return data ? map(data) : null; },
-  async createCategory(input: Omit<Category, "id" | "createdAt" | "updatedAt">) { const { data, error } = await createClient().from("categories").insert(row(input)).select("*").single(); if (error) throw new Error(error.message); return map(data); },
+  async createCategory(input: Omit<Category, "id" | "createdAt" | "updatedAt">) { const { data, error } = await createClient().from("categories").insert(row(input)).select("*").single(); if (error) throw new Error(error.message); const category = map(data); eventBus.emit("categories.changed"); return category; },
   async updateCategory(id: string, input: Partial<Category>) {
     const supabase = createClient();
     const { data, error } = await supabase.rpc("update_category_with_products", {
@@ -71,10 +72,10 @@ export const CategoryService = {
         const { error: productError } = await supabase.from("products").update({ category: input.name }).eq("category", current.name);
         if (productError) throw new Error(`Danh mục đã đổi tên nhưng chưa thể cập nhật sản phẩm: ${productError.message}`);
       }
-      return map(fallbackData);
+      const category = map(fallbackData); eventBus.emit("categories.changed"); return category;
     }
     if (error) throw new Error(error.message);
-    return map(data as Record<string, unknown>);
+    const category = map(data as Record<string, unknown>); eventBus.emit("categories.changed"); return category;
   },
   async getUsageCount(categoryName: string) {
     const { count, error } = await createClient().from("products").select("id", { count: "exact", head: true }).eq("category", categoryName);
@@ -93,13 +94,15 @@ export const CategoryService = {
     if (!productIds.length) return;
     const { error } = await createClient().from("products").update({ category: categoryName }).in("id", productIds);
     if (error) throw new Error(error.message);
+    eventBus.emit("products.changed");
   },
   async removeProductFromCategory(productId: string) {
     const { error } = await createClient().from("products").update({ category: "" }).eq("id", productId);
     if (error) throw new Error(error.message);
+    eventBus.emit("products.changed");
   },
-  async softDelete(id: string) { const { error } = await createClient().from("categories").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); },
-  async restore(id: string) { const { error } = await createClient().from("categories").update({ is_active: true }).eq("id", id); if (error) throw new Error(error.message); },
+  async softDelete(id: string) { const { error } = await createClient().from("categories").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); eventBus.emit("categories.changed"); },
+  async restore(id: string) { const { error } = await createClient().from("categories").update({ is_active: true }).eq("id", id); if (error) throw new Error(error.message); eventBus.emit("categories.changed"); },
   async hardDelete(id: string) {
     const supabase = createClient();
     const { error } = await supabase.rpc("delete_category_safely", { category_id: id });
@@ -112,5 +115,6 @@ export const CategoryService = {
       return;
     }
     if (error) throw new Error(error.message);
+    eventBus.emit("categories.changed");
   },
 };

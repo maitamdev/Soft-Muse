@@ -5,7 +5,7 @@ import Link from "next/link";
 import { IconHeart as Heart, IconShoppingBag as ShoppingBag, IconCheck as Check, IconX as X } from "@tabler/icons-react";
 import { useStore } from "@/context/StoreContext";
 import { useNotification } from "@/context/NotificationContext";
-import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { useStorefrontProductsState } from "@/hooks/useStorefrontProducts";
 import { primaryImage, discountOriginalPrice, resolveStockStatus } from "@/data/mock/products";
 import { getRelatedProducts } from "@/lib/catalog/storefront-catalog";
 import { ProductCard } from "@/components/ui/Card";
@@ -30,8 +30,8 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  const { addToCart, toggleWishlist, isInWishlist } = useStore();
  const { showNotification } = useNotification();
 
- const products = useStorefrontProducts();
- const product = products.find((p) => p.id === id) ?? initialProduct;
+ const { products, loading: productsLoading } = useStorefrontProductsState();
+ const product = products.find((p) => p.id === id) ?? (productsLoading ? initialProduct : undefined);
 
  // States
  const [selectedSize, setSelectedSize] = useState("");
@@ -87,7 +87,14 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  }
  };
 
- const isOutOfStock = resolveStockStatus(product) === "out_of_stock";
+ const cartVariant = product.variants.find((variant) =>
+ (!hasColorOptions || variant.color === selectedColor)
+ && (!hasSizeOptions || variant.size === selectedSize)
+ );
+ const selectionComplete = (!hasColorOptions || Boolean(selectedColor)) && (!hasSizeOptions || Boolean(selectedSize));
+ const isOutOfStock = selectionComplete && product.variants.length ? !cartVariant || cartVariant.stock <= 0 : resolveStockStatus(product) === "out_of_stock";
+ const displayPrice = cartVariant?.price ?? product.price;
+ const displayedStock = cartVariant?.stock ?? product.stock;
 
  const handleAddToBag = () => {
  if (isOutOfStock) return;
@@ -102,22 +109,21 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  showNotification(message, "warning");
  return;
  }
- const cartVariant = product.variants.find((variant) =>
- (!hasColorOptions || variant.color === selectedColor)
- && (!hasSizeOptions || variant.size === selectedSize)
- );
+ if (product.variants.length && !cartVariant) { showNotification("Phân loại này hiện không tồn tại. Vui lòng chọn màu hoặc kích cỡ khác.", "warning"); return; }
+ if (cartVariant && cartVariant.stock < quantity) { showNotification(`Phân loại này chỉ còn ${cartVariant.stock} sản phẩm.`, "warning"); return; }
+ const sellingPrice = cartVariant?.price ?? product.price;
  addToCart({
  id: product.id,
  variantId: cartVariant?.id,
  title: product.name,
- price: product.price,
+ price: sellingPrice,
  image: activeImage || primaryImage(product),
  size: selectedSize,
  color: selectedColor,
  collection: product.collection,
  variantImages: galleryImages,
  }, quantity);
- analytics.trackAddToCart(product.id, product.name, product.price, selectedSize, selectedColor, quantity);
+ analytics.trackAddToCart(product.id, product.name, sellingPrice, selectedSize, selectedColor, quantity);
  showNotification(
  "Đã thêm sản phẩm vào giỏ hàng.",
  "success"
@@ -185,11 +191,11 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  Hết hàng
  </span>
  )}
- {resolveStockStatus(product) === "low_stock" && (
- <span className="inline-block border border-accent-dark text-accent-dark text-[9px] font-sans font-bold uppercase px-2 py-0.5"> </span>
+ {displayedStock > 0 && displayedStock <= product.lowStockLimit && (
+ <span className="inline-block border border-accent-dark text-accent-dark text-[9px] font-sans font-bold uppercase px-2 py-0.5">Chỉ còn {displayedStock}</span>
  )}
  </div> </div> <div className="flex items-baseline gap-3"> <span className="font-display text-2xl font-semibold text-accent">
- {product.price.toLocaleString()} đ
+ {displayPrice.toLocaleString()} đ
  </span>
  {discountOriginalPrice(product) && (
  <span className="font-display text-sm text-text-secondary/50 line-through">
@@ -205,7 +211,9 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  <div className="flex flex-col gap-2"> <label className="text-[10px] font-sans font-bold text-text-secondary">
  Màu sắc: {selectedColor || "Chọn màu"}
  </label> <div className="flex gap-3">
- {colorOptions.map((col) => (
+ {colorOptions.map((col) => {
+ const unavailable = Boolean(product.variants.length && selectedSize && !product.variants.some((variant) => variant.color === col.color && variant.size === selectedSize && variant.stock > 0));
+ return (
  <button
  key={col.color}
  onClick={() => handleColorSelect(col.color)}
@@ -218,11 +226,13 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  title={col.color}
  aria-label={`Chọn màu ${col.color}`}
  aria-pressed={selectedColor === col.color}
+ disabled={unavailable}
+ data-unavailable={unavailable || undefined}
  > <span
  className="absolute inset-1 rounded-full border border-black/5 shadow-sm"
  style={{ backgroundColor: col.value }}
- /> </button>
- ))}
+ />{unavailable && <span className="absolute h-px w-9 rotate-45 bg-text-secondary/50" />}</button>
+ )})}
  </div> </div>
  )}
 
@@ -235,23 +245,27 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  >
  Kích cỡ
  </button> </div> <div className="flex gap-2">
- {sizeOptions.map((sz) => (
+ {sizeOptions.map((sz) => {
+ const unavailable = Boolean(product.variants.length && selectedColor && !product.variants.some((variant) => variant.color === selectedColor && variant.size === sz && variant.stock > 0));
+ return (
  <button
  key={sz}
  onClick={() => setSelectedSize(sz)}
  aria-label={`Kích cỡ: ${sz}`}
  aria-pressed={selectedSize === sz}
+ disabled={unavailable}
  className="text-xs px-4 py-2 border transition-all duration-300 bg-background-primary"
  style={{
  borderColor: selectedSize === sz ? "var(--color-accent-dark)" : "var(--color-brand-border)",
  backgroundColor: selectedSize === sz ? "rgba(142, 107, 75, 0.08)" : "transparent",
- color: selectedSize === sz ? "var(--color-accent-dark)" : "var(--color-text-secondary)",
+ color: unavailable ? "var(--color-text-secondary)" : selectedSize === sz ? "var(--color-accent-dark)" : "var(--color-text-secondary)",
+ opacity: unavailable ? 0.4 : 1,
  fontWeight: selectedSize === sz ? "bold" : "normal",
  }}
  >
  {sz}
  </button>
- ))}
+ )})}
  </div> </div>
  )}
 
@@ -262,6 +276,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  <div className="flex flex-col gap-2"> <label className="text-[10px] font-sans font-bold text-text-secondary">Số lượng</label> <input
  type="number"
  min="1"
+ max={Math.max(1, displayedStock)}
  value={quantity}
  onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
  className="w-20 bg-background-primary border border-brand-border text-xs p-2 outline-none focus:border-accent text-center font-display"
@@ -283,7 +298,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  )}
  </Button> <Button
  variant="secondary"
- onClick={() => toggleWishlist({ id: product.id, title: product.name, price: product.price, image: primaryImage(product), collection: product.collection })}
+ onClick={() => toggleWishlist({ id: product.id, title: product.name, price: displayPrice, image: primaryImage(product), collection: product.collection })}
  className={`h-12 w-1/3 ${wishlisted ? "border-accent text-accent" : ""}`}
  > <Heart className={`w-4 h-4 ${wishlisted ? "fill-accent text-accent" : ""}`} /> <span className="sr-only">Yêu thích</span> </Button> </div>
 
@@ -383,7 +398,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  <RecentlyViewed />
 
  {/* STICKY BOTTOM PURCHASE PANEL - Solid Background, No Blur */}
- <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> {(hasSizeOptions || hasColorOptions) && <span className="text-[10px] text-text-secondary font-light">{hasSizeOptions && `Kích cỡ: ${selectedSize || "Chưa chọn"}`}{hasSizeOptions && hasColorOptions && " | "}{hasColorOptions && `Màu: ${selectedColor || "Chưa chọn"}`}</span>} </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{product.price.toLocaleString()} đ</span> <Button
+ <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> {(hasSizeOptions || hasColorOptions) && <span className="text-[10px] text-text-secondary font-light">{hasSizeOptions && `Kích cỡ: ${selectedSize || "Chưa chọn"}`}{hasSizeOptions && hasColorOptions && " | "}{hasColorOptions && `Màu: ${selectedColor || "Chưa chọn"}`}</span>} </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{displayPrice.toLocaleString()} đ</span> <Button
  variant="primary"
  onClick={handleAddToBag}
  className="h-10 px-6 text-[10px]"

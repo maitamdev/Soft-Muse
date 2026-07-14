@@ -44,7 +44,7 @@ export function SpotlightSearch() {
  { id: '1', title: `Product matching "${query}"`, type: 'Products', icon: <IconPackage size={16} />, href: '/admin/products' },
  { id: '2', title: `Order matching "${query}"`, type: 'Orders', icon: <IconShoppingCart size={16} />, href: '/admin/orders' },
  { id: '3', title: `Customer matching "${query}"`, type: 'Customers', icon: <IconUsers size={16} />, href: '/admin/customers' },
- { id: '4', title: `CMS Page matching "${query}"`, type: 'CMS', icon: <IconFileText size={16} />, href: '/admin/cms' },
+ { id: '4', title: `Nội dung website khớp "${query}"`, type: 'Website', icon: <IconFileText size={16} />, href: '/admin/website/pages' },
  ] : [];
 
  return (

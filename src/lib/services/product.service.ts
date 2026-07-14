@@ -88,7 +88,14 @@ class SupabaseProductRepository implements IProductRepository {
     const merged = { ...current, ...input } as Product;
     const { error } = await supabase.from("products").update(productToRow(merged)).eq("id", id);
     if (error) throw new Error(`Không thể cập nhật sản phẩm: ${error.message}`);
-    await this.replaceRelations(id, merged);
+    try {
+      await this.replaceRelations(id, merged);
+    } catch (relationError) {
+      const { error: rollbackError } = await supabase.from("products").update(productToRow(current)).eq("id", id);
+      if (!rollbackError) await this.replaceRelations(id, current);
+      if (rollbackError) throw new Error(`Không thể lưu biến thể và cũng không thể hoàn tác sản phẩm: ${rollbackError.message}`);
+      throw relationError;
+    }
     const product = await this.getProduct(id);
     if (!product) throw new Error("Không thể tải sản phẩm sau khi cập nhật.");
     eventBus.emit("products.changed");
@@ -101,7 +108,7 @@ class SupabaseProductRepository implements IProductRepository {
       target_product_id: productId,
       image_payload: (product.images ?? []).map((url, sortOrder) => ({ url, altText: product.name ?? "", sortOrder })),
       variant_payload: (product.variants ?? []).map((variant) => ({
-        sku: variant.sku, color: variant.color, size: variant.size, price: variant.price,
+        id: variant.id, sku: variant.sku, color: variant.color, size: variant.size, price: variant.price,
         cost: variant.cost ?? 0, stock: variant.stock, weight: variant.weight ?? 0,
         image: variant.image ?? null, status: variant.status ?? "active",
       })),
@@ -112,6 +119,12 @@ class SupabaseProductRepository implements IProductRepository {
   async deleteProduct(id: string): Promise<void> {
     const { error } = await createClient().from("products").update({ status: "archived" }).eq("id", id);
     if (error) throw new Error(`Không thể lưu trữ sản phẩm: ${error.message}`);
+    eventBus.emit("products.changed");
+  }
+
+  async restoreProduct(id: string): Promise<void> {
+    const { error } = await createClient().from("products").update({ status: "draft" }).eq("id", id).eq("status", "archived");
+    if (error) throw new Error(`Không thể khôi phục sản phẩm: ${error.message}`);
     eventBus.emit("products.changed");
   }
 

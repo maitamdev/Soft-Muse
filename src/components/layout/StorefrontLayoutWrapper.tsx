@@ -11,6 +11,8 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { SEOInjector } from "@/components/layout/SEOInjector";
 import { AnalyticsTracker } from "@/components/storefront/AnalyticsTracker";
+import { StorefrontRealtimeBridge } from "@/components/storefront/StorefrontRealtimeBridge";
+import { StorefrontCatalogSync } from "@/components/storefront/StorefrontCatalogSync";
 
 const Footer = dynamic(() => import("@/components/layout/Footer"), { ssr: true });
 
@@ -25,6 +27,6 @@ export function StorefrontLayoutWrapper({ children }: { children: React.ReactNod
  return (
  <>
  {/* CMS runtime hooks — render nothing, only apply side effects */}
- <ThemeProvider /> <SEOInjector /> <AnalyticsTracker /> <AnnouncementBar /> <Navbar /> <main className="flex-grow">{children}</main> <Footer /> <WhatsAppButton /> <ScrollToTop /> <CustomerNotificationListener /> </>
+ <StorefrontRealtimeBridge /> <StorefrontCatalogSync /> <ThemeProvider /> <SEOInjector /> <AnalyticsTracker /> <AnnouncementBar /> <Navbar /> <main className="flex-grow">{children}</main> <Footer /> <WhatsAppButton /> <ScrollToTop /> <CustomerNotificationListener /> </>
  );
 }

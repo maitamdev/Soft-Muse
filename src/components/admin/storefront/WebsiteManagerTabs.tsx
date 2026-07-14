@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
- IconHome, IconFileText, IconStack2, IconSlideshow, IconSitemap,
+ IconFileText, IconStack2, IconSlideshow, IconSitemap,
  IconPhoto, IconSearch, IconArrowsRightLeft, IconPalette,
  IconLayoutBottombar, IconBuildingStore,
 } from "@tabler/icons-react";
@@ -20,11 +20,13 @@ interface WebsiteTab {
 // Tab order is fixed by product spec. Each tab is a real nested route under
 // /admin/website — add a new storefront surface by adding one entry + page.
 const TABS: WebsiteTab[] = [
- { key: "home", path: "/admin/website/home", icon: IconHome },
  { key: "pages", path: "/admin/website/pages", icon: IconFileText },
+ { key: "collections", path: "/admin/website/collections", icon: IconStack2 },
+ { key: "banners", path: "/admin/website/banners", icon: IconSlideshow },
  { key: "navigation", path: "/admin/website/navigation", icon: IconSitemap },
  { key: "media", path: "/admin/website/media", icon: IconPhoto },
  { key: "seo", path: "/admin/website/seo", icon: IconSearch },
+ { key: "redirects", path: "/admin/website/redirects", icon: IconArrowsRightLeft },
  { key: "appearance", path: "/admin/website/appearance", icon: IconPalette },
  { key: "footer", path: "/admin/website/footer", icon: IconLayoutBottombar },
  { key: "storeSettings", path: "/admin/website/settings", icon: IconBuildingStore },

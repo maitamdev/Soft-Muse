@@ -84,6 +84,32 @@ export class ProductValidator {
  if (!this.isValidStock(product.stock, product.lowStockLimit)) {
  errors.stock = 'Số lượng tồn kho và ngưỡng cảnh báo không được âm.';
  }
+
+ if (product.status === 'published') {
+ if (!product.category?.trim()) errors.category = 'Sản phẩm xuất bản phải có danh mục.';
+ if (!product.images?.length) errors.images = 'Sản phẩm xuất bản phải có ít nhất một ảnh.';
+ }
+
+ if (product.publishAt && product.hideAt && new Date(product.hideAt) <= new Date(product.publishAt)) {
+ errors.schedule = 'Thời gian ngừng hiển thị phải sau thời gian bắt đầu.';
+ }
+
+ const variants = product.variants ?? [];
+ const variantSkus = new Set<string>();
+ const variantOptions = new Set<string>();
+ variants.forEach((variant, index) => {
+ const label = `Biến thể ${index + 1}`;
+ if (!variant.color.trim() || !variant.size.trim()) errors[`variant_${index}`] = `${label} phải có màu và kích cỡ.`;
+ if (!this.isValidSku(variant.sku)) errors[`variant_sku_${index}`] = `${label} có SKU không hợp lệ.`;
+ if (variant.sku === product.sku || variantSkus.has(variant.sku) || allProducts.some(p => p.id !== product.id && (p.sku === variant.sku || p.variants.some(v => v.sku === variant.sku)))) {
+ errors[`variant_unique_${index}`] = `SKU ${variant.sku} đã được sử dụng.`;
+ }
+ variantSkus.add(variant.sku);
+ const optionKey = `${variant.color.trim().toLowerCase()}:${variant.size.trim().toLowerCase()}`;
+ if (variantOptions.has(optionKey)) errors[`variant_option_${index}`] = `Biến thể ${variant.color}/${variant.size} bị trùng.`;
+ variantOptions.add(optionKey);
+ if (variant.price <= 0 || variant.stock < 0 || (variant.cost ?? 0) < 0) errors[`variant_values_${index}`] = `${label} có giá hoặc tồn kho không hợp lệ.`;
+ });
  }
 
  return {

@@ -8,14 +8,14 @@ import { FadeIn } from "@/components/admin/ui/motion";
 import { SEOService, SEOSettings, SEOPage } from "@/lib/services/storefront/seo.service";
 
 const PAGES: { key: SEOPage; label: string }[] = [
- { key: 'global', label: '' },
+ { key: 'global', label: 'Toàn website' },
  { key: 'homepage', label: 'Trang chủ' },
  { key: 'shop', label: 'Cửa hàng' },
  { key: 'about', label: 'Xưởng may' },
  { key: 'winter', label: 'Mùa đông' },
  { key: 'summer', label: 'Mùa hè' },
- { key: 'contact', label: '' },
- { key: 'tracking', label: '' },
+ { key: 'contact', label: 'Liên hệ' },
+ { key: 'tracking', label: 'Theo dõi đơn hàng' },
  { key: 'reviews', label: 'Đánh giá' },
  { key: 'journal', label: 'Tạp chí' },
 ];

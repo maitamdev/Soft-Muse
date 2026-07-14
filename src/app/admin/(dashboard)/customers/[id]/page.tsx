@@ -277,7 +277,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
  const statusMap: Record<CustomerStatus, { label: string, variant: any }> = {
  active: { label: 'Hoạt động', variant: 'success' },
  inactive: { label: 'Không hoạt động', variant: 'neutral' },
- blocked: { label: '', variant: 'danger' },
+ blocked: { label: 'Đã chặn', variant: 'danger' },
  pending: { label: 'Tạm khóa', variant: 'warning' },
  vip: { label: '(VIP)', variant: 'primary' }
  };
@@ -312,14 +312,14 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
  {/* Analytics Cards */}
  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
  {[
- { label: 'tổng', value: formatCurrency(customer.totalSpent), icon: IconCurrencyDollar, color: 'text-[var(--admin-success)]', bg: 'bg-[var(--admin-success)]/10' },
- { label: 'Đơn hàng', value: formatCurrency(customer.averageOrderValue), icon: IconCurrencyDollar, color: 'text-[var(--admin-info)]', bg: 'bg-[var(--admin-info)]/10' },
- { label: 'Đơn hàng', value: customer.totalOrders, icon: IconShoppingBag, color: 'text-[var(--admin-primary)]', bg: 'bg-[var(--admin-primary-muted)]' },
- { label: '', value: customer.loyaltyPoints, icon: IconStar, color: 'text-[var(--admin-warning)]', bg: 'bg-[var(--admin-warning)]/10' },
- { label: '', value: customer.wishlistCount, icon: IconHeart, color: 'text-[var(--admin-danger)]', bg: 'bg-[var(--admin-danger)]/10' },
+ { label: 'Tổng chi tiêu', value: formatCurrency(customer.totalSpent), icon: IconCurrencyDollar, color: 'text-[var(--admin-success)]', bg: 'bg-[var(--admin-success)]/10' },
+ { label: 'Giá trị đơn trung bình', value: formatCurrency(customer.averageOrderValue), icon: IconCurrencyDollar, color: 'text-[var(--admin-info)]', bg: 'bg-[var(--admin-info)]/10' },
+ { label: 'Tổng đơn hàng', value: customer.totalOrders, icon: IconShoppingBag, color: 'text-[var(--admin-primary)]', bg: 'bg-[var(--admin-primary-muted)]' },
+ { label: 'Điểm thành viên', value: customer.loyaltyPoints, icon: IconStar, color: 'text-[var(--admin-warning)]', bg: 'bg-[var(--admin-warning)]/10' },
+ { label: 'Danh sách yêu thích', value: customer.wishlistCount, icon: IconHeart, color: 'text-[var(--admin-danger)]', bg: 'bg-[var(--admin-danger)]/10' },
  { label: 'Đánh giá', value: customer.reviewsCount, icon: IconStar, color: 'text-[var(--admin-warning)]', bg: 'bg-[var(--admin-warning)]/10' },
- { label: '', value: customer.couponsUsed, icon: IconTicket, color: 'text-[var(--admin-info)]', bg: 'bg-[var(--admin-info)]/10' },
- { label: '', value: customer.lastLogin ? new Date(customer.lastLogin).toLocaleDateString('ar-EG') : '—', icon: IconClock, color: 'text-[var(--admin-text-base)]', bg: 'bg-[var(--admin-bg-hover)]' },
+ { label: 'Mã giảm giá đã dùng', value: customer.couponsUsed, icon: IconTicket, color: 'text-[var(--admin-info)]', bg: 'bg-[var(--admin-info)]/10' },
+ { label: 'Lần đăng nhập gần nhất', value: customer.lastLogin ? new Date(customer.lastLogin).toLocaleDateString('vi-VN') : '—', icon: IconClock, color: 'text-[var(--admin-text-base)]', bg: 'bg-[var(--admin-bg-hover)]' },
  ].map((stat, i) => (
  <Card key={i} className="p-4 flex flex-col items-center justify-center text-center"> <div className={`w-8 h-8 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center mb-2`}> <stat.icon size={16} /> </div> <p className="text-lg font-bold text-[var(--admin-text-base)] tabular-nums">{stat.value}</p> <p className="text-xs text-[var(--admin-text-muted)] mt-1">{stat.label}</p> </Card>
  ))}
@@ -448,6 +448,6 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
  footer={
  <div className="flex justify-end gap-3"> <Button variant="ghost" onClick={() => setAddressModalOpen(false)}>Hủy</Button> <Button variant="primary" onClick={handleSaveAddress} isLoading={savingAddress}>{editingAddressId ? 'Lưu Sửa' : 'Thêm'}</Button> </div>
  }
- > <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-1"> <div className="sm:col-span-2"> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">mã( / )</label> <Input value={addressForm.label} onChange={e => setAddressForm(f => ({ ...f, label: e.target.value }))} /> </div> <div className="sm:col-span-2"> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5"></label> <Input value={addressForm.street} onChange={e => setAddressForm(f => ({ ...f, street: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5"></label> <Input value={addressForm.building} onChange={e => setAddressForm(f => ({ ...f, building: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5"></label> <Input value={addressForm.apartment} onChange={e => setAddressForm(f => ({ ...f, apartment: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5"></label> <Input value={addressForm.area} onChange={e => setAddressForm(f => ({ ...f, area: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Thành phố</label> <Input value={addressForm.city} onChange={e => setAddressForm(f => ({ ...f, city: e.target.value }))} /> </div> <label className="sm:col-span-2 flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={addressForm.isDefault} onChange={e => setAddressForm(f => ({ ...f, isDefault: e.target.checked }))} className="w-4 h-4 accent-[var(--admin-primary)]" /> <span className="text-sm text-[var(--admin-text-base)]"></span> </label> </div> </Modal> </div>
+ > <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-1"> <div className="sm:col-span-2"> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Tên địa chỉ (Nhà/Văn phòng)</label> <Input value={addressForm.label} onChange={e => setAddressForm(f => ({ ...f, label: e.target.value }))} /> </div> <div className="sm:col-span-2"> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Địa chỉ đường</label> <Input value={addressForm.street} onChange={e => setAddressForm(f => ({ ...f, street: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Tòa nhà</label> <Input value={addressForm.building} onChange={e => setAddressForm(f => ({ ...f, building: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Căn hộ/phòng</label> <Input value={addressForm.apartment} onChange={e => setAddressForm(f => ({ ...f, apartment: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Phường/xã</label> <Input value={addressForm.area} onChange={e => setAddressForm(f => ({ ...f, area: e.target.value }))} /> </div> <div> <label className="block text-sm font-medium text-[var(--admin-text-subtle)] mb-1.5">Tỉnh/thành phố</label> <Input value={addressForm.city} onChange={e => setAddressForm(f => ({ ...f, city: e.target.value }))} /> </div> <label className="sm:col-span-2 flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={addressForm.isDefault} onChange={e => setAddressForm(f => ({ ...f, isDefault: e.target.checked }))} className="w-4 h-4 accent-[var(--admin-primary)]" /> <span className="text-sm text-[var(--admin-text-base)]">Đặt làm địa chỉ mặc định</span> </label> </div> </Modal> </div>
  );
 }

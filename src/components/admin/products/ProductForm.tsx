@@ -7,6 +7,7 @@ import { Product, ProductVariant, ProductSeo } from '@/data/mock/products';
 import { ProductValidator } from '@/lib/validations/product';
 import { ProductService } from '@/lib/services/product.service';
 import { CategoryService } from '@/lib/services/category.service';
+import { CollectionService } from '@/lib/services/collection.service';
 import { ImageUpload } from '@/components/admin/ui/ImageUpload';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -71,11 +72,12 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  const [saving, setSaving] = useState(false);
  const [allProducts, setAllProducts] = useState<Product[]>([]);
  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+ const [collectionOptions, setCollectionOptions] = useState<string[]>([]);
  const [skuManuallyEdited, setSkuManuallyEdited] = useState(Boolean(isEdit && initialData?.sku));
 
  const [formData, setFormData] = useState<Partial<Product>>({
  name: '', sku: '', slug: '', shortDescription: '', description: '',
- category: 'Áo sơ mi', collection: 'Office Essentials', season: 'summer', brand: 'Soft Muse',
+ category: '', collection: '', season: 'all', brand: 'Soft Muse',
  price: 0, comparePrice: 0, costPrice: 0, stock: 0, lowStockLimit: 5,
  barcode: '', material: '', weight: 0, tags: [],
  status: 'draft', featured: false, bestSeller: false, newArrival: false,
@@ -85,10 +87,19 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  });
 
  useEffect(() => {
- ProductService.getProducts().then(setAllProducts);
- CategoryService.getCategories()
- .then((items) => setCategoryOptions(items.filter((category) => category.status === 'active').map((category) => category.name)))
- .catch(() => setCategoryOptions([]));
+ Promise.all([
+ ProductService.getProducts(),
+ CategoryService.getCategories(),
+ CollectionService.getCollections(),
+ ]).then(([products, categories, collections]) => {
+ setAllProducts(products);
+ setCategoryOptions(categories.filter((category) => category.status === 'active').map((category) => category.name));
+ setCollectionOptions(collections.filter((collection) => collection.status === 'active').map((collection) => collection.name));
+ }).catch(() => {
+ setCategoryOptions([]);
+ setCollectionOptions([]);
+ toast.error('Không thể tải dữ liệu phân loại sản phẩm.');
+ });
  }, []);
 
  useEffect(() => {
@@ -119,8 +130,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  const handleVariantAdd = () => {
  const newVariant: ProductVariant = {
- id: `v_${Date.now()}`,
- sku: `${formData.sku || 'SKU'}-NEW`,
+ id: crypto.randomUUID(),
+ sku: `${formData.sku || 'SKU'}-${String((formData.variants?.length ?? 0) + 1).padStart(2, '0')}`,
  color: '',
  size: '',
  price: formData.price || 0,
@@ -271,7 +282,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  type="number"
  value={formData.stock || 0}
  onChange={(e) => handleChange('stock', Number(e.target.value))}
- /> <p className="text-[10px] text-[var(--admin-text-muted)]">.</p> </div> <Input
+ disabled={Boolean(formData.variants?.length)}
+ /> <p className="text-[10px] text-[var(--admin-text-muted)]">{formData.variants?.length ? 'Tồn kho tổng được tự động tính từ các biến thể.' : 'Dùng khi sản phẩm không có biến thể.'}</p> </div> <Input
  label="Ngưỡng cảnh báo tồn kho"
  type="number"
  value={formData.lowStockLimit || 0}
@@ -343,11 +355,11 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  value={formData.status}
  onChange={(e) => handleChange('status', e.target.value)}
  className="w-full px-3 py-2 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="draft">Nháp</option> <option value="published">Đã xuất bản</option> <option value="hidden"></option> <option value="archived">Đã lưu trữ</option> </select> </Card> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">Phân loại</h3> <div className="space-y-3"> <Input
+ > <option value="draft">Nháp</option> <option value="published">Đã xuất bản</option> <option value="hidden">Đang ẩn</option> <option value="archived">Đã lưu trữ</option> </select> <div className="grid grid-cols-1 gap-3"> <Input label="Bắt đầu hiển thị" type="datetime-local" value={formData.publishAt?.slice(0, 16) || ''} onChange={(e) => handleChange('publishAt', e.target.value ? new Date(e.target.value).toISOString() : undefined)} /> <Input label="Ngừng hiển thị" type="datetime-local" value={formData.hideAt?.slice(0, 16) || ''} onChange={(e) => handleChange('hideAt', e.target.value ? new Date(e.target.value).toISOString() : undefined)} /> </div> </Card> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">Phân loại</h3> <div className="space-y-3"> <Input
  label="Thương hiệu"
  value={formData.brand || ''}
  onChange={(e) => handleChange('brand', e.target.value)}
- /> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Danh mục</label> <select value={formData.category} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> {categoryOptions.length ? categoryOptions.map((category) => <option key={category} value={category}>{category}</option>) : <option value={formData.category || ''}>{formData.category || 'Chưa có danh mục'}</option>} </select> <p className="text-[10px] text-[var(--admin-text-muted)]">Danh mục lấy từ trang quản lý danh mục và dùng để lọc sản phẩm ngoài website.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">(Collection)</label> <select value={formData.collection} onChange={(e) => handleChange('collection', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="couture">couture</option> <option value="Bộ sưu tập ">Bộ sưu tập </option> <option value="vàmùa đông 2027">vàmùa đông 2027</option> <option value="vàmùa hè 2027">vàmùa hè 2027</option> </select> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mùa (Season)</label> <select value={formData.season || 'summer'} onChange={(e) => handleChange('season', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="summer">mùa hè (Summer)</option> <option value="winter">mùa đông (Winter)</option> </select> </div> <Input
+ /> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Danh mục</label> <select value={formData.category || ''} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="">Chưa phân loại</option>{categoryOptions.map((category) => <option key={category} value={category}>{category}</option>)}</select> <p className="text-[10px] text-[var(--admin-text-muted)]">Danh mục lấy từ trang quản lý danh mục và dùng để lọc sản phẩm ngoài website.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Bộ sưu tập chính</label> <select value={formData.collection || ''} onChange={(e) => handleChange('collection', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"><option value="">Không thuộc bộ sưu tập</option>{collectionOptions.map((collection) => <option key={collection} value={collection}>{collection}</option>)}</select><p className="text-[10px] text-[var(--admin-text-muted)]">Danh sách này đồng bộ từ mục Bộ sưu tập.</p></div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mùa</label> <select value={formData.season || 'all'} onChange={(e) => handleChange('season', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"><option value="all">Quanh năm</option><option value="summer">Mùa hè</option><option value="winter">Mùa đông</option></select></div> <Input
  label="Thẻ sản phẩm"
  value={formData.tags?.join(', ') || ''}
  onChange={(e) => handleChange('tags', e.target.value.split(',').map(t=>t.trim()).filter(Boolean))}

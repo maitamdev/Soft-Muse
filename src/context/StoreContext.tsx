@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import type { Product } from "@/data/mock/products";
+import { primaryImage } from "@/data/mock/products";
 
 export interface CartItem {
  id: string;
@@ -36,6 +38,7 @@ interface StoreContextType {
  isCartOpen: boolean;
  setCartOpen: (open: boolean) => void;
  clearCart: () => void;
+ syncCatalog: (products: Product[]) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -69,6 +72,31 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  const clearCart = useCallback(() => {
  saveCart([]);
  }, [saveCart]);
+
+ const syncCatalog = useCallback((products: Product[]) => {
+ const byId = new Map(products.map((product) => [product.id, product]));
+ setCart((current) => {
+ const next = current.flatMap((item) => {
+ const product = byId.get(item.id);
+ if (!product) return [];
+ const variant = item.variantId ? product.variants.find((entry) => entry.id === item.variantId && entry.status !== "inactive") : undefined;
+ if (item.variantId && !variant) return [];
+ const stock = variant?.stock ?? product.stock;
+ if (stock <= 0) return [];
+ return [{ ...item, title: product.name, price: variant?.price ?? product.price, image: variant?.image || primaryImage(product), collection: product.collection, quantity: Math.min(item.quantity, stock, 20) }];
+ });
+ if (JSON.stringify(next) !== JSON.stringify(current)) localStorage.setItem("soft_muse_cart", JSON.stringify(next));
+ return next;
+ });
+ setWishlist((current) => {
+ const next = current.flatMap((item) => {
+ const product = byId.get(item.id);
+ return product ? [{ ...item, title: product.name, price: product.price, image: primaryImage(product), collection: product.collection }] : [];
+ });
+ if (JSON.stringify(next) !== JSON.stringify(current)) localStorage.setItem("soft_muse_wishlist", JSON.stringify(next));
+ return next;
+ });
+ }, []);
 
  const addToCart = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
  const safeQuantity = Math.min(20, Math.max(1, Math.floor(quantity)));
@@ -146,7 +174,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  isCartOpen,
  setCartOpen,
  clearCart,
- }), [cart, wishlist, addToCart, removeFromCart, updateQuantity, toggleWishlist, isInWishlist, cartCount, cartSubtotal, isCartOpen, clearCart]);
+ syncCatalog,
+ }), [cart, wishlist, addToCart, removeFromCart, updateQuantity, toggleWishlist, isInWishlist, cartCount, cartSubtotal, isCartOpen, clearCart, syncCatalog]);
 
  return (
  <StoreContext.Provider value={contextValue}>

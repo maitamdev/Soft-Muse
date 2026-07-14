@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { IconPlus, IconTrash, IconEdit, IconArchive } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconEdit, IconArchive, IconRestore } from '@tabler/icons-react';
 import { EntityDeleteDialog } from '@/components/admin/crud/EntityDialogs';
 import { ProductService } from '@/lib/services/product.service';
 import type { Product } from '@/data/mock/products';
@@ -37,7 +37,7 @@ export default function ProductsPage() {
  const data = await ProductService.getProducts();
  setProducts(data);
  } catch {
- toast.error("Đã xảy ra lỗi tảiSản phẩm");
+ toast.error("Không thể tải danh sách sản phẩm.");
  } finally {
  setLoading(false);
  }
@@ -53,11 +53,11 @@ export default function ProductsPage() {
  setIsBulkDeleting(true);
  try {
  await Promise.all(selectedIds.map(id => ProductService.deleteProduct(String(id))));
- toast.success("đãXóa Sản phẩm");
+ toast.success("Đã lưu trữ các sản phẩm đã chọn.");
  setSelectedIds([]);
  loadProducts();
  } catch {
- toast.error("Đã xảy ra lỗi Xóa");
+ toast.error("Không thể lưu trữ sản phẩm.");
  } finally {
  setIsBulkDeleting(false);
  setDeleteDialog({ isOpen: false, id: null });
@@ -68,10 +68,10 @@ export default function ProductsPage() {
  if (!deleteDialog.id) return;
  try {
  await ProductService.deleteProduct(deleteDialog.id);
- toast.success("đãXóa sản phẩm");
+ toast.success("Đã lưu trữ sản phẩm.");
  loadProducts();
  } catch {
- toast.error("Đã xảy ra lỗi Xóa");
+ toast.error("Không thể lưu trữ sản phẩm.");
  } finally {
  setDeleteDialog({ isOpen: false, id: null });
  }
@@ -84,7 +84,7 @@ export default function ProductsPage() {
  type: 'custom',
  render: (_, row) => (
  <div className="w-12 h-12 rounded-[var(--admin-radius-sm)] overflow-hidden border border-[var(--admin-border-light)] bg-[var(--admin-bg-elevated)] p-1"> <img
- src={row.images?.[0] || 'https://via.placeholder.com/100'}
+ src={row.images?.[0] || '/images/campaign/campaign_2.png'}
  alt=""
  className="w-full h-full object-contain"
  /> </div>
@@ -130,6 +130,7 @@ export default function ProductsPage() {
  align: 'end',
  render: (_, row) => (
  <div className="flex items-center gap-2 justify-end"> <Button variant="ghost" size="icon-sm" onClick={() => router.push(`/admin/products/${row.id}`)}> <IconEdit size={16} /> </Button>
+ {row.status === 'archived' && canWrite && <Button variant="ghost" size="icon-sm" title="Khôi phục về bản nháp" onClick={async () => { try { await ProductService.restoreProduct(row.id); toast.success('Đã khôi phục sản phẩm về bản nháp.'); loadProducts(); } catch { toast.error('Không thể khôi phục sản phẩm.'); } }}><IconRestore size={16} /></Button>}
  {canDelete && (
  <Button
  variant="ghost"
@@ -156,7 +157,7 @@ export default function ProductsPage() {
  return (
  <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 fade-in"> <PageHeader
  title="Sản phẩm"
- description="Quản lý vàSửa sản phẩm"
+ description="Quản lý thông tin, trạng thái bán, giá và tồn kho sản phẩm."
  actions={
  canWrite ? (
  <Button variant="primary" leftIcon={<IconPlus size={18} />} onClick={() => router.push('/admin/products/new')}>
@@ -167,14 +168,14 @@ export default function ProductsPage() {
  value={seasonFilter}
  onChange={(e) => setSeasonFilter(e.target.value as typeof seasonFilter)}
  className="h-10 px-3 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-surface)] text-sm text-[var(--admin-text-base)] outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="all">:Cửa hàng ()</option> <option value="winter">Thời trang đông</option> <option value="summer">Thời trang hè</option> </select> <select
+ > <option value="all">Tất cả mùa</option> <option value="winter">Mùa đông</option> <option value="summer">Mùa hè</option> </select> <select
  value={statusFilter}
  onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
  className="h-10 px-3 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-surface)] text-sm text-[var(--admin-text-base)] outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="all">Trạng thái: </option> <option value="published">Đã xuất bản</option> <option value="draft">Nháp</option> <option value="hidden"></option> <option value="archived">Đã lưu trữ</option> </select> <div className="flex items-center gap-1.5">
+ > <option value="all">Tất cả trạng thái</option> <option value="published">Đã xuất bản</option> <option value="draft">Nháp</option> <option value="hidden">Đang ẩn</option> <option value="archived">Đã lưu trữ</option> </select> <div className="flex items-center gap-1.5">
  {([
- ['all', ''],
- ['featured', ''],
+ ['all', 'Tất cả'],
+ ['featured', 'Nổi bật'],
  ['bestSeller', 'Bán chạy nhất'],
  ['newArrival', 'Hàng mới về'],
  ] as const).map(([value, label]) => (
@@ -196,7 +197,7 @@ export default function ProductsPage() {
  {selectedIds.length > 0 && canDelete && (
  <div className="bg-[var(--admin-primary-muted)] border border-[var(--admin-primary)]/20 p-3 px-4 flex items-center justify-between rounded-[var(--admin-radius-xl)] shadow-[var(--admin-shadow-sm)]"> <span className="text-sm font-bold text-[var(--admin-primary)]">
  Đã chọn {selectedIds.length} sản phẩm</span> <Button size="sm" variant="danger" leftIcon={<IconTrash size={16} />} onClick={() => setDeleteDialog({ isOpen: true, id: null })}>
- Xóa mục đã chọn
+ Lưu trữ mục đã chọn
  </Button> </div>
  )}
 
@@ -225,11 +226,11 @@ export default function ProductsPage() {
  isOpen={deleteDialog.isOpen}
  onClose={() => setDeleteDialog({ isOpen: false, id: null })}
  onConfirm={deleteDialog.id ? confirmRowDelete : handleDeleteSelected}
- title="Xóa sản phẩm"
+ title="Lưu trữ sản phẩm"
  description={
  deleteDialog.id
- ? 'Bạn có chắc muốn Xóa này sản phẩmvĩnh viễnً؟ Không thể hoàn tác thao tác này.'
- : `Bạn có chắc muốn Xóa ${selectedIds.length} sản phẩm؟Không thể hoàn tác thao tác này.`
+ ? 'Sản phẩm sẽ ngừng hiển thị ngoài cửa hàng và có thể khôi phục về bản nháp sau.'
+ : `${selectedIds.length} sản phẩm sẽ ngừng hiển thị ngoài cửa hàng và vẫn được giữ để bảo toàn lịch sử đơn hàng.`
  }
  isProcessing={isBulkDeleting}
  /> </div>

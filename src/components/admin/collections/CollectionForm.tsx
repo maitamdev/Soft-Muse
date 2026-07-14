@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { IconArrowRight, IconDeviceFloppy, IconPackage } from "@tabler/icons-react";
+import { IconArrowRight, IconDeviceFloppy, IconPackage, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Button } from "@/components/admin/design-system/Button";
 import { Card } from "@/components/admin/design-system/Card";
 import { Input } from "@/components/admin/design-system/Input";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 import { ProductService } from "@/lib/services/product.service";
-import { Collection, CollectionService } from "@/lib/services/collection.service";
+import { Collection, CollectionRule, CollectionService } from "@/lib/services/collection.service";
 import type { Product } from "@/data/mock/products";
 
 type CollectionDraft = Omit<Collection, "id" | "createdAt" | "updatedAt"> & { id?: string };
@@ -84,6 +84,8 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
     const slug = slugify(draft.slug);
     if (!name) return toast.error("Vui lòng nhập tên bộ sưu tập.");
     if (!slug) return toast.error("Vui lòng nhập đường dẫn bộ sưu tập.");
+    if (draft.type === "automatic" && !draft.rules.length) return toast.error("Bộ sưu tập tự động phải có ít nhất một điều kiện.");
+    if (draft.type === "automatic" && draft.rules.some((rule) => !rule.value.trim())) return toast.error("Vui lòng nhập giá trị cho tất cả điều kiện.");
 
     setSaving(true);
     try {
@@ -157,8 +159,9 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
           <Card className="space-y-4 p-5">
             <div className="flex items-center justify-between gap-3 border-b border-[var(--admin-border-light)] pb-2">
               <h2 className="text-sm font-bold text-[var(--admin-text-base)]">Sản phẩm</h2>
-              <span className="text-xs font-semibold text-[var(--admin-primary)]">{draft.productIds.length} đã chọn</span>
+              <span className="text-xs font-semibold text-[var(--admin-primary)]">{draft.type === "manual" ? `${draft.productIds.length} đã chọn` : `${draft.rules.length} điều kiện`}</span>
             </div>
+            {draft.type === "automatic" ? <AutomaticRules draft={draft} setDraft={setDraft} /> : <>
             <Input label="Tìm sản phẩm" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="max-h-[420px] divide-y divide-[var(--admin-border-light)] overflow-y-auto border-y border-[var(--admin-border-base)]">
               {filteredProducts.length ? filteredProducts.map((product) => (
@@ -174,9 +177,46 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
                 </label>
               )) : <p className="py-10 text-center text-sm text-[var(--admin-text-muted)]">Không có sản phẩm phù hợp.</p>}
             </div>
+            </>}
           </Card>
         </div>
       </div>
     </div>
   );
+}
+
+function AutomaticRules({ draft, setDraft }: { draft: CollectionDraft; setDraft: React.Dispatch<React.SetStateAction<CollectionDraft>> }) {
+  const addRule = () => setDraft((current) => ({
+    ...current,
+    rules: [...current.rules, { field: "tag", operator: "contains", value: "" }],
+  }));
+  const updateRule = (index: number, updates: Partial<CollectionRule>) => setDraft((current) => ({
+    ...current,
+    rules: current.rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, ...updates } : rule),
+  }));
+  const removeRule = (index: number) => setDraft((current) => ({ ...current, rules: current.rules.filter((_, ruleIndex) => ruleIndex !== index) }));
+
+  return <div className="space-y-4">
+    <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--admin-text-muted)]">
+      Cách khớp điều kiện
+      <select value={draft.matchType} onChange={(event) => setDraft((current) => ({ ...current, matchType: event.target.value as CollectionDraft["matchType"] }))} className="h-10 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-3 text-sm">
+        <option value="all">Khớp tất cả điều kiện</option>
+        <option value="any">Khớp ít nhất một điều kiện</option>
+      </select>
+    </label>
+    <div className="space-y-3">
+      {draft.rules.map((rule, index) => <div key={index} className="grid gap-2 border border-[var(--admin-border-base)] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
+        <select value={rule.field} onChange={(event) => updateRule(index, { field: event.target.value as CollectionRule["field"] })} className="h-10 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-2 text-sm">
+          <option value="title">Tên sản phẩm</option><option value="tag">Thẻ</option><option value="price">Giá</option><option value="inventory">Tồn kho</option>
+        </select>
+        <select value={rule.operator} onChange={(event) => updateRule(index, { operator: event.target.value as CollectionRule["operator"] })} className="h-10 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-2 text-sm">
+          <option value="equals">Bằng</option><option value="not_equals">Không bằng</option><option value="contains">Có chứa</option><option value="greater_than">Lớn hơn</option><option value="less_than">Nhỏ hơn</option>
+        </select>
+        <input value={rule.value} type={rule.field === "price" || rule.field === "inventory" ? "number" : "text"} onChange={(event) => updateRule(index, { value: event.target.value })} placeholder="Giá trị" className="h-10 border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] px-3 text-sm outline-none focus:border-[var(--admin-primary)]" />
+        <Button type="button" variant="ghost" size="icon-sm" className="text-[var(--admin-danger)]" aria-label="Xóa điều kiện" onClick={() => removeRule(index)}><IconTrash size={16} /></Button>
+      </div>)}
+    </div>
+    <Button type="button" variant="secondary" size="sm" leftIcon={<IconPlus size={15} />} onClick={addRule}>Thêm điều kiện</Button>
+    <p className="text-xs text-[var(--admin-text-muted)]">Sản phẩm trên website được tự động tính lại theo các điều kiện này.</p>
+  </div>;
 }

@@ -67,7 +67,10 @@ export default function CouponsPage() {
  };
 
  const handleSave = async () => {
- if (!form.code.trim()) { toast.error(''); return; }
+ if (!form.code.trim()) { toast.error('Vui lòng nhập mã giảm giá.'); return; }
+ if (Number(form.discountValue) <= 0) { toast.error('Giá trị giảm phải lớn hơn 0.'); return; }
+ if (form.type === 'percentage' && Number(form.discountValue) > 100) { toast.error('Mức giảm phần trăm không được vượt quá 100%.'); return; }
+ if (form.expirationDate && form.startDate && new Date(form.expirationDate) <= new Date(form.startDate)) { toast.error('Ngày hết hạn phải sau ngày bắt đầu.'); return; }
  setSaving(true);
  try {
  const payload: Partial<Coupon> = {
@@ -85,15 +88,15 @@ export default function CouponsPage() {
  };
  if (editingId) {
  await CouponService.updateCoupon(editingId, payload);
- toast.success('đã');
+ toast.success('Đã cập nhật mã giảm giá.');
  } else {
  await CouponService.createCoupon(payload);
- toast.success('đã');
+ toast.success('Đã tạo mã giảm giá.');
  }
  setEditorOpen(false);
  loadCoupons();
- } catch {
- toast.error('trongLưu ');
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : 'Không thể lưu mã giảm giá.');
  } finally {
  setSaving(false);
  }
@@ -118,23 +121,23 @@ export default function CouponsPage() {
  useEventSubscribeMany(REFRESH_EVENTS.coupons, loadCoupons);
 
  const handleDelete = async (id: string) => {
- if (confirm('Xóa؟')) {
+ if (confirm('Xóa vĩnh viễn mã giảm giá này? Các đơn cũ vẫn giữ mã đã áp dụng.')) {
  await CouponService.deleteCoupon(id);
- toast.success('đãXóa');
+ toast.success('Đã xóa mã giảm giá.');
  loadCoupons();
  }
  };
 
  const handleDuplicate = async (id: string) => {
  await CouponService.duplicateCoupon(id);
- toast.success('đã');
+ toast.success('Đã nhân bản mã giảm giá ở trạng thái tắt.');
  loadCoupons();
  };
 
  const handleToggleStatus = async (coupon: Coupon) => {
  const newStatus = coupon.status === 'active' ? 'disabled' : 'active';
  await CouponService.updateCoupon(coupon.id, { status: newStatus });
- toast.success('đã');
+ toast.success(newStatus === 'active' ? 'Đã bật mã giảm giá.' : 'Đã tắt mã giảm giá.');
  loadCoupons();
  };
 
@@ -186,7 +189,7 @@ export default function CouponsPage() {
  accessor: 'status', 
  render: (_, c) => (
  <button onClick={(e) => { e.stopPropagation(); handleToggleStatus(c); }}> <Badge variant={c.status === 'active' ? 'success' : 'neutral'}>
- {c.status === 'active' ? '' : ''}
+ {c.status === 'active' ? 'Đang hoạt động' : 'Đã tắt'}
  </Badge> </button>
  )
  },
@@ -205,12 +208,12 @@ export default function CouponsPage() {
 
  return (
  <div className="space-y-6 max-w-6xl mx-auto pb-20"> <PageHeader 
- title="AURA"
- description="Quản lý vàMã khuyến mãi."
+ title="Mã giảm giá"
+ description="Quản lý điều kiện, thời hạn và giới hạn sử dụng mã khuyến mãi."
  actions={
  canWrite ? (
  <Button leftIcon={<IconPlus size={18} />} onClick={openCreate}>
- Mới
+ Thêm mã giảm giá
  </Button>
  ) : undefined
  }

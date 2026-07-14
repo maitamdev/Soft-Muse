@@ -138,7 +138,7 @@ export default function CustomersPage() {
  const statusMap: Record<CustomerStatus, { label: string, variant: any }> = {
  active: { label: 'Hoạt động', variant: 'success' },
  inactive: { label: 'Không hoạt động', variant: 'neutral' },
- blocked: { label: '', variant: 'danger' },
+ blocked: { label: 'Đã chặn', variant: 'danger' },
  pending: { label: 'Tạm khóa', variant: 'warning' },
  vip: { label: '(VIP)', variant: 'primary' }
  };

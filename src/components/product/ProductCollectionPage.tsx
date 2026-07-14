@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ProductCard } from "@/components/ui/Card";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
-import { useStorefrontCategories } from "@/hooks/useStorefrontCategories";
-import type { Category } from "@/lib/services/category.service";
+import { useStorefrontCollections } from "@/hooks/useStorefrontCollections";
+import { productsForCollection } from "@/lib/catalog/collection-rules";
 import { discountOriginalPrice, primaryImage, resolveStockStatus, type Product } from "@/data/mock/products";
 
 interface ProductCollectionPageProps {
@@ -22,9 +22,19 @@ export default function ProductCollectionPage({
   filter,
 }: ProductCollectionPageProps) {
   const products = useStorefrontProducts();
-  const categories = useStorefrontCategories();
+  const collections = useStorefrontCollections();
   const visibleProducts = resolveProducts(products, filter);
-  const grouped = groupByCategory(products, categories);
+  const grouped = collections.map((collection) => {
+    const collectionProducts = productsForCollection(collection, products);
+    const fallbackProduct = collectionProducts[0] ?? products[0];
+    return {
+      id: collection.id,
+      slug: collection.slug,
+      name: collection.name,
+      image: collection.image || (fallbackProduct ? primaryImage(fallbackProduct) : "") || "/images/campaign/campaign_2.png",
+      products: collectionProducts,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-background-primary">
@@ -47,8 +57,8 @@ export default function ProductCollectionPage({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {grouped.map((collection) => (
               <Link
-                key={collection.name}
-                href={`/shop?category=${encodeURIComponent(collection.name)}`}
+                key={collection.id}
+                href={`/shop?collection=${encodeURIComponent(collection.slug)}`}
                 className="group relative aspect-[4/5] overflow-hidden border border-brand-border bg-background-secondary"
               >
                 <Image
@@ -68,6 +78,7 @@ export default function ProductCollectionPage({
               </Link>
             ))}
           </div>
+          {grouped.length === 0 && <div className="border border-brand-border bg-background-secondary px-6 py-16 text-center"><h2 className="font-sans text-xl font-medium text-text-primary">Chưa có bộ sưu tập đang hiển thị</h2><p className="mt-2 text-sm text-text-secondary">Các bộ sưu tập được xuất bản trong trang quản trị sẽ xuất hiện tại đây ngay sau khi lưu.</p><Link href="/shop" className="mt-6 inline-block text-sm font-semibold text-accent underline underline-offset-4">Xem tất cả sản phẩm</Link></div>}
         </main>
       ) : (
         <main className="max-w-[1280px] mx-auto px-6 md:px-12 py-12 md:py-20">
@@ -100,35 +111,4 @@ function resolveProducts(products: Product[], filter: ProductCollectionPageProps
   if (filter === "best") return products.filter((product) => product.bestSeller);
   if (filter === "sale") return products.filter((product) => product.comparePrice > product.price);
   return products;
-}
-
-function groupByCategory(
-  products: Product[],
-  categories: Category[],
-): { name: string; image: string; products: Product[] }[] {
-  const byCategory = new Map<string, Product[]>();
-  products.forEach((product) => {
-    if (!product.category) return;
-    const current = byCategory.get(product.category) ?? [];
-    current.push(product);
-    byCategory.set(product.category, current);
-  });
-
-  if (categories.length) {
-    return categories
-      .map((category) => {
-        const groupedProducts = byCategory.get(category.name) ?? [];
-        return {
-          name: category.name,
-          image: category.thumbnail || (groupedProducts[0] ? primaryImage(groupedProducts[0]) : "") || "/images/campaign/campaign_2.png",
-          products: groupedProducts,
-        };
-      });
-  }
-
-  return Array.from(byCategory.entries()).map(([name, groupedProducts]) => ({
-    name,
-    image: groupedProducts[0] ? primaryImage(groupedProducts[0]) : "/images/campaign/campaign_2.png",
-    products: groupedProducts,
-  }));
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   IconAdjustmentsHorizontal as SlidersHorizontal,
   IconChevronLeft,
@@ -12,6 +12,8 @@ import { ProductCard } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { useStorefrontCategories } from "@/hooks/useStorefrontCategories";
+import { useStorefrontCollections } from "@/hooks/useStorefrontCollections";
+import { productsForCollection } from "@/lib/catalog/collection-rules";
 import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/mock/products";
 
 const SIZES = ["XS", "S", "M", "L", "XL", "F"];
@@ -20,9 +22,12 @@ const PAGE_SIZE = 12;
 
 function ShopContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const products = useStorefrontProducts();
   const categories = useStorefrontCategories();
+  const collections = useStorefrontCollections();
   const categoryParam = searchParams.get("category");
+  const collectionParam = searchParams.get("collection");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -41,6 +46,15 @@ function ShopContent() {
     return ["", ...categories.map((category) => category.name)];
   }, [categories]);
 
+  const activeCollection = useMemo(
+    () => collections.find((collection) => collection.slug === collectionParam || collection.id === collectionParam),
+    [collections, collectionParam],
+  );
+  const collectionProductIds = useMemo(
+    () => new Set(activeCollection ? productsForCollection(activeCollection, products).map((product) => product.id) : []),
+    [activeCollection, products],
+  );
+
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -52,15 +66,16 @@ function ShopContent() {
         product.collection.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query);
       const matchesCategory = selectedCategory === "" || product.category === selectedCategory;
+      const matchesCollection = !activeCollection || collectionProductIds.has(product.id);
       const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
       const matchesSize =
         selectedSizes.length === 0 || Boolean(product.sizes?.some((size) => selectedSizes.includes(size)));
       const matchesColor =
         selectedColors.length === 0 || Boolean(product.colors?.some((color) => selectedColors.includes(color)));
 
-      return matchesSearch && matchesCategory && matchesPrice && matchesSize && matchesColor;
+      return matchesSearch && matchesCategory && matchesCollection && matchesPrice && matchesSize && matchesColor;
     });
-  }, [products, searchQuery, selectedCategory, priceRange, selectedSizes, selectedColors]);
+  }, [products, searchQuery, selectedCategory, activeCollection, collectionProductIds, priceRange, selectedSizes, selectedColors]);
 
   const sortedProducts = useMemo(() => {
     if (sortBy === "price_asc") return [...filteredProducts].sort((a, b) => a.price - b.price);
@@ -86,6 +101,7 @@ function ShopContent() {
     setSearchQuery("");
     setSelectedSizes([]);
     setSelectedColors([]);
+    if (collectionParam || categoryParam) router.replace("/shop");
   };
 
   return (
@@ -96,7 +112,7 @@ function ShopContent() {
             Soft Muse Boutique
           </span>
           <h1 className="font-sans text-3xl md:text-4xl font-light text-text-primary mt-3">
-            {selectedCategory || "Sản phẩm"}
+            {activeCollection?.name || selectedCategory || "Sản phẩm"}
           </h1>
           <p className="font-sans text-xs md:text-sm text-text-secondary font-light mt-4 leading-relaxed">
             Thời trang công sở nữ thanh lịch, tối giản và dễ ứng dụng mỗi ngày.
@@ -109,7 +125,10 @@ function ShopContent() {
           {categoryOptions.map((category) => (
             <button
               key={category || "all"}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category);
+                if (collectionParam) router.replace(category ? `/shop?category=${encodeURIComponent(category)}` : "/shop");
+              }}
               className={`px-4 py-1.5 font-sans text-xs transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary ${
                 selectedCategory === category
                   ? "text-accent border-b-2 border-accent font-semibold"

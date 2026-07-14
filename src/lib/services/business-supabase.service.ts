@@ -83,7 +83,7 @@ export class SupabaseBusinessRepository implements IBusinessRepository {
  async getFinancialSummary() {
   const supabase = createClient();
   const [orders, expenses, assets, liabilities, capital, suppliers, purchaseOrders, products] = await Promise.all([
-   supabase.from('orders').select('total,status,order_items(quantity,products(cost_price))').is('archived_at', null),
+   supabase.from('orders').select('total,status,order_items(quantity,cost_price)').is('archived_at', null),
    supabase.from('expenses').select('amount,status'), supabase.from('assets').select('current_value'),
    supabase.from('liabilities').select('amount,status'), supabase.from('capital_entries').select('entry_type,amount'),
    supabase.from('suppliers').select('id', { count: 'exact', head: true }),
@@ -92,9 +92,9 @@ export class SupabaseBusinessRepository implements IBusinessRepository {
   ]);
   const failed = [orders, expenses, assets, liabilities, capital, suppliers, purchaseOrders, products].find((result) => result.error);
   if (failed?.error) throw new Error(`Không thể tổng hợp tài chính: ${failed.error.message}`);
-  const delivered = ((orders.data ?? []) as Array<Row & { order_items?: Array<Row & { products?: { cost_price?: number } | null }> }>).filter((order) => order.status === 'delivered');
+  const delivered = ((orders.data ?? []) as Array<Row & { order_items?: Array<Row> }>).filter((order) => order.status === 'delivered');
   const totalRevenue = delivered.reduce((sum, order) => sum + Number(order.total), 0);
-  const totalCOGS = delivered.reduce((sum, order) => sum + (order.order_items ?? []).reduce((lineSum, line) => lineSum + Number(line.quantity) * Number(line.products?.cost_price ?? 0), 0), 0);
+  const totalCOGS = delivered.reduce((sum, order) => sum + (order.order_items ?? []).reduce((lineSum, line) => lineSum + Number(line.quantity) * Number(line.cost_price ?? 0), 0), 0);
   const expenseRows = (expenses.data ?? []) as Row[];
   const assetRows = (assets.data ?? []) as Row[];
   const liabilityRows = (liabilities.data ?? []) as Row[];

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { adminAr } from '@/lib/i18n/admin-ar';
 import { OrderService, OrderFilters, CreateOrderInput } from '@/lib/services/order.service';
 import { Order, OrderPaymentStatus } from '@/data/mock/orders';
+import type { ProductVariant } from '@/data/mock/products';
 import { getStatusMeta, WORKFLOW_STATUSES } from '@/lib/orders/order-status';
 import { CustomerService } from '@/lib/services/customer.service';
 import { ProductService } from '@/lib/services/product.service';
@@ -36,7 +37,7 @@ import {
  IconX,
 } from '@tabler/icons-react';
 
-interface OrderLine { productId: string; quantity: number; }
+interface OrderLine { productId: string; variantId?: string; quantity: number; }
 const escapeHtml = (value: unknown) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
 const escapeCsv = (value: unknown) => {
  const raw = String(value);
@@ -59,7 +60,7 @@ export default function OrdersPage() {
  const [createOpen, setCreateOpen] = useState(false);
  const [creating, setCreating] = useState(false);
  const [custList, setCustList] = useState<{ id: string; name: string; email: string; phone?: string }[]>([]);
- const [prodList, setProdList] = useState<{ id: string; name: string; sku: string; price: number; stock: number }[]>([]);
+ const [prodList, setProdList] = useState<{ id: string; name: string; sku: string; price: number; stock: number; variants: ProductVariant[] }[]>([]);
  const [form, setForm] = useState<{ customerId: string; shippingAddress: string; lines: OrderLine[] }>({ customerId: '', shippingAddress: '', lines: [{ productId: '', quantity: 1 }] });
 
  // Coupon state for the create-order modal
@@ -76,7 +77,7 @@ export default function OrdersPage() {
  try {
  const [customers, products] = await Promise.all([CustomerService.getCustomers(), ProductService.getProducts()]);
  setCustList(customers.map(c => ({ id: c.id, name: c.fullName || c.name, email: c.email, phone: c.phone })));
- setProdList(products.filter(p => p.status === 'published' && p.stock > 0).map(p => ({ id: p.id, name: p.name, sku: p.sku, price: p.price, stock: p.stock })));
+ setProdList(products.filter(p => p.status === 'published' && p.stock > 0).map(p => ({ id: p.id, name: p.name, sku: p.sku, price: p.price, stock: p.stock, variants: p.variants.filter(variant => variant.status !== 'inactive' && variant.stock > 0) })));
  } catch {
  toast.error(adminAr.toasts.unexpectedError);
  }
@@ -84,7 +85,8 @@ export default function OrdersPage() {
 
  const orderTotal = form.lines.reduce((sum, l) => {
  const p = prodList.find(pr => pr.id === l.productId);
- return sum + (p ? p.price * l.quantity : 0);
+ const variant = p?.variants.find(item => item.id === l.variantId);
+ return sum + (p ? (variant?.price ?? p.price) * l.quantity : 0);
  }, 0);
  const orderNet = Math.max(0, orderTotal - (appliedCode ? couponDiscount : 0));
 
@@ -117,8 +119,9 @@ export default function OrdersPage() {
  const lines = form.lines.filter(l => l.productId && l.quantity > 0);
  if (!customer) { toast.error('Vui lòng chọn khách hàng.'); return; }
  if (lines.length === 0) { toast.error('Vui lòng thêm ít nhất một sản phẩm.'); return; }
+ if (lines.some(line => { const product = prodList.find(item => item.id === line.productId); return Boolean(product?.variants.length && !line.variantId); })) { toast.error('Vui lòng chọn biến thể cho tất cả sản phẩm có phân loại.'); return; }
  if (!form.shippingAddress.trim()) { toast.error('Vui lòng nhập địa chỉ giao hàng.'); return; }
- if (new Set(lines.map(line => line.productId)).size !== lines.length) { toast.error('Mỗi sản phẩm chỉ được thêm một dòng. Hãy điều chỉnh số lượng trên dòng hiện có.'); return; }
+ if (new Set(lines.map(line => `${line.productId}:${line.variantId ?? ''}`)).size !== lines.length) { toast.error('Mỗi sản phẩm/biến thể chỉ được thêm một dòng.'); return; }
  setCreating(true);
  try {
  const input: CreateOrderInput = {
@@ -131,7 +134,8 @@ export default function OrdersPage() {
  couponCode: appliedCode,
  items: lines.map(l => {
  const p = prodList.find(pr => pr.id === l.productId)!;
- return { productId: p.id, productName: p.name, sku: p.sku, quantity: l.quantity, price: p.price };
+ const variant = p.variants.find(item => item.id === l.variantId);
+ return { productId: p.id, variantId: variant?.id, productName: p.name, sku: variant?.sku ?? p.sku, quantity: l.quantity, price: variant?.price ?? p.price, size: variant?.size, color: variant?.color };
  }),
  };
  const created = await OrderService.createOrder(input);
@@ -351,15 +355,15 @@ export default function OrdersPage() {
  <div key={idx} className="flex items-center gap-2"> <select
  value={line.productId}
  onChange={e => {
- const lines = [...form.lines]; lines[idx] = { ...lines[idx], productId: e.target.value }; setForm({ ...form, lines });
+ const lines = [...form.lines]; lines[idx] = { ...lines[idx], productId: e.target.value, variantId: undefined }; setForm({ ...form, lines });
  }}
  className="h-10 px-3 flex-1 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
  > <option value="">— sản phẩm —</option>
  {prodList.map(p => <option key={p.id} value={p.id}>{p.name} — {p.price.toLocaleString('vi-VN')} đ — tồn {p.stock}</option>)}
- </select> <input
+ </select> {prodList.find(product => product.id === line.productId)?.variants.length ? <select value={line.variantId ?? ''} onChange={e => { const lines = [...form.lines]; lines[idx] = { ...lines[idx], variantId: e.target.value || undefined }; setForm({ ...form, lines }); }} className="h-10 px-2 w-40 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm"><option value="">— biến thể —</option>{prodList.find(product => product.id === line.productId)!.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.color}/{variant.size} · tồn {variant.stock}</option>)}</select> : null} <input
  type="number"
  min={1}
- max={prodList.find(product => product.id === line.productId)?.stock}
+ max={prodList.find(product => product.id === line.productId)?.variants.find(variant => variant.id === line.variantId)?.stock ?? prodList.find(product => product.id === line.productId)?.stock}
  value={line.quantity}
  onChange={e => {
  const lines = [...form.lines]; lines[idx] = { ...lines[idx], quantity: Math.max(1, parseInt(e.target.value, 10) || 1) }; setForm({ ...form, lines });

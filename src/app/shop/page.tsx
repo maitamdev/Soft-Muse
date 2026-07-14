@@ -38,10 +38,8 @@ function ShopContent() {
   }, [categoryParam]);
 
   const categoryOptions = useMemo(() => {
-    const adminCategories = categories.map((category) => category.name);
-    const productCategories = products.map((product) => product.category).filter(Boolean);
-    return ["", ...Array.from(new Set([...adminCategories, ...productCategories]))];
-  }, [categories, products]);
+    return ["", ...categories.map((category) => category.name)];
+  }, [categories]);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

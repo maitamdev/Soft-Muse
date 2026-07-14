@@ -49,11 +49,27 @@ function createSlug(value: string) {
  .replace(/^-+|-+$/g, '');
 }
 
+function createNextSku(category: string, products: Product[]) {
+ const categoryCodes: Record<string, string> = {
+ 'Áo sơ mi': 'ASM', 'Áo kiểu': 'AK', 'Chân váy': 'CV', 'Váy': 'VAY',
+ 'Quần tây': 'QT', 'Blazer': 'BLZ', 'Set đồ': 'SET', 'Phụ kiện': 'PK',
+ };
+ const code = categoryCodes[category] || 'SP';
+ const prefix = `SM-${code}-`;
+ const largestNumber = products.reduce((largest, product) => {
+ if (!product.sku.startsWith(prefix)) return largest;
+ const number = Number(product.sku.slice(prefix.length));
+ return Number.isFinite(number) ? Math.max(largest, number) : largest;
+ }, 0);
+ return `${prefix}${String(largestNumber + 1).padStart(3, '0')}`;
+}
+
 export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  const router = useRouter();
  const [activeTab, setActiveTab] = useState('general');
  const [saving, setSaving] = useState(false);
  const [allProducts, setAllProducts] = useState<Product[]>([]);
+ const [skuManuallyEdited, setSkuManuallyEdited] = useState(Boolean(isEdit && initialData?.sku));
  
  const [formData, setFormData] = useState<Partial<Product>>({
  name: '', sku: '', slug: '', shortDescription: '', description: '',
@@ -69,6 +85,11 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  useEffect(() => {
  ProductService.getProducts().then(setAllProducts);
  }, []);
+
+ useEffect(() => {
+ if (isEdit || skuManuallyEdited) return;
+ setFormData((current) => ({ ...current, sku: createNextSku(current.category || '', allProducts) }));
+ }, [allProducts, isEdit, skuManuallyEdited, formData.category]);
 
  const handleChange = (field: keyof Product, value: unknown) => {
  setFormData(prev => ({ ...prev, [field]: value }));
@@ -227,10 +248,10 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  label="Mã SKU" 
  required 
  value={formData.sku || ''} 
- onChange={(e) => handleChange('sku', e.target.value)} 
+ onChange={(e) => { setSkuManuallyEdited(true); handleChange('sku', e.target.value.toUpperCase()); }}
  placeholder="SM-ASM-001" 
  className="dir-ltr text-left" 
- /> <Input 
+ /> <p className="-mt-3 text-[10px] text-[var(--admin-text-muted)]">Mã quản lý tồn kho được tạo tự động và không trùng với sản phẩm hiện có.</p> <Input
  label="Mã vạch" 
  value={formData.barcode || ''} 
  onChange={(e) => handleChange('barcode', e.target.value)} 

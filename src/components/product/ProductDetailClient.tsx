@@ -57,8 +57,15 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  );
  }
 
- // Find matching variant
- const selectedVariant = product.colorVariants?.find((v) => v.color === selectedColor);
+ const colorOptions = product.colorVariants?.length
+ ? product.colorVariants.filter((variant) => variant.color.trim())
+ : (product.colors ?? []).filter(Boolean).map((color) => ({ color, value: "#D8C8B6", images: [] }));
+ const sizeOptions = (product.sizes ?? []).filter(Boolean);
+ const hasColorOptions = colorOptions.length > 0;
+ const hasSizeOptions = sizeOptions.length > 0;
+
+ // Match only against attributes that this product actually offers.
+ const selectedVariant = colorOptions.find((variant) => variant.color === selectedColor);
 
  // Gallery images array (fallback to defaults if no variant is selected)
  const defaultImages = [
@@ -84,16 +91,24 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
 
  const handleAddToBag = () => {
  if (isOutOfStock) return;
- if (!selectedColor || !selectedSize) {
- showNotification(
- "Vui lòng chọn màu sắc và kích cỡ trước khi thêm vào giỏ hàng.",
- "warning"
- );
+ const missingColor = hasColorOptions && !selectedColor;
+ const missingSize = hasSizeOptions && !selectedSize;
+ if (missingColor || missingSize) {
+ const message = missingColor && missingSize
+ ? "Vui lòng chọn màu sắc và kích cỡ trước khi thêm vào giỏ hàng."
+ : missingColor
+ ? "Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng."
+ : "Vui lòng chọn kích cỡ trước khi thêm vào giỏ hàng.";
+ showNotification(message, "warning");
  return;
  }
+ const cartVariant = product.variants.find((variant) =>
+ (!hasColorOptions || variant.color === selectedColor)
+ && (!hasSizeOptions || variant.size === selectedSize)
+ );
  addToCart({
  id: product.id,
- variantId: product.variants.find((variant) => variant.color === selectedColor && variant.size === selectedSize)?.id,
+ variantId: cartVariant?.id,
  title: product.name,
  price: product.price,
  image: activeImage || primaryImage(product),
@@ -186,14 +201,11 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  </p>
 
  {/* Colors Swatch Choice */}
+ {hasColorOptions && (
  <div className="flex flex-col gap-2"> <label className="text-[10px] font-sans font-bold text-text-secondary">
  Màu sắc: {selectedColor || "Chọn màu"}
  </label> <div className="flex gap-3">
- {(product.colorVariants || [
- { color: "Đồng", value: "#8E6B4B" },
- { color: "Đen", value: "#111111" },
- { color: "Ngà", value: "#FAF8F5" }
- ]).map((col) => (
+ {colorOptions.map((col) => (
  <button
  key={col.color}
  onClick={() => handleColorSelect(col.color)}
@@ -212,8 +224,10 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  /> </button>
  ))}
  </div> </div>
+ )}
 
  {/* Sizes Box Choice */}
+ {hasSizeOptions && (
  <div className="flex flex-col gap-2"> <div className="flex justify-between items-center text-[10px] font-sans font-bold text-text-secondary w-full"> <span>Kích cỡ: {selectedSize || "Kích cỡ"}</span> <button
  onClick={() => setIsSizeGuideOpen(true)}
  className="text-accent hover:underline text-[10px] font-bold"
@@ -221,7 +235,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  >
  Kích cỡ
  </button> </div> <div className="flex gap-2">
- {(product.sizes || ["XS", "S", "M", "L", "XL"]).map((sz) => (
+ {sizeOptions.map((sz) => (
  <button
  key={sz}
  onClick={() => setSelectedSize(sz)}
@@ -239,6 +253,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  </button>
  ))}
  </div> </div>
+ )}
 
  {/* Premium Size Recommendation Form */}
  <SizeRecommendation />
@@ -368,7 +383,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  <RecentlyViewed />
 
  {/* STICKY BOTTOM PURCHASE PANEL - Solid Background, No Blur */}
- <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> <span className="text-[10px] text-text-secondary font-light">Kích cỡ: {selectedSize || "Chưa chọn"} | Màu: {selectedColor || "Chưa chọn"}</span> </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{product.price.toLocaleString()} đ</span> <Button
+ <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> {(hasSizeOptions || hasColorOptions) && <span className="text-[10px] text-text-secondary font-light">{hasSizeOptions && `Kích cỡ: ${selectedSize || "Chưa chọn"}`}{hasSizeOptions && hasColorOptions && " | "}{hasColorOptions && `Màu: ${selectedColor || "Chưa chọn"}`}</span>} </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{product.price.toLocaleString()} đ</span> <Button
  variant="primary"
  onClick={handleAddToBag}
  className="h-10 px-6 text-[10px]"

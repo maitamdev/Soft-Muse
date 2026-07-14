@@ -8,6 +8,32 @@ export interface Category {
   deletedAt?: string; createdAt: string; updatedAt: string;
 }
 
+export interface CategoryProduct {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: string;
+  image: string;
+}
+
+function mapCategoryProduct(row: Record<string, unknown>): CategoryProduct {
+  const images = (row.product_images ?? []) as Array<Record<string, unknown>>;
+  const firstImage = [...images].sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))[0];
+  return {
+    id: String(row.id),
+    name: String(row.name ?? ""),
+    sku: String(row.sku ?? ""),
+    category: String(row.category ?? ""),
+    price: Number(row.price ?? 0),
+    stock: Number(row.stock ?? 0),
+    status: String(row.status ?? "draft"),
+    image: String(firstImage?.url ?? ""),
+  };
+}
+
 function map(row: Record<string, unknown>): Category {
   return {
     id: String(row.id), name: String(row.name), slug: String(row.slug), description: String(row.description ?? ""),
@@ -54,6 +80,23 @@ export const CategoryService = {
     const { count, error } = await createClient().from("products").select("id", { count: "exact", head: true }).eq("category", categoryName);
     if (error) throw new Error(error.message);
     return count ?? 0;
+  },
+  async getProductsForAssignment(): Promise<CategoryProduct[]> {
+    const { data, error } = await createClient()
+      .from("products")
+      .select("id,name,sku,category,price,stock,status,product_images(url,sort_order)")
+      .order("name");
+    if (error) throw new Error(error.message);
+    return ((data ?? []) as Array<Record<string, unknown>>).map(mapCategoryProduct);
+  },
+  async assignProducts(categoryName: string, productIds: string[]) {
+    if (!productIds.length) return;
+    const { error } = await createClient().from("products").update({ category: categoryName }).in("id", productIds);
+    if (error) throw new Error(error.message);
+  },
+  async removeProductFromCategory(productId: string) {
+    const { error } = await createClient().from("products").update({ category: "" }).eq("id", productId);
+    if (error) throw new Error(error.message);
   },
   async softDelete(id: string) { const { error } = await createClient().from("categories").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); },
   async restore(id: string) { const { error } = await createClient().from("categories").update({ is_active: true }).eq("id", id); if (error) throw new Error(error.message); },

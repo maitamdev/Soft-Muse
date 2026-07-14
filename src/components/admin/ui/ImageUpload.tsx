@@ -31,22 +31,23 @@ export function ImageUpload({ images, onChange, multiple = false, label = "Tải
   const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
 
-  const addImageUrl = () => {
+  const addImageUrl = (value = imageUrl) => {
     setError("");
-    const url = normalizeImageUrl(imageUrl);
+    const url = normalizeImageUrl(value);
 
     if (!url) {
       setError("Vui lòng nhập link ảnh hợp lệ, ví dụ https://... hoặc /images/...");
-      return;
+      return false;
     }
 
     if (images.includes(url)) {
       setError("Link ảnh này đã có trong danh sách.");
-      return;
+      return false;
     }
 
     onChange(multiple ? [...images, url] : [url]);
     setImageUrl("");
+    return true;
   };
 
   const upload = async (files: FileList | null) => {
@@ -109,6 +110,16 @@ export function ImageUpload({ images, onChange, multiple = false, label = "Tải
             type="text"
             value={imageUrl}
             onChange={(event) => setImageUrl(event.target.value)}
+            onBlur={() => {
+              if (normalizeImageUrl(imageUrl)) addImageUrl();
+            }}
+            onPaste={(event) => {
+              const pastedUrl = event.clipboardData.getData("text");
+              if (normalizeImageUrl(pastedUrl)) {
+                event.preventDefault();
+                addImageUrl(pastedUrl);
+              }
+            }}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
@@ -121,13 +132,14 @@ export function ImageUpload({ images, onChange, multiple = false, label = "Tải
         </label>
         <button
           type="button"
-          onClick={addImageUrl}
+          onClick={() => addImageUrl()}
           className="inline-flex h-11 items-center justify-center gap-2 border border-[var(--admin-border-base)] bg-[var(--admin-bg-base)] px-4 text-sm font-semibold text-[var(--admin-text-base)] transition-colors hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)]"
         >
           <IconPlus size={17} />
           Thêm link
         </button>
       </div>
+      <p className="-mt-2 text-xs text-[var(--admin-text-muted)]">Dán link ảnh hợp lệ sẽ tự thêm vào danh sách bên dưới.</p>
 
       {error && <p className="text-sm text-[var(--admin-danger)]">{error}</p>}
 

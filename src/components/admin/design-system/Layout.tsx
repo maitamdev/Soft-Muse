@@ -126,6 +126,7 @@ export function Tabs({
  <div className={cn("flex items-center gap-0.5 bg-[var(--admin-bg-elevated)] p-1 rounded-[var(--admin-radius-lg)]", className)}>
  {tabs.map((tab) => (
  <button
+ type="button"
  key={tab.key}
  onClick={() => onChange(tab.key)}
  className={cn(

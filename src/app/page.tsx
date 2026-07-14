@@ -90,7 +90,7 @@ export default function HomePage() {
               priority={heroSlide === 0}
               unoptimized
               sizes="(max-width: 767px) 100vw, 1200px"
-              className="object-cover object-top md:object-contain md:object-right saturate-[1.04] contrast-[1.08]"
+              className={`object-cover object-top saturate-[1.04] contrast-[1.08] ${heroSlide === 0 ? "md:object-cover md:object-center" : "md:object-contain md:object-right"}`}
             />
           </motion.div>
         </AnimatePresence>

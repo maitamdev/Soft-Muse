@@ -66,7 +66,7 @@ export default function HomePage() {
   return (
     <div className="w-full bg-background-primary flex flex-col items-center">
       <section
-        className="relative w-full min-h-[calc(100vh-88px)] overflow-hidden bg-background-secondary border-b border-brand-border"
+        className="relative w-full min-h-[calc(100vh-88px)] overflow-hidden bg-[#cfc9bf] border-b border-brand-border"
         onMouseEnter={() => setHeroPaused(true)}
         onMouseLeave={() => setHeroPaused(false)}
         onFocusCapture={() => setHeroPaused(true)}
@@ -81,16 +81,16 @@ export default function HomePage() {
             animate={{ opacity: 1, scale: reduceMotion ? 1 : 1.025 }}
             exit={{ opacity: 0 }}
             transition={{ opacity: { duration: 0.9, ease: "easeInOut" }, scale: { duration: 6.2, ease: "linear" } }}
-            className="absolute inset-0"
+            className="absolute inset-y-0 right-0 w-full md:max-w-[1200px]"
           >
             <Image
               src={heroImages[heroSlide] ?? content.home_hero_image}
               alt={`Thời trang công sở nữ Soft Muse ${heroSlide + 1}`}
               fill
               priority={heroSlide === 0}
-              quality={95}
-              sizes="100vw"
-              className="object-cover object-[58%_16%] md:object-[56%_18%] saturate-[1.04] contrast-[1.06]"
+              unoptimized
+              sizes="(max-width: 767px) 100vw, 1200px"
+              className="object-cover object-[58%_16%] md:object-center saturate-[1.04] contrast-[1.08]"
             />
           </motion.div>
         </AnimatePresence>

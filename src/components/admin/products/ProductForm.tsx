@@ -37,6 +37,18 @@ const TABS = [
  { key: 'stats', label: 'Thống kê' }
 ];
 
+function createSlug(value: string) {
+ return value
+ .normalize('NFD')
+ .replace(/[\u0300-\u036f]/g, '')
+ .replace(/đ/g, 'd')
+ .replace(/Đ/g, 'D')
+ .toLowerCase()
+ .trim()
+ .replace(/[^a-z0-9]+/g, '-')
+ .replace(/^-+|-+$/g, '');
+}
+
 export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  const router = useRouter();
  const [activeTab, setActiveTab] = useState('general');
@@ -60,6 +72,14 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  const handleChange = (field: keyof Product, value: unknown) => {
  setFormData(prev => ({ ...prev, [field]: value }));
+ };
+
+ const handleNameChange = (name: string) => {
+ setFormData((current) => {
+ const previousAutoSlug = createSlug(current.name || '');
+ const shouldUpdateSlug = !current.slug || current.slug === previousAutoSlug;
+ return { ...current, name, slug: shouldUpdateSlug ? createSlug(name) : current.slug };
+ });
  };
 
  const handleSeoChange = (field: keyof ProductSeo, value: string) => {
@@ -138,16 +158,16 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  label="Tên sản phẩm" 
  required 
  value={formData.name || ''} 
- onChange={(e) => handleChange('name', e.target.value)} 
+ onChange={(e) => handleNameChange(e.target.value)}
  placeholder="Ví dụ: Áo sơ mi lụa mềm Muse" 
  /> <Input 
- label="Đường dẫn (Slug)" 
+ label="Đường dẫn sản phẩm"
  required 
  value={formData.slug || ''} 
  onChange={(e) => handleChange('slug', e.target.value)} 
- placeholder="product-slug-in-english"
+ placeholder="Tự tạo từ tên sản phẩm"
  className="dir-ltr text-left" 
- /> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">mô tả</label> <textarea 
+ /> <p className="-mt-4 text-[10px] text-[var(--admin-text-muted)]">Dùng trong URL và SEO, ví dụ: ao-so-mi-lua-mem-muse.</p> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mô tả ngắn</label> <textarea
  rows={2} 
  value={formData.shortDescription || ''} 
  onChange={(e) => handleChange('shortDescription', e.target.value)} 

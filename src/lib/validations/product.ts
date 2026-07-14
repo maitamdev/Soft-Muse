@@ -17,15 +17,15 @@ export class ProductValidator {
  }
 
  /**
- * Validates SKU format (AURA-XXX-00)
+ * Validates a readable uppercase SKU such as SM-ASM-001.
  */
  static isValidSku(sku: string): boolean {
- const skuRegex = /^AURA-[A-Z0-9]+-[0-9]+$/;
+ const skuRegex = /^[A-Z0-9]+(?:-[A-Z0-9]+)+$/;
  return skuRegex.test(sku);
  }
 
  /**
- * Simulates a check for SKU uniqueness (Mock)
+ * Checks SKU uniqueness against the products loaded from the database.
  */
  static isSkuUnique(sku: string, currentId: string, allProducts: Product[]): boolean {
  return !allProducts.some(p => p.sku === sku && p.id !== currentId);
@@ -55,34 +55,34 @@ export class ProductValidator {
  const errors: Record<string, string> = {};
 
  if (!this.isRequired(product.name)) {
- errors.name = 'Tênsản phẩm ';
+ errors.name = 'Vui lòng nhập tên sản phẩm.';
  }
 
  if (!this.isRequired(product.slug)) {
- errors.slug = 'Đường dẫn (Slug) ';
+ errors.slug = 'Vui lòng nhập đường dẫn sản phẩm.';
  }
 
  if (!this.isRequired(product.sku)) {
- errors.sku = '(SKU) ';
+ errors.sku = 'Vui lòng nhập mã SKU.';
  } else if (!this.isValidSku(product.sku as string)) {
- errors.sku = 'SKU không.AURA-ABC-01';
+ errors.sku = 'SKU chỉ gồm chữ in hoa, số và dấu gạch ngang, ví dụ SM-ASM-001.';
  } else if (!this.isSkuUnique(product.sku as string, product.id || '', allProducts)) {
- errors.sku = '(SKU) ';
+ errors.sku = 'Mã SKU đã được sử dụng.';
  }
 
  if (!this.isRequired(product.price) || (product.price as number) <= 0) {
- errors.price = 'Giá từ';
+ errors.price = 'Giá bán phải lớn hơn 0.';
  }
 
  if (product.price !== undefined && product.comparePrice !== undefined && product.costPrice !== undefined) {
  if (!this.isValidPricing(product.price, product.comparePrice, product.costPrice)) {
- errors.pricing = 'giá từGiá ';
+ errors.pricing = 'Giá gốc phải bằng hoặc lớn hơn giá bán.';
  }
  }
 
  if (product.stock !== undefined && product.lowStockLimit !== undefined) {
  if (!this.isValidStock(product.stock, product.lowStockLimit)) {
- errors.stock = 'Số lượng Tồn kho ';
+ errors.stock = 'Số lượng tồn kho và ngưỡng cảnh báo không được âm.';
  }
  }
 

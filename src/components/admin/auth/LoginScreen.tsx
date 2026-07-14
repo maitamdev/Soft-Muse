@@ -30,7 +30,7 @@ export function LoginScreen() {
 
   useEffect(() => {
     emailRef.current?.focus();
-    if (searchParams.get("reason") === "session_expired") setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+    if (searchParams.get("reason") === "forbidden") setError("Tài khoản này chưa được cấp quyền quản trị.");
     if (searchParams.get("reason") === "not_configured") setError("Dự án chưa được cấu hình Supabase.");
   }, [searchParams]);
 
@@ -68,7 +68,7 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="admin-theme grid min-h-screen bg-[#F7F5F2] lg:grid-cols-[1.08fr_0.92fr]">
+    <div className="grid min-h-screen bg-[#F7F5F2] text-[#1D1D1B] lg:grid-cols-[1.08fr_0.92fr]">
       <section className="relative hidden min-h-screen overflow-hidden lg:block">
         <Image src="/images/campaign/campaign_4.png" alt="Soft Muse officewear" fill priority sizes="55vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-black/25" />
@@ -108,7 +108,7 @@ export function LoginScreen() {
               <span className="mb-2 block text-xs font-semibold text-[#383532]">Email quản trị</span>
               <span className="relative block">
                 <IconMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A938C]" size={18} />
-                <input ref={emailRef} type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="admin@softmuse.vn" className="h-12 w-full border border-[#D9D3CC] bg-white pl-11 pr-4 text-sm text-[#1D1D1B] outline-none transition focus:border-[#A77958] focus:ring-2 focus:ring-[#A77958]/15" />
+                <input ref={emailRef} type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email của bạn" className="h-12 w-full border border-[#D9D3CC] bg-white pl-11 pr-4 text-sm text-[#1D1D1B] outline-none transition placeholder:text-[#9A938C] focus:border-[#A77958] focus:ring-2 focus:ring-[#A77958]/15" />
               </span>
             </label>
             <label className="block">

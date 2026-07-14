@@ -33,8 +33,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/admin/login" && isStaff) return NextResponse.redirect(new URL("/admin", request.url));
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login" && !user) {
+    return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
   if (pathname.startsWith("/admin") && pathname !== "/admin/login" && !isStaff) {
-    return NextResponse.redirect(new URL("/admin/login?reason=session_expired", request.url));
+    return NextResponse.redirect(new URL("/admin/login?reason=forbidden", request.url));
   }
 
   return response;

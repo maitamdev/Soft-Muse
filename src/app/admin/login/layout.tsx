@@ -2,8 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Đăng nhập | AURA Admin",
- description: "đếnQuản lý AURA",
+ title: "Đăng nhập | Soft Muse Admin",
+ description: "Cổng quản trị cửa hàng Soft Muse",
  robots: "noindex, nofollow",
 };
 

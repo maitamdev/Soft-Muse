@@ -10,6 +10,7 @@ import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/mock/products";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { heroFadeUp, scrollViewport } from "@/lib/animations";
+import { HOME_CONTENT, usePageContent } from "@/hooks/usePageContent";
 
 const categories = [
   { title: "Áo sơ mi", href: "/shop?category=Áo sơ mi", image: "/images/campaign/campaign_2.png" },
@@ -34,6 +35,7 @@ const testimonials = [
 ];
 
 export default function HomePage() {
+  const content = usePageContent(HOME_CONTENT);
   const products = useStorefrontProducts();
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
@@ -44,7 +46,7 @@ export default function HomePage() {
     <div className="w-full bg-background-primary flex flex-col items-center">
       <section className="relative w-full min-h-[calc(100vh-88px)] overflow-hidden bg-background-secondary border-b border-brand-border">
         <Image
-          src="/images/campaign/campaign_1.png"
+          src={content.home_hero_image}
           alt="Soft Muse công sở nữ"
           fill
           priority
@@ -61,20 +63,20 @@ export default function HomePage() {
             className="max-w-xl text-background-secondary"
           >
             <span className="font-sans text-[10px] uppercase tracking-[0.28em] font-bold text-background-secondary/85">
-              Soft Muse Officewear
+              {content.home_hero_label}
             </span>
             <h1 className="mt-5 font-sans text-4xl md:text-6xl font-light leading-tight">
-              Thanh lịch mỗi ngày, tự tin theo cách của bạn
+              {content.home_hero_title}
             </h1>
             <p className="mt-5 font-sans text-sm md:text-base leading-8 font-light text-background-secondary/90">
-              Thời trang công sở nữ tối giản, nữ tính và hiện đại với mức giá 200.000-1.000.000đ.
+              {content.home_hero_text}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link href="/shop">
-                <Button variant="primary" className="h-12 px-8">Mua sắm ngay</Button>
+                <Button variant="primary" className="h-12 px-8">{content.home_hero_primary_cta}</Button>
               </Link>
               <Link href="/collections">
-                <Button variant="secondary" className="h-12 px-8">Xem bộ sưu tập</Button>
+                <Button variant="secondary" className="h-12 px-8">{content.home_hero_secondary_cta}</Button>
               </Link>
             </div>
           </motion.div>
@@ -91,10 +93,10 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row justify-between gap-6 md:items-end mb-10">
           <div>
             <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.22em]">
-              Danh mục
+              {content.home_category_label}
             </span>
             <h2 className="font-sans text-3xl md:text-4xl font-light text-text-primary mt-2">
-              Mua theo nhu cầu đi làm
+              {content.home_category_title}
             </h2>
           </div>
           <Link href="/shop" className="font-sans text-xs text-accent underline underline-offset-4">
@@ -126,21 +128,20 @@ export default function HomePage() {
       >
         <div className="max-w-[1280px] mx-auto px-6 md:px-12 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="relative aspect-[4/5] overflow-hidden border border-brand-border bg-background-primary">
-            <Image src="/images/campaign/campaign_5.png" alt="Lookbook Soft Muse" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            <Image src={content.home_lookbook_image} alt="Lookbook Soft Muse" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
           </div>
           <div className="flex flex-col items-start gap-5">
             <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.22em]">
-              Lookbook
+              {content.home_lookbook_label}
             </span>
             <h2 className="font-sans text-3xl md:text-4xl font-light text-text-primary leading-tight">
-              Một tủ đồ công sở mềm mại, ít nghĩ nhưng luôn đẹp
+              {content.home_lookbook_title}
             </h2>
             <p className="font-sans text-sm text-text-secondary font-light leading-7">
-              Phối sơ mi lụa với quần tây ống đứng, thêm blazer linen cho những cuộc họp quan trọng,
-              hoặc chọn váy midi khi bạn muốn vẻ ngoài nữ tính và gọn gàng hơn.
+              {content.home_lookbook_text}
             </p>
             <Link href="/collections">
-              <Button variant="dark-outline">Khám phá lookbook</Button>
+              <Button variant="dark-outline">{content.home_lookbook_button}</Button>
             </Link>
           </div>
         </div>
@@ -155,10 +156,10 @@ export default function HomePage() {
       >
         <div className="text-center mb-10">
           <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.22em]">
-            Khách hàng nói gì
+            {content.home_testimonial_label}
           </span>
           <h2 className="font-sans text-3xl md:text-4xl font-light text-text-primary mt-2">
-            Từ những ngày làm việc thật
+            {content.home_testimonial_title}
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -177,13 +178,13 @@ export default function HomePage() {
       <section className="w-full bg-background-secondary border-y border-brand-border py-14 md:py-20">
         <div className="max-w-[720px] mx-auto px-6 text-center flex flex-col items-center gap-5">
           <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.22em]">
-            Newsletter
+            {content.home_newsletter_label}
           </span>
           <h2 className="font-sans text-3xl md:text-4xl font-light text-text-primary">
-            Nhận ưu đãi từ Soft Muse
+            {content.home_newsletter_title}
           </h2>
           <p className="font-sans text-sm text-text-secondary font-light leading-7">
-            Hàng mới, mẹo phối đồ công sở và mã giảm giá riêng cho thành viên.
+            {content.home_newsletter_text}
           </p>
           {newsletterSubmitted ? (
             <div className="border border-accent/40 bg-accent/5 px-8 py-4 text-sm font-sans text-text-primary">
@@ -216,10 +217,10 @@ export default function HomePage() {
       <section className="w-full max-w-[1280px] px-6 md:px-12 py-14 md:py-24">
         <div className="text-center mb-10">
           <span className="font-sans text-[10px] text-accent font-bold uppercase tracking-[0.22em]">
-            @softmuse.vn
+            {content.home_instagram_label}
           </span>
           <h2 className="font-sans text-3xl md:text-4xl font-light text-text-primary mt-2">
-            Instagram Gallery
+            {content.home_instagram_title}
           </h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-2">

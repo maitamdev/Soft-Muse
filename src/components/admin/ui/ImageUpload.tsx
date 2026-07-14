@@ -8,9 +8,10 @@ interface ImageUploadProps {
   images: string[];
   onChange: (images: string[]) => void;
   multiple?: boolean;
+  label?: string;
 }
 
-export function ImageUpload({ images, onChange, multiple = false }: ImageUploadProps) {
+export function ImageUpload({ images, onChange, multiple = false, label = "Tải ảnh sản phẩm" }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -62,7 +63,7 @@ export function ImageUpload({ images, onChange, multiple = false }: ImageUploadP
       >
         {uploading ? <IconLoader2 className="animate-spin text-[var(--admin-primary)]" /> : <IconPhotoPlus size={32} className="text-[var(--admin-primary)]" />}
         <span className="text-sm font-semibold text-[var(--admin-text-base)]">
-          {uploading ? "Đang tải ảnh lên Supabase..." : "Tải ảnh sản phẩm"}
+          {uploading ? "Đang tải ảnh lên Supabase..." : label}
         </span>
         <span className="text-xs text-[var(--admin-text-muted)]">JPG, PNG, WebP hoặc AVIF, tối đa 10 MB</span>
       </button>

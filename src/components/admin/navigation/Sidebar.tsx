@@ -10,7 +10,7 @@ import {
  IconShoppingBag, IconCategory2, IconStack2, IconStar,
  IconPackage, IconArrowsExchange,
  IconTicket, IconShieldCheck,
- IconSparkles, IconChevronDown, IconChevronLeft, IconChevronRight, IconLogout,
+ IconSparkles, IconChevronDown, IconChevronLeft, IconChevronRight, IconLogout, IconEdit,
 } from "@tabler/icons-react";
 import { adminAr } from "@/lib/i18n/admin-ar";
 import { cn } from "@/utils/cn";
@@ -77,6 +77,7 @@ const NAV_GROUPS: NavGroup[] = [
  label: "",
  items: [
  { nameKey: "coupons", icon: IconTicket, path: "/admin/coupons", color: "orange", flag: "enableCoupons", permission: "marketing.view" },
+ { nameKey: "websiteManager", icon: IconEdit, path: "/admin/website/pages", color: "indigo", permission: "products.view" },
  ]
  },
 ];

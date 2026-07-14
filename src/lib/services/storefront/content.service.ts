@@ -82,4 +82,21 @@ export const ContentService = {
  }
  throw new Error('Content not found');
  },
+
+ async savePageContent(values: Record<string, string>, descriptions: Record<string, string> = {}): Promise<void> {
+ const allContent = await this.getAllContent();
+ const nextContent = [...allContent];
+ Object.entries(values).forEach(([key, value]) => {
+ const index = nextContent.findIndex(block => block.key === key);
+ if (index >= 0) nextContent[index] = { ...nextContent[index], value };
+ else nextContent.push({ id: `cms-${key}`, group: 'pages', key, value, description: descriptions[key] ?? key });
+ });
+ const { error } = await createClient().rpc('update_storefront_setting', {
+ setting_key: 'storefront.content',
+ setting_value: nextContent,
+ });
+ if (error) throw new Error(error.message);
+ mockContent = nextContent;
+ eventBus.emit('website.changed', { area: 'content' });
+ },
 };

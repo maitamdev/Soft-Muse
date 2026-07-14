@@ -18,14 +18,56 @@ function map(row: Record<string, unknown>): Category {
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
 }
-function row(data: Partial<Category>) { return { name: data.name, slug: data.slug, description: data.description, image_url: data.thumbnail, banner_url: data.banner, is_featured: data.isFeatured, show_on_homepage: data.showOnHomepage, show_in_menu: data.showInMenu, sort_order: data.sortOrder, is_active: data.status === "active", seo: data.seo }; }
+function row(data: Partial<Category>) {
+  return Object.fromEntries(Object.entries({
+    name: data.name, slug: data.slug, description: data.description, image_url: data.thumbnail,
+    banner_url: data.banner, is_featured: data.isFeatured, show_on_homepage: data.showOnHomepage,
+    show_in_menu: data.showInMenu, sort_order: data.sortOrder,
+    is_active: data.status ? data.status === "active" : undefined, seo: data.seo,
+  }).filter(([, value]) => value !== undefined));
+}
 
 export const CategoryService = {
   async getCategories(): Promise<Category[]> { const { data, error } = await createClient().from("categories").select("*").order("sort_order"); if (error) throw new Error(error.message); return (data ?? []).map(map); },
   async getCategory(id: string) { const { data, error } = await createClient().from("categories").select("*").eq("id", id).maybeSingle(); if (error) throw new Error(error.message); return data ? map(data) : null; },
   async createCategory(input: Omit<Category, "id" | "createdAt" | "updatedAt">) { const { data, error } = await createClient().from("categories").insert(row(input)).select("*").single(); if (error) throw new Error(error.message); return map(data); },
-  async updateCategory(id: string, input: Partial<Category>) { const { data, error } = await createClient().from("categories").update(row(input)).eq("id", id).select("*").single(); if (error) throw new Error(error.message); return map(data); },
+  async updateCategory(id: string, input: Partial<Category>) {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("update_category_with_products", {
+      category_id: id,
+      category_payload: input,
+    });
+    if (error?.code === "PGRST202") {
+      const current = await this.getCategory(id);
+      const { data: fallbackData, error: updateError } = await supabase.from("categories").update(row(input)).eq("id", id).select("*").single();
+      if (updateError) throw new Error(updateError.message);
+      if (current && input.name && input.name !== current.name) {
+        const { error: productError } = await supabase.from("products").update({ category: input.name }).eq("category", current.name);
+        if (productError) throw new Error(`Danh mục đã đổi tên nhưng chưa thể cập nhật sản phẩm: ${productError.message}`);
+      }
+      return map(fallbackData);
+    }
+    if (error) throw new Error(error.message);
+    return map(data as Record<string, unknown>);
+  },
+  async getUsageCount(categoryName: string) {
+    const { count, error } = await createClient().from("products").select("id", { count: "exact", head: true }).eq("category", categoryName);
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  },
   async softDelete(id: string) { const { error } = await createClient().from("categories").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); },
   async restore(id: string) { const { error } = await createClient().from("categories").update({ is_active: true }).eq("id", id); if (error) throw new Error(error.message); },
-  async hardDelete(id: string) { const { error } = await createClient().from("categories").delete().eq("id", id); if (error) throw new Error(error.message); },
+  async hardDelete(id: string) {
+    const supabase = createClient();
+    const { error } = await supabase.rpc("delete_category_safely", { category_id: id });
+    if (error?.code === "PGRST202") {
+      const category = await this.getCategory(id);
+      if (!category) throw new Error("Không tìm thấy danh mục.");
+      if (await this.getUsageCount(category.name)) throw new Error("Danh mục đang có sản phẩm và không thể xóa.");
+      const { error: deleteError } = await supabase.from("categories").delete().eq("id", id);
+      if (deleteError) throw new Error(deleteError.message);
+      return;
+    }
+    if (error) throw new Error(error.message);
+  },
 };

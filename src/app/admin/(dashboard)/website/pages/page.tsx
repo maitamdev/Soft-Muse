@@ -1,108 +1,98 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { IconDeviceFloppy, IconExternalLink, IconHome, IconInfoCircle } from "@tabler/icons-react";
 import { toast } from "sonner";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/admin/ui/motion";
-import { ContentService, ContentBlock } from "@/lib/services/storefront/content.service";
+import { ContentService } from "@/lib/services/storefront/content.service";
+import { ABOUT_CONTENT, HOME_CONTENT } from "@/hooks/usePageContent";
+import { PageHeader } from "@/components/admin/design-system/Layout";
+import { Button } from "@/components/admin/design-system/Button";
+import { Input } from "@/components/admin/design-system/Input";
+import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 
-export default function ContentManager() {
- const [content, setContent] = useState<ContentBlock[]>([]);
- const [loading, setLoading] = useState(true);
- const [savingId, setSavingId] = useState<string | null>(null);
- const [group, setGroup] = useState<ContentBlock['group']>('order_tracking');
+type PageKey = "home" | "about";
+type Field = { key: string; label: string; type?: "text" | "textarea" | "image"; section: string; hint?: string };
 
+const fields: Record<PageKey, Field[]> = {
+  home: [
+    { key: "home_hero_label", label: "Nhãn thương hiệu", section: "Banner chính" },
+    { key: "home_hero_title", label: "Tiêu đề chính", section: "Banner chính", type: "textarea" },
+    { key: "home_hero_text", label: "Nội dung giới thiệu", section: "Banner chính", type: "textarea" },
+    { key: "home_hero_primary_cta", label: "Nút mua sắm", section: "Banner chính" },
+    { key: "home_hero_secondary_cta", label: "Nút bộ sưu tập", section: "Banner chính" },
+    { key: "home_hero_image", label: "Ảnh banner", section: "Banner chính", type: "image" },
+    { key: "home_category_label", label: "Nhãn", section: "Danh mục sản phẩm" },
+    { key: "home_category_title", label: "Tiêu đề", section: "Danh mục sản phẩm" },
+    { key: "home_lookbook_label", label: "Nhãn", section: "Lookbook" },
+    { key: "home_lookbook_title", label: "Tiêu đề", section: "Lookbook", type: "textarea" },
+    { key: "home_lookbook_text", label: "Nội dung", section: "Lookbook", type: "textarea" },
+    { key: "home_lookbook_button", label: "Nút hành động", section: "Lookbook" },
+    { key: "home_lookbook_image", label: "Ảnh lookbook", section: "Lookbook", type: "image" },
+    { key: "home_testimonial_label", label: "Nhãn", section: "Đánh giá khách hàng" },
+    { key: "home_testimonial_title", label: "Tiêu đề", section: "Đánh giá khách hàng" },
+    { key: "home_newsletter_label", label: "Nhãn", section: "Đăng ký nhận tin" },
+    { key: "home_newsletter_title", label: "Tiêu đề", section: "Đăng ký nhận tin" },
+    { key: "home_newsletter_text", label: "Nội dung", section: "Đăng ký nhận tin", type: "textarea" },
+    { key: "home_instagram_label", label: "Tài khoản Instagram", section: "Instagram" },
+    { key: "home_instagram_title", label: "Tiêu đề", section: "Instagram" },
+  ],
+  about: [
+    { key: "about_hero_label", label: "Nhãn", section: "Banner giới thiệu" },
+    { key: "about_hero_title", label: "Tiêu đề", section: "Banner giới thiệu", type: "textarea" },
+    { key: "about_hero_image", label: "Ảnh banner", section: "Banner giới thiệu", type: "image" },
+    { key: "about_philosophy_label", label: "Nhãn", section: "Triết lý thương hiệu" },
+    { key: "about_philosophy_title", label: "Tiêu đề", section: "Triết lý thương hiệu", type: "textarea" },
+    { key: "about_philosophy_text", label: "Nội dung", section: "Triết lý thương hiệu", type: "textarea" },
+    { key: "about_philosophy_image", label: "Hình ảnh", section: "Triết lý thương hiệu", type: "image" },
+    { key: "about_products_label", label: "Nhãn", section: "Sản phẩm" },
+    { key: "about_products_title", label: "Tiêu đề", section: "Sản phẩm", type: "textarea" },
+    { key: "about_products_text", label: "Nội dung", section: "Sản phẩm", type: "textarea" },
+    { key: "about_values_label", label: "Nhãn", section: "Giá trị cốt lõi" },
+    { key: "about_values_title", label: "Tiêu đề", section: "Giá trị cốt lõi" },
+    { key: "about_cta_label", label: "Nhãn", section: "Kêu gọi mua sắm" },
+    { key: "about_cta_title", label: "Tiêu đề", section: "Kêu gọi mua sắm" },
+    { key: "about_cta_text", label: "Nội dung", section: "Kêu gọi mua sắm", type: "textarea" },
+    { key: "about_cta_button", label: "Nút hành động", section: "Kêu gọi mua sắm" },
+  ],
+};
 
- async function loadContent() {
- setLoading(true);
- try {
- const data = await ContentService.getContentByGroup(group);
- setContent(data);
- } catch (e) {
- toast.error("trong tải");
- } finally {
- setLoading(false);
- }
- };
+export default function WebsiteContentPage() {
+  const [page, setPage] = useState<PageKey>("home");
+  const [values, setValues] = useState<Record<string, string>>({ ...HOME_CONTENT, ...ABOUT_CONTENT });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
- useEffect(() => {
- loadContent();
- }, [group]);
+  useEffect(() => {
+    void ContentService.getContentByGroup("pages").then(blocks => {
+      setValues(current => ({ ...current, ...Object.fromEntries(blocks.filter(block => block.value.trim()).map(block => [block.key, block.value])) }));
+    }).catch(error => toast.error(error instanceof Error ? error.message : "Không thể tải nội dung.")).finally(() => setLoading(false));
+  }, []);
 
- const handleUpdate = async (id: string, newValue: string) => {
- setSavingId(id);
- try {
- await ContentService.updateContent(id, newValue);
- toast.success("Content saved");
- } catch (e) {
- toast.error("Failed to save content");
- } finally {
- setSavingId(null);
- }
- };
+  const sections = useMemo(() => Array.from(new Set(fields[page].map(field => field.section))), [page]);
+  const save = async () => {
+    setSaving(true);
+    try {
+      const pageValues = Object.fromEntries(fields[page].map(field => [field.key, values[field.key] ?? ""]));
+      await ContentService.savePageContent(pageValues, Object.fromEntries(fields[page].map(field => [field.key, field.label])));
+      toast.success("Đã lưu nội dung và cập nhật website.");
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Không thể lưu nội dung."); }
+    finally { setSaving(false); }
+  };
 
- return (
- <FadeIn className="space-y-6 max-w-5xl mx-auto">
- {/* Group tabs */}
- <div className="flex gap-2 overflow-x-auto pb-2 border-b border-[var(--admin-border-light)] custom-scrollbar">
- {[
- { id: 'order_tracking', label: 'Theo dõi đơn hàng' },
- { id: 'general', label: '' },
- { id: 'pages', label: '' },
- { id: 'emails', label: '' },
- ].map(tab => (
- <button
- key={tab.id}
- onClick={() => setGroup(tab.id as any)}
- className={`px-4 py-2 rounded-t-[var(--admin-radius-md)] text-sm font-bold transition-colors whitespace-nowrap ${
- group === tab.id
- ? "bg-[var(--admin-bg-surface)] text-[var(--admin-primary)] border-t-2 border-[var(--admin-primary)] shadow-sm"
- : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-base)] hover:bg-[var(--admin-bg-hover)]"
- }`}
- >
- {tab.label}
- </button>
- ))}
- </div> <div className="bg-[var(--admin-bg-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border-base)] overflow-hidden">
- {loading ? (
- <div className="p-8 text-center text-[var(--admin-text-muted)] animate-pulse">Đang tải.</div>
- ) : (
- <StaggerContainer className="divide-y divide-[var(--admin-border-light)]">
- {content.map(block => (
- <StaggerItem key={block.id} className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6"> <div> <h3 className="font-bold text-[var(--admin-text-base)] text-sm">{block.description}</h3> <code className="text-xs text-[var(--admin-text-subtle)] mt-1 inline-block bg-[var(--admin-bg-elevated)] px-2 py-1 rounded">
- {block.key}
- </code> </div> <div className="md:col-span-2 space-y-3 flex flex-col items-end">
- {block.group === 'pages' ? (
- <textarea
- defaultValue={block.value}
- className="w-full min-h-[120px] bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)] transition-all custom-scrollbar"
- onBlur={(e) => {
- if (e.target.value !== block.value) {
- handleUpdate(block.id, e.target.value);
- }
- }}
- />
- ) : (
- <input
- type="text"
- defaultValue={block.value}
- className="w-full bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)] transition-all"
- onBlur={(e) => {
- if (e.target.value !== block.value) {
- handleUpdate(block.id, e.target.value);
- }
- }}
- />
- )}
- {savingId === block.id && <span className="text-xs text-[var(--admin-primary)] font-semibold flex items-center gap-1"><IconDeviceFloppy size={14} /> Lưu.</span>}
- </div> </StaggerItem>
- ))}
- {content.length === 0 && (
- <div className="p-8 text-center text-[var(--admin-text-muted)] font-medium">
- không trong nàyDanh mục </div>
- )}
- </StaggerContainer>
- )}
- </div> </FadeIn>
- );
+  return <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-6 lg:p-8">
+    <PageHeader title="Nội dung website" description="Chỉnh sửa nội dung hiển thị trên trang khách hàng mà không cần thay đổi mã nguồn." actions={<><Link href={page === "home" ? "/" : "/about"} target="_blank"><Button variant="secondary" leftIcon={<IconExternalLink size={17} />}>Xem trang</Button></Link><Button isLoading={saving} leftIcon={<IconDeviceFloppy size={17} />} onClick={() => void save()}>Lưu thay đổi</Button></>} />
+    <div className="flex gap-2 border-b border-[var(--admin-border-base)]">
+      <button onClick={() => setPage("home")} className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold ${page === "home" ? "border-[var(--admin-primary)] text-[var(--admin-primary)]" : "border-transparent text-[var(--admin-text-muted)]"}`}><IconHome size={17} />Trang chủ</button>
+      <button onClick={() => setPage("about")} className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold ${page === "about" ? "border-[var(--admin-primary)] text-[var(--admin-primary)]" : "border-transparent text-[var(--admin-text-muted)]"}`}><IconInfoCircle size={17} />Giới thiệu</button>
+    </div>
+    {loading ? <div className="py-20 text-center text-sm text-[var(--admin-text-muted)]">Đang tải nội dung...</div> : <div className="space-y-6">
+      {sections.map(section => <section key={section} className="border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] p-5 shadow-sm md:p-6">
+        <h2 className="mb-5 text-base font-bold text-[var(--admin-text-base)]">{section}</h2>
+        <div className="grid gap-5 md:grid-cols-2">{fields[page].filter(field => field.section === section).map(field => <div key={field.key} className={field.type === "textarea" || field.type === "image" ? "md:col-span-2" : ""}>
+          {field.type === "image" ? <><p className="mb-2 text-xs font-semibold text-[var(--admin-text-muted)]">{field.label}</p><ImageUpload label="Tải ảnh nội dung" images={values[field.key] ? [values[field.key]] : []} onChange={images => setValues(current => ({ ...current, [field.key]: images[0] ?? "" }))} /></> : field.type === "textarea" ? <label className="block text-xs font-semibold text-[var(--admin-text-muted)]">{field.label}<textarea rows={3} value={values[field.key] ?? ""} onChange={event => setValues(current => ({ ...current, [field.key]: event.target.value }))} className="mt-1.5 w-full border border-[var(--admin-border-base)] bg-[var(--admin-bg-surface)] p-3 text-sm font-normal text-[var(--admin-text-base)] outline-none focus:border-[var(--admin-primary)]" /></label> : <Input label={field.label} value={values[field.key] ?? ""} onChange={event => setValues(current => ({ ...current, [field.key]: event.target.value }))} />}
+        </div>)}</div>
+      </section>)}
+    </div>}
+  </div>;
 }

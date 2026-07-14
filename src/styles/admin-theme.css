@@ -8,107 +8,107 @@
 /* Light Mode */
 :root {
  /* Surfaces */
- --admin-bg-base: #F4F7FB;
- --admin-bg-surface: #FAFAFC;
+ --admin-bg-base: #F5F6F7;
+ --admin-bg-surface: #FFFFFF;
  --admin-bg-card: #FFFFFF;
  --admin-bg-sidebar: #FFFFFF;
  --admin-bg-elevated: #FFFFFF;
- --admin-bg-hover: #F8FAFC;
- --admin-bg-active: #F1F5F9;
+ --admin-bg-hover: #F7F4F5;
+ --admin-bg-active: #F3E9EC;
 
  /* Borders */
- --admin-border-base: #E5E7EB;
- --admin-border-light: #F3F4F6;
- --admin-border-strong: #D1D5DB;
+ --admin-border-base: #E2E4E7;
+ --admin-border-light: #EEF0F2;
+ --admin-border-strong: #C9CDD2;
 
  /* Text */
- --admin-text-base: #0F172A;
- --admin-text-muted: #475569;
- --admin-text-subtle: #94A3B8;
+ --admin-text-base: #202326;
+ --admin-text-muted: #5F656B;
+ --admin-text-subtle: #8B9299;
  --admin-text-inverse: #FFFFFF;
 
  /* Brand Colors */
- --admin-primary: #4F46E5;
- --admin-primary-hover: #4338CA;
- --admin-primary-muted: rgba(79, 70, 229, 0.08);
+ --admin-primary: #9B596A;
+ --admin-primary-hover: #824858;
+ --admin-primary-muted: rgba(155, 89, 106, 0.11);
 
- --admin-accent: #6366F1;
- --admin-accent-hover: #4F46E5;
+ --admin-accent: #2F7069;
+ --admin-accent-hover: #245B56;
 
  /* Status Colors */
- --admin-success: #22C55E;
- --admin-success-muted: rgba(34, 197, 94, 0.1);
- --admin-danger: #EF4444;
- --admin-danger-muted: rgba(239, 68, 68, 0.1);
- --admin-warning: #F59E0B;
- --admin-warning-muted: rgba(245, 158, 11, 0.1);
- --admin-info: #38BDF8;
- --admin-info-muted: rgba(56, 189, 248, 0.1);
+ --admin-success: #287A5B;
+ --admin-success-muted: rgba(40, 122, 91, 0.11);
+ --admin-danger: #C74747;
+ --admin-danger-muted: rgba(199, 71, 71, 0.10);
+ --admin-warning: #B7791F;
+ --admin-warning-muted: rgba(183, 121, 31, 0.12);
+ --admin-info: #39759A;
+ --admin-info-muted: rgba(57, 117, 154, 0.11);
 
  /* Shadows - Premium SaaS */
- --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
- --admin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
- --admin-shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
- --admin-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
- --admin-shadow-sidebar: 4px 0 24px rgba(0, 0, 0, 0.04);
- --admin-shadow-float: 0 8px 30px rgba(0, 0, 0, 0.08);
+ --admin-shadow-sm: 0 1px 2px rgba(32, 35, 38, 0.04);
+ --admin-shadow-md: 0 3px 10px rgba(32, 35, 38, 0.06);
+ --admin-shadow-lg: 0 10px 28px rgba(32, 35, 38, 0.08);
+ --admin-shadow-xl: 0 16px 36px rgba(32, 35, 38, 0.10);
+ --admin-shadow-sidebar: 2px 0 12px rgba(32, 35, 38, 0.03);
+ --admin-shadow-float: 0 8px 24px rgba(32, 35, 38, 0.08);
 
  /* Radius */
- --admin-radius-sm: 8px;
- --admin-radius-md: 12px;
- --admin-radius-lg: 16px;
- --admin-radius-xl: 20px;
- --admin-radius-2xl: 24px;
+ --admin-radius-sm: 4px;
+ --admin-radius-md: 6px;
+ --admin-radius-lg: 8px;
+ --admin-radius-xl: 8px;
+ --admin-radius-2xl: 8px;
  --admin-radius-full: 9999px;
 }
 
 /* Dark Mode */
 .dark {
  /* Surfaces */
- --admin-bg-base: #0B1220;
- --admin-bg-surface: #0F172A;
- --admin-bg-card: #111827;
- --admin-bg-sidebar: #0F172A;
- --admin-bg-elevated: #1E293B;
- --admin-bg-hover: #172033;
- --admin-bg-active: #1E293B;
+ --admin-bg-base: #F5F6F7;
+ --admin-bg-surface: #FFFFFF;
+ --admin-bg-card: #FFFFFF;
+ --admin-bg-sidebar: #FFFFFF;
+ --admin-bg-elevated: #FFFFFF;
+ --admin-bg-hover: #F7F4F5;
+ --admin-bg-active: #F3E9EC;
 
  /* Borders */
- --admin-border-base: #1E293B;
- --admin-border-light: #172033;
- --admin-border-strong: #334155;
+ --admin-border-base: #E2E4E7;
+ --admin-border-light: #EEF0F2;
+ --admin-border-strong: #C9CDD2;
 
  /* Text */
- --admin-text-base: #F8FAFC;
- --admin-text-muted: #94A3B8;
- --admin-text-subtle: #64748B;
- --admin-text-inverse: #0B1220;
+ --admin-text-base: #202326;
+ --admin-text-muted: #5F656B;
+ --admin-text-subtle: #8B9299;
+ --admin-text-inverse: #FFFFFF;
 
  /* Brand Colors */
- --admin-primary: #4F46E5;
- --admin-primary-hover: #6366F1;
- --admin-primary-muted: rgba(79, 70, 229, 0.15);
+ --admin-primary: #9B596A;
+ --admin-primary-hover: #824858;
+ --admin-primary-muted: rgba(155, 89, 106, 0.11);
 
- --admin-accent: #818CF8;
- --admin-accent-hover: #6366F1;
+ --admin-accent: #2F7069;
+ --admin-accent-hover: #245B56;
 
  /* Status Colors */
- --admin-success: #22C55E;
- --admin-success-muted: rgba(34, 197, 94, 0.15);
- --admin-danger: #EF4444;
- --admin-danger-muted: rgba(239, 68, 68, 0.15);
- --admin-warning: #F59E0B;
- --admin-warning-muted: rgba(245, 158, 11, 0.15);
- --admin-info: #38BDF8;
- --admin-info-muted: rgba(56, 189, 248, 0.15);
+ --admin-success: #287A5B;
+ --admin-success-muted: rgba(40, 122, 91, 0.11);
+ --admin-danger: #C74747;
+ --admin-danger-muted: rgba(199, 71, 71, 0.10);
+ --admin-warning: #B7791F;
+ --admin-warning-muted: rgba(183, 121, 31, 0.12);
+ --admin-info: #39759A;
+ --admin-info-muted: rgba(57, 117, 154, 0.11);
 
  /* Shadows - Dark Mode */
- --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
- --admin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
- --admin-shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
- --admin-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
- --admin-shadow-sidebar: 4px 0 24px rgba(0, 0, 0, 0.6);
- --admin-shadow-float: 0 16px 40px rgba(0, 0, 0, 0.6);
+ --admin-shadow-sm: 0 1px 2px rgba(32, 35, 38, 0.04);
+ --admin-shadow-md: 0 3px 10px rgba(32, 35, 38, 0.06);
+ --admin-shadow-lg: 0 10px 28px rgba(32, 35, 38, 0.08);
+ --admin-shadow-xl: 0 16px 36px rgba(32, 35, 38, 0.10);
+ --admin-shadow-sidebar: 2px 0 12px rgba(32, 35, 38, 0.03);
+ --admin-shadow-float: 0 8px 24px rgba(32, 35, 38, 0.08);
 }
 
 /* Base Admin container — override storefront styles */
@@ -116,9 +116,9 @@
  background-color: var(--admin-bg-base);
  color: var(--admin-text-base);
  font-family: var(--font-geist), var(--font-inter), 'Inter', system-ui, sans-serif;
- line-height: 1.8; /* Increased line-height for better readability */
- word-spacing: 0.08em; /* Increased word spacing for Arabic text */
- font-size: 14px; /* Decreased base font size */
+ line-height: 1.6;
+ word-spacing: 0;
+ font-size: 14px;
 }
 
 .admin-theme * {

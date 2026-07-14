@@ -11,7 +11,6 @@ import {
 import { NotificationService } from "@/lib/services/notification.service";
 import { AuthService, AuthenticatedUser } from "@/lib/services/auth.service";
 import { usePermissions } from "@/lib/auth/PermissionContext";
-import { ThemeToggle } from "../design-system/ThemeToggle";
 import { Button } from "../design-system/Button";
 import { adminAr } from "@/lib/i18n/admin-ar";
 
@@ -56,7 +55,7 @@ export function Topbar({ setIsMobileOpen }: { setIsMobileOpen: (v: boolean) => v
  });
 
  return (
- <header className="h-[72px] bg-[var(--admin-bg-surface)]/80 backdrop-blur-md border-b border-[var(--admin-border-base)] flex items-center justify-between px-6 sticky top-0 z-30 transition-colors"> <div className="flex items-center gap-4 w-1/3"> <Button variant="ghost" size="icon-sm" onClick={() => setIsMobileOpen(true)} className="md:hidden shrink-0 text-[var(--admin-text-muted)]"> <IconMenu2 size={20} /> </Button> <div className="hidden md:flex items-center gap-1.5 text-sm font-medium">
+ <header className="h-16 bg-[var(--admin-bg-surface)] border-b border-[var(--admin-border-base)] flex items-center justify-between px-4 md:px-6 sticky top-0 z-30"> <div className="flex items-center gap-4 w-1/3"> <Button variant="ghost" size="icon-sm" onClick={() => setIsMobileOpen(true)} className="md:hidden shrink-0 text-[var(--admin-text-muted)]"> <IconMenu2 size={20} /> </Button> <div className="hidden md:flex items-center gap-1.5 text-sm font-medium">
  {breadcrumbs.map((crumb, idx) => (
  <React.Fragment key={idx}> <span className={crumb.isLast ? "text-[var(--admin-text-base)]" : "text-[var(--admin-text-subtle)]"}>
  {crumb.name}
@@ -69,11 +68,11 @@ export function Topbar({ setIsMobileOpen }: { setIsMobileOpen: (v: boolean) => v
  {/* Command Palette trigger */}
  <div className="w-1/3 flex justify-center"> <button
  onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
- className="w-full max-w-md flex items-center justify-between gap-3 h-10 px-4 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg-elevated)] border border-[var(--admin-border-base)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:bg-[var(--admin-bg-surface)] hover:text-[var(--admin-text-base)] hover:shadow-[var(--admin-shadow-sm)] transition-all duration-200 group"
- > <div className="flex items-center gap-2"> <IconSearch size={18} className="text-[var(--admin-text-muted)] group-hover:text-[var(--admin-primary)] transition-colors" /> <span className="text-sm font-medium">Tìm kiếm trongBảng điều khiển.</span> </div> <div className="hidden sm:flex items-center gap-1"> <kbd className="text-[10px] font-sans font-medium bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] text-[var(--admin-text-muted)] rounded-[4px] px-1.5 py-0.5 leading-none shadow-sm">Ctrl</kbd> <kbd className="text-[10px] font-sans font-medium bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] text-[var(--admin-text-muted)] rounded-[4px] px-1.5 py-0.5 leading-none shadow-sm">K</kbd> </div> </button> </div>
+ className="w-full max-w-md flex items-center justify-between gap-3 h-10 px-4 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:bg-white hover:text-[var(--admin-text-base)] transition-all duration-200 group"
+ > <div className="flex items-center gap-2"> <IconSearch size={18} className="text-[var(--admin-text-muted)] group-hover:text-[var(--admin-primary)] transition-colors" /> <span className="hidden lg:inline text-sm font-medium">Tìm kiếm trong quản trị</span> </div> <div className="hidden xl:flex items-center gap-1"> <kbd className="text-[10px] font-sans font-medium bg-white border border-[var(--admin-border-base)] text-[var(--admin-text-muted)] rounded-[4px] px-1.5 py-0.5 leading-none">Ctrl</kbd> <kbd className="text-[10px] font-sans font-medium bg-white border border-[var(--admin-border-base)] text-[var(--admin-text-muted)] rounded-[4px] px-1.5 py-0.5 leading-none">K</kbd> </div> </button> </div>
 
  {/* Right side */}
- <div className="flex items-center justify-end gap-2 w-1/3"> <ThemeToggle /> <Link href="/admin/notifications"> <Button variant="ghost" size="icon" className="relative text-[var(--admin-text-muted)] hover:text-[var(--admin-text-base)] rounded-full"> <IconBell size={20} /> <AnimatePresence>
+ <div className="flex items-center justify-end gap-2 w-1/3"> <Link href="/admin/notifications"> <Button variant="ghost" size="icon" className="relative text-[var(--admin-text-muted)] hover:text-[var(--admin-text-base)]"> <IconBell size={20} /> <AnimatePresence>
  {unreadCount > 0 && (
  <motion.span
  key="badge"
@@ -90,7 +89,7 @@ export function Topbar({ setIsMobileOpen }: { setIsMobileOpen: (v: boolean) => v
  {/* Profile menu */}
  <div className="relative hidden sm:block" ref={profileRef}> <button
  onClick={() => setProfileOpen(v => !v)}
- className="flex items-center gap-3 p-1.5 pe-4 rounded-[var(--admin-radius-full)] hover:bg-[var(--admin-bg-elevated)] transition-colors border border-transparent hover:border-[var(--admin-border-base)] group"
+ className="flex items-center gap-3 p-1.5 pe-3 rounded-[var(--admin-radius-md)] hover:bg-[var(--admin-bg-hover)] transition-colors border border-transparent hover:border-[var(--admin-border-base)] group"
  > <div className="relative"> <img
  src={avatarUrl}
  alt={user?.name ?? "Admin"}

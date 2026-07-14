@@ -362,8 +362,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
  initial={false}
  animate={{ width: isCollapsed ? 76 : 250 }}
  transition={{ type: "spring", stiffness: 350, damping: 30 }}
- className="hidden md:block h-screen sticky top-0 z-40 shrink-0 p-3 pe-0"
- > <div className="h-full w-full rounded-[var(--admin-radius-2xl)] overflow-hidden shadow-[var(--admin-shadow-float)] border border-[var(--admin-border-base)] relative"> <SidebarContent isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} /> </div> </motion.aside>
+ className="hidden md:block h-screen sticky top-0 z-40 shrink-0 border-r border-[var(--admin-border-base)] bg-[var(--admin-bg-sidebar)]"
+ > <div className="h-full w-full overflow-hidden relative"> <SidebarContent isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} /> </div> </motion.aside>
 
  {/* Mobile overlay */}
  <AnimatePresence>

@@ -81,7 +81,7 @@ export default function HomePage() {
             animate={{ opacity: 1, scale: reduceMotion ? 1 : 1.025 }}
             exit={{ opacity: 0 }}
             transition={{ opacity: { duration: 0.9, ease: "easeInOut" }, scale: { duration: 6.2, ease: "linear" } }}
-            className="absolute inset-y-0 right-0 w-full md:max-w-[1200px]"
+            className="absolute inset-y-0 right-0 w-full bg-[#cfc9bf] md:max-w-[1200px]"
           >
             <Image
               src={heroImages[heroSlide] ?? content.home_hero_image}
@@ -90,7 +90,7 @@ export default function HomePage() {
               priority={heroSlide === 0}
               unoptimized
               sizes="(max-width: 767px) 100vw, 1200px"
-              className="object-cover object-[58%_16%] md:object-center saturate-[1.04] contrast-[1.08]"
+              className="object-cover object-top md:object-contain md:object-right saturate-[1.04] contrast-[1.08]"
             />
           </motion.div>
         </AnimatePresence>

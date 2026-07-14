@@ -1,99 +1,15 @@
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { createClient } from "@/lib/supabase/client";
 
-export interface CollectionRule {
-  field: 'title' | 'tag' | 'price' | 'inventory';
-  operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains';
-  value: string;
-}
+export interface CollectionRule { field: "title" | "tag" | "price" | "inventory"; operator: "equals" | "not_equals" | "greater_than" | "less_than" | "contains"; value: string; }
+export interface Collection { id: string; name: string; slug: string; description: string; type: "manual" | "automatic"; image: string; matchType: "all" | "any"; rules: CollectionRule[]; productIds: string[]; status: "active" | "draft" | "archived"; deletedAt?: string; createdAt: string; updatedAt: string; }
 
-export interface Collection {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  type: 'manual' | 'automatic';
-  image: string;
-  matchType: 'all' | 'any';
-  rules: CollectionRule[];
-  productIds: string[];
-  status: 'active' | 'draft' | 'archived';
-  deletedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-let MOCK_COLLECTIONS: Collection[] = [
-  {
-    id: "col_summer",
-    name: "Summer 2026 Collection",
-    slug: "summer-2026",
-    description: "Light, breezy styles for the summer.",
-    type: 'manual',
-    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800",
-    matchType: 'any',
-    rules: [],
-    productIds: ["prod_1"],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "col_clearance",
-    name: "Clearance Sale",
-    slug: "clearance",
-    description: "Products with price drop.",
-    type: 'automatic',
-    image: "",
-    matchType: 'all',
-    rules: [{ field: 'tag', operator: 'contains', value: 'clearance' }],
-    productIds: [],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-MOCK_COLLECTIONS = mockStorage.read('collections', MOCK_COLLECTIONS);
-const persistCollections = () => mockStorage.write('collections', MOCK_COLLECTIONS);
+function map(row: Record<string, unknown>): Collection { return { id: String(row.id), name: String(row.name), slug: String(row.slug), description: String(row.description ?? ""), type: String(row.collection_type ?? "manual") as Collection["type"], image: String(row.image_url ?? ""), matchType: String(row.match_type ?? "any") as Collection["matchType"], rules: (row.rules as CollectionRule[] | null) ?? [], productIds: (row.product_ids as string[] | null) ?? [], status: row.is_active ? "active" : "draft", createdAt: String(row.created_at), updatedAt: String(row.updated_at) }; }
+function row(data: Partial<Collection>) { return { name: data.name, slug: data.slug, description: data.description, collection_type: data.type, image_url: data.image, match_type: data.matchType, rules: data.rules, product_ids: data.productIds, is_active: data.status === "active" }; }
 
 export const CollectionService = {
-  async getCollections(includeDeleted = false): Promise<Collection[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return includeDeleted ? [...MOCK_COLLECTIONS] : MOCK_COLLECTIONS.filter(c => !c.deletedAt);
-  },
-
-  async getCollection(id: string): Promise<Collection | null> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const c = MOCK_COLLECTIONS.find(x => x.id === id);
-    return (c && !c.deletedAt) ? { ...c } : null;
-  },
-
-  async createCollection(data: Omit<Collection, 'id' | 'createdAt' | 'updatedAt'>): Promise<Collection> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const newCollection: Collection = {
-      ...data,
-      id: `col_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    MOCK_COLLECTIONS = [...MOCK_COLLECTIONS, newCollection];
-    persistCollections();
-    return newCollection;
-  },
-
-  async updateCollection(id: string, updates: Partial<Collection>): Promise<Collection> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const idx = MOCK_COLLECTIONS.findIndex(x => x.id === id);
-    if (idx === -1) throw new Error("Collection not found");
-    const updated = { ...MOCK_COLLECTIONS[idx], ...updates, updatedAt: new Date().toISOString() };
-    MOCK_COLLECTIONS = [...MOCK_COLLECTIONS.slice(0, idx), updated, ...MOCK_COLLECTIONS.slice(idx + 1)];
-    persistCollections();
-    return updated;
-  },
-
-  async softDelete(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const idx = MOCK_COLLECTIONS.findIndex(x => x.id === id);
-    if (idx > -1) { MOCK_COLLECTIONS[idx].deletedAt = new Date().toISOString(); persistCollections(); }
-  }
+  async getCollections(): Promise<Collection[]> { const { data, error } = await createClient().from("collections").select("*").order("created_at", { ascending: false }); if (error) throw new Error(error.message); return (data ?? []).map(map); },
+  async getCollection(id: string) { const { data, error } = await createClient().from("collections").select("*").eq("id", id).maybeSingle(); if (error) throw new Error(error.message); return data ? map(data) : null; },
+  async createCollection(input: Omit<Collection, "id" | "createdAt" | "updatedAt">) { const { data, error } = await createClient().from("collections").insert(row(input)).select("*").single(); if (error) throw new Error(error.message); return map(data); },
+  async updateCollection(id: string, input: Partial<Collection>) { const { data, error } = await createClient().from("collections").update(row(input)).eq("id", id).select("*").single(); if (error) throw new Error(error.message); return map(data); },
+  async softDelete(id: string) { const { error } = await createClient().from("collections").update({ is_active: false }).eq("id", id); if (error) throw new Error(error.message); },
 };

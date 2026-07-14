@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { adminAr } from '@/lib/i18n/admin-ar';
-import { MediaPicker } from './MediaPicker';
-import { Media } from '@/data/mock/media';
-import { IconPhoto, IconX } from '@tabler/icons-react';
+import { useRef, useState } from "react";
+import { IconPhotoPlus, IconTrash, IconLoader2 } from "@tabler/icons-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface ImageUploadProps {
   images: string[];
@@ -13,72 +11,80 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ images, onChange, multiple = false }: ImageUploadProps) {
-  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleMediaSelect = (media: Media | Media[]) => {
-    if (Array.isArray(media)) {
-      if (multiple) {
-        onChange([...images, ...media.map(m => m.url)]);
+  const upload = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setUploading(true);
+    setError("");
+    const uploaded: string[] = [];
+
+    try {
+      const supabase = createClient();
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith("image/")) throw new Error("Chỉ chấp nhận tệp hình ảnh.");
+        if (file.size > 10 * 1024 * 1024) throw new Error("Mỗi ảnh phải nhỏ hơn 10 MB.");
+        const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+        const path = `${new Date().getFullYear()}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage.from("product-images").upload(path, file, {
+          cacheControl: "31536000",
+          upsert: false,
+        });
+        if (uploadError) throw uploadError;
+        uploaded.push(supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl);
       }
-    } else {
-      if (multiple) {
-        onChange([...images, media.url]);
-      } else {
-        onChange([media.url]);
-      }
+      onChange(multiple ? [...images, ...uploaded] : uploaded.slice(0, 1));
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Tải ảnh thất bại.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
-  const removeImage = (index: number) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    onChange(newImages);
-  };
-
   return (
-    <div className="space-y-4 w-full">
-      <div 
-        onClick={() => setMediaPickerOpen(true)}
-        className="relative border-2 border-dashed rounded-[var(--admin-radius-lg)] p-8 text-center transition-colors cursor-pointer border-[var(--admin-border-strong)] hover:border-[var(--admin-primary)] bg-[var(--admin-bg-elevated)] hover:bg-[var(--admin-primary-muted)]"
+    <div className="space-y-4">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        multiple={multiple}
+        className="sr-only"
+        onChange={(event) => void upload(event.target.files)}
+      />
+      <button
+        type="button"
+        disabled={uploading}
+        onClick={() => inputRef.current?.click()}
+        className="flex min-h-36 w-full flex-col items-center justify-center gap-2 border-2 border-dashed border-[var(--admin-border-strong)] bg-[var(--admin-bg-elevated)] p-6 text-center transition-colors hover:border-[var(--admin-primary)] disabled:cursor-wait disabled:opacity-60"
       >
-        <div className="flex flex-col items-center justify-center gap-2 pointer-events-none group">
-          <IconPhoto size={36} className="text-[var(--admin-text-subtle)] group-hover:text-[var(--admin-primary)] transition-colors" stroke={1.5} />
-          <p className="text-sm font-semibold text-[var(--admin-text-base)] group-hover:text-[var(--admin-primary)] transition-colors">
-            اختيار من مكتبة الوسائط
-          </p>
-          <p className="text-xs text-[var(--admin-text-muted)] font-medium">
-            أو رفع صورة جديدة
-          </p>
-        </div>
-      </div>
+        {uploading ? <IconLoader2 className="animate-spin text-[var(--admin-primary)]" /> : <IconPhotoPlus size={32} className="text-[var(--admin-primary)]" />}
+        <span className="text-sm font-semibold text-[var(--admin-text-base)]">
+          {uploading ? "Đang tải ảnh lên Supabase..." : "Tải ảnh sản phẩm"}
+        </span>
+        <span className="text-xs text-[var(--admin-text-muted)]">JPG, PNG, WebP hoặc AVIF, tối đa 10 MB</span>
+      </button>
+      {error && <p className="text-sm text-[var(--admin-danger)]">{error}</p>}
 
       {images.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
-          {images.map((src, idx) => (
-            <div key={idx} className="relative aspect-square rounded-[var(--admin-radius-md)] overflow-hidden border border-[var(--admin-border-base)] shadow-[var(--admin-shadow-sm)] group bg-[var(--admin-bg-subtle)]">
-              { }
-              <img src={src} alt="Upload preview" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-[var(--admin-bg-base)]/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
-                <button 
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
-                  className="p-2 bg-[var(--admin-danger)] text-white rounded-[var(--admin-radius-md)] shadow-[var(--admin-shadow-md)] hover:bg-[#b91c1c] transition-colors hover:scale-105 active:scale-95"
-                >
-                  <IconX size={18} stroke={2.5} />
-                </button>
-              </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {images.map((src, index) => (
+            <div key={src} className="group relative aspect-[3/4] overflow-hidden border border-[var(--admin-border-base)] bg-[var(--admin-bg-subtle)]">
+              <img src={src} alt={`Ảnh sản phẩm ${index + 1}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                title="Xóa ảnh"
+                onClick={() => onChange(images.filter((_, imageIndex) => imageIndex !== index))}
+                className="absolute right-2 top-2 grid h-9 w-9 place-items-center bg-white/95 text-red-600 opacity-0 shadow transition-opacity group-hover:opacity-100 focus:opacity-100"
+              >
+                <IconTrash size={17} />
+              </button>
             </div>
           ))}
         </div>
       )}
-
-      <MediaPicker 
-        open={mediaPickerOpen}
-        onClose={() => setMediaPickerOpen(false)}
-        onSelect={handleMediaSelect}
-        multiple={multiple}
-        allowedTypes={['image']}
-      />
     </div>
   );
 }

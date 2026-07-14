@@ -1,18 +1,18 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "أزياء الشتاء | AURA",
-  description: "تشكيلة الشتاء الفاخرة من دار أورا — معاطف وقطع شتوية راقية بأقمشة الكشمير والصوف الطبيعي.",
-  openGraph: {
-    title: "أزياء الشتاء | AURA",
-    description: "تشكيلة الشتاء الفاخرة من دار أورا.",
-    url: "https://aura-fashion-virid.vercel.app/winter-fashion",
-  },
-  alternates: {
-    canonical: "https://aura-fashion-virid.vercel.app/winter-fashion",
-  },
+ title: "Blazer và đồ công sở mùa lạnh | Soft Muse",
+ description: "Blazer, quần tây và set đồ công sở thanh lịch cho ngày làm việc se lạnh.",
+ openGraph: {
+ title: "Blazer và đồ công sở mùa lạnh | Soft Muse",
+ description: "Blazer, quần tây và set đồ công sở thanh lịch từ Soft Muse.",
+ url: "https://softmuse.vn/winter-fashion",
+ },
+ alternates: {
+ canonical: "https://softmuse.vn/winter-fashion",
+ },
 };
 
 export default function WinterFashionLayout({ children }: { children: React.ReactNode }) {
-  return children;
+ return children;
 }

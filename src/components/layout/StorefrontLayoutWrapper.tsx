@@ -14,26 +14,16 @@ import { SEOInjector } from "@/components/layout/SEOInjector";
 const Footer = dynamic(() => import("@/components/layout/Footer"), { ssr: true });
 
 export function StorefrontLayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+ const pathname = usePathname();
+ const isAdmin = pathname?.startsWith('/admin');
 
-  if (isAdmin) {
-    return <>{children}</>;
-  }
+ if (isAdmin) {
+ return <>{children}</>;
+ }
 
-  return (
-    <>
-      {/* CMS runtime hooks — render nothing, only apply side effects */}
-      <ThemeProvider />
-      <SEOInjector />
-
-      <AnnouncementBar />
-      <Navbar />
-      <main className="flex-grow">{children}</main>
-      <Footer />
-      <WhatsAppButton />
-      <ScrollToTop />
-      <CustomerNotificationListener />
-    </>
-  );
+ return (
+ <>
+ {/* CMS runtime hooks — render nothing, only apply side effects */}
+ <ThemeProvider /> <SEOInjector /> <AnnouncementBar /> <Navbar /> <main className="flex-grow">{children}</main> <Footer /> <WhatsAppButton /> <ScrollToTop /> <CustomerNotificationListener /> </>
+ );
 }

@@ -1,494 +1,368 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useEventSubscribeMany } from "@/hooks/useEventBus";
-import { DASHBOARD_REFRESH_EVENTS } from "@/lib/events/refresh-events";
 import {
-  IconCurrencyDollar, IconShoppingCart, IconUsers, IconTrendingUp,
-  IconPackage, IconArrowUpRight, IconAlertTriangle, IconStar,
-  IconChartArea, IconClock, IconActivity,
-  IconReceipt2, IconCoin, IconChartPie, IconWallet,
-  IconTicket, IconCheck,
+  IconAlertTriangle,
+  IconArrowUpRight,
+  IconChartBar,
+  IconChecklist,
+  IconDiscount2,
+  IconPackage,
+  IconPlus,
+  IconReceipt2,
+  IconShoppingBag,
+  IconSparkles,
+  IconTruckDelivery,
+  IconUsers,
+  IconWallet,
 } from "@tabler/icons-react";
-import { KpiCard } from "@/components/admin/design-system/KpiCard";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/admin/design-system/Card";
-import { DataTable } from "@/components/admin/design-system/DataTable";
+import { RevenueChart } from "@/components/admin/charts/RevenueChart";
 import { Badge } from "@/components/admin/design-system/Badge";
 import { Button } from "@/components/admin/design-system/Button";
-import { RevenueChart } from "@/components/admin/charts/RevenueChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/design-system/Card";
+import { useEventSubscribeMany } from "@/hooks/useEventBus";
+import { DASHBOARD_REFRESH_EVENTS } from "@/lib/events/refresh-events";
 import { AnalyticsService } from "@/lib/services/analytics.service";
-import { OrderService } from "@/lib/services/order.service";
 import { CustomerService } from "@/lib/services/customer.service";
+import { OrderService } from "@/lib/services/order.service";
 import { ProductService } from "@/lib/services/product.service";
-import { businessService } from "@/lib/services/business.service";
-import { getStatusMeta } from "@/lib/orders/order-status";
-import { AnalyticsSummary, RevenueData } from "@/data/mock/analytics";
 import { toast } from "sonner";
-import { adminAr } from "@/lib/i18n/admin-ar";
-import { formatCurrency, formatNumber } from "@/lib/utils/formatters";
-import { FadeIn, FadeUp, StaggerContainer, StaggerItem, HoverScale } from "@/components/admin/ui/motion";
-import { IconContainer } from "@/components/admin/ui/IconContainer";
+
+type DashboardOrder = {
+  id: string;
+  orderNumber?: string;
+  customerName?: string;
+  status?: string;
+  paymentStatus?: string;
+  total?: number;
+  date?: string;
+  createdAt?: string;
+};
+
+type DashboardCustomer = {
+  id: string;
+  fullName?: string;
+  name?: string;
+  email?: string;
+  totalSpent?: number;
+  spent?: number;
+  registrationDate?: string;
+  createdAt?: string;
+};
+
+type DashboardProduct = {
+  id: string;
+  name: string;
+  sku: string;
+  stock?: number;
+  price?: number;
+  costPrice?: number;
+};
+
+type DashboardState = {
+  revenueData: Record<string, unknown>[];
+  orders: DashboardOrder[];
+  customers: DashboardCustomer[];
+  products: DashboardProduct[];
+};
+
+const money = (value = 0) => `${new Intl.NumberFormat("vi-VN").format(value)} đ`;
+const number = (value = 0) => new Intl.NumberFormat("vi-VN").format(value);
+
+const statusLabel: Record<string, { label: string; variant: "warning" | "primary" | "info" | "success" | "danger" | "neutral" }> = {
+  pending: { label: "Chờ xác nhận", variant: "warning" },
+  confirmed: { label: "Đã xác nhận", variant: "info" },
+  processing: { label: "Đang xử lý", variant: "primary" },
+  preparing: { label: "Đang chuẩn bị", variant: "primary" },
+  ready_to_ship: { label: "Sẵn sàng giao", variant: "info" },
+  shipped: { label: "Đã gửi hàng", variant: "info" },
+  out_for_delivery: { label: "Đang giao", variant: "info" },
+  delivered: { label: "Hoàn tất", variant: "success" },
+  completed: { label: "Hoàn tất", variant: "success" },
+  cancelled: { label: "Đã hủy", variant: "danger" },
+  returned: { label: "Hoàn trả", variant: "neutral" },
+};
+
+function KpiTile({
+  title,
+  value,
+  helper,
+  icon,
+  tone = "neutral",
+}: {
+  title: string;
+  value: string;
+  helper: string;
+  icon: React.ReactNode;
+  tone?: "neutral" | "success" | "warning" | "danger" | "info";
+}) {
+  const tones = {
+    neutral: "bg-slate-50 text-slate-700 border-slate-200",
+    success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    warning: "bg-amber-50 text-amber-700 border-amber-200",
+    danger: "bg-rose-50 text-rose-700 border-rose-200",
+    info: "bg-sky-50 text-sky-700 border-sky-200",
+  };
+
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-subtle)]">{title}</p>
+            <p className="mt-3 text-2xl font-bold tracking-tight text-[var(--admin-text-base)] tabular-nums">{value}</p>
+          </div>
+          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border ${tones[tone]}`}>
+            {icon}
+          </div>
+        </div>
+        <p className="mt-4 text-xs font-medium text-[var(--admin-text-muted)]">{helper}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SectionHeader({ title, subtitle, href }: { title: string; subtitle?: string; href?: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <CardTitle className="text-base">{title}</CardTitle>
+        {subtitle && <p className="mt-1 text-xs text-[var(--admin-text-muted)]">{subtitle}</p>}
+      </div>
+      {href && (
+        <Link href={href} className="text-xs font-semibold text-[var(--admin-primary)] hover:underline">
+          Xem tất cả
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default function DashboardHome() {
-  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
-  const [financeSummary, setFinanceSummary] = useState<any>(null);
-  const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
-  const [latestCustomers, setLatestCustomers] = useState<any[]>([]);
-  const [lowStock, setLowStock] = useState<any[]>([]);
+  const [data, setData] = useState<DashboardState | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-      try {
-        const [sum, rev, orders, customers, products, reviews, coupons, finance] = await Promise.all([
-          AnalyticsService.getSummary(),
-          AnalyticsService.getRevenueData("month"),
-          OrderService.getOrders(),
-          CustomerService.getCustomers(),
-          ProductService.getProducts(),
-          import("@/lib/services/review.service").then(m => m.ReviewService.getReviews()),
-          import("@/lib/services/coupon.service").then(m => m.CouponService.getCoupons()),
-          businessService.getFinancialSummary(),
-        ]);
+    try {
+      setLoading(true);
+      const [revenueData, orders, customers, products] = await Promise.all([
+        AnalyticsService.getRevenueData("month"),
+        OrderService.getOrders(),
+        CustomerService.getCustomers(),
+        ProductService.getProducts(),
+      ]);
 
-        const totalRevenue = orders.reduce(
-          (acc: number, o) => acc + (o.paymentStatus === "paid" ? o.total : 0), 0
-        );
-        const countByStatus = (s: string) => orders.filter((o: any) => o.status === s).length;
-        const pendingOrders   = countByStatus("pending");
-        const preparingOrders = countByStatus("preparing") + countByStatus("processing");
-        const shippedOrders   = countByStatus("shipped") + countByStatus("out_for_delivery");
-        const cancelledOrders = countByStatus("cancelled");
-        const completedOrders = orders.filter((o: any) => o.status === "completed" || o.status === "delivered").length;
-
-        setSummary({
-          ...sum,
-          totalRevenue,
-          totalOrders: orders.length,
-          totalCustomers: customers.length,
-          conversionRate: 2.4,
-          revenueGrowth: "+12.5%",
-          ordersGrowth: "+8.2%",
-          customersGrowth: "+5.4%",
-          conversionGrowth: "+1.1%",
-          pendingReviews: reviews.filter((r: any) => r.status === "pending").length,
-          activeCoupons: coupons.filter((c: any) => c.status === "active").length,
-          pendingOrders,
-          preparingOrders,
-          shippedOrders,
-          cancelledOrders,
-          completedOrders,
-          lowStockCount: products.filter((p: any) => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 10).length,
-          outOfStockCount: products.filter((p: any) => (p.stock ?? 0) <= 0).length,
-          totalProducts: products.length,
-          inventoryValue: products.reduce((acc: number, p: any) => acc + (p.stock ?? 0) * ((p as any).costPrice ?? 0), 0),
-        } as any);
-
-        setFinanceSummary(finance);
-        setRevenueData(rev);
-        setRecentOrders(orders.slice(0, 5));
-
-        const sorted = [...customers].sort(
-          (a, b) => new Date(b.registrationDate ?? b.createdAt).getTime() - new Date(a.registrationDate ?? a.createdAt).getTime()
-        );
-        setLatestCustomers(sorted.slice(0, 5));
-        setLowStock(products.filter((p: any) => (p.stock ?? 0) < 10).slice(0, 5));
-      } catch {
-        toast.error(adminAr.toasts.unexpectedError);
-      } finally {
-        setLoading(false);
-      }
+      setData({
+        revenueData: revenueData as unknown as Record<string, unknown>[],
+        orders: orders as DashboardOrder[],
+        customers: customers as DashboardCustomer[],
+        products: products as DashboardProduct[],
+      });
+    } catch {
+      toast.error("Không tải được dữ liệu bảng điều khiển.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
+
   useEventSubscribeMany(DASHBOARD_REFRESH_EVENTS, load);
 
-  if (loading || !summary) {
+  const metrics = useMemo(() => {
+    if (!data) return null;
+    const paidRevenue = data.orders.reduce((sum, order) => sum + (order.paymentStatus === "paid" ? order.total ?? 0 : 0), 0);
+    const pendingOrders = data.orders.filter((order) => ["pending", "confirmed"].includes(order.status ?? "")).length;
+    const shippingOrders = data.orders.filter((order) => ["ready_to_ship", "shipped", "out_for_delivery"].includes(order.status ?? "")).length;
+    const lowStock = data.products.filter((product) => (product.stock ?? 0) > 0 && (product.stock ?? 0) <= 10);
+    const outOfStock = data.products.filter((product) => (product.stock ?? 0) <= 0);
+    const inventoryValue = data.products.reduce((sum, product) => sum + (product.stock ?? 0) * (product.costPrice ?? 0), 0);
+
+    return {
+      paidRevenue,
+      pendingOrders,
+      shippingOrders,
+      lowStock,
+      outOfStock,
+      inventoryValue,
+      averageOrder: data.orders.length ? paidRevenue / data.orders.length : 0,
+    };
+  }, [data]);
+
+  if (loading || !data || !metrics) {
     return (
-      <div className="space-y-6 animate-pulse p-4 md:p-6">
-        <div className="h-10 w-64 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-elevated)]" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          {[1,2,3,4,5,6,7,8].map(i => (
-            <div key={i} className="h-[160px] rounded-[var(--admin-radius-2xl)] bg-[var(--admin-bg-elevated)]" />
+      <div className="space-y-6">
+        <div className="h-28 rounded-[var(--admin-radius-2xl)] bg-[var(--admin-bg-elevated)] animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="h-36 rounded-[var(--admin-radius-xl)] bg-[var(--admin-bg-elevated)] animate-pulse" />
           ))}
         </div>
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 h-[400px] rounded-[var(--admin-radius-2xl)] bg-[var(--admin-bg-elevated)]" />
-          <div className="h-[400px] rounded-[var(--admin-radius-2xl)] bg-[var(--admin-bg-elevated)]" />
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+          <div className="xl:col-span-2 h-96 rounded-[var(--admin-radius-xl)] bg-[var(--admin-bg-elevated)] animate-pulse" />
+          <div className="h-96 rounded-[var(--admin-radius-xl)] bg-[var(--admin-bg-elevated)] animate-pulse" />
         </div>
       </div>
     );
   }
 
-  const s = summary as any;
+  const recentOrders = data.orders.slice(0, 6);
+  const latestCustomers = [...data.customers]
+    .sort((a, b) => new Date(b.registrationDate ?? b.createdAt ?? 0).getTime() - new Date(a.registrationDate ?? a.createdAt ?? 0).getTime())
+    .slice(0, 5);
+  const stockAlerts = [...metrics.outOfStock, ...metrics.lowStock].slice(0, 5);
 
   return (
-    <StaggerContainer className="space-y-8 pb-12">
-
-      {/* ── Page header ─────────────── */}
-      <FadeUp className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--admin-text-base)] tracking-tight">نظرة عامة</h1>
-          <p className="text-sm text-[var(--admin-text-muted)] mt-1 font-medium">مرحباً بك مجدداً! إليك ملخص لأداء متجرك.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin/analytics">
-            <Button variant="secondary" size="md" leftIcon={<IconChartArea size={18} />}>
-              التحليلات الكاملة
-            </Button>
-          </Link>
-          <Link href="/admin/orders">
-            <Button variant="primary" size="md" leftIcon={<IconActivity size={18} />}>
-              إدارة الطلبات
-            </Button>
-          </Link>
-        </div>
-      </FadeUp>
-
-      {/* ── Sales KPIs ─────────────────── */}
-      <StaggerItem>
-        <p className="text-xs font-bold text-[var(--admin-text-subtle)] uppercase tracking-widest mb-3 px-1">المبيعات والعملاء</p>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <KpiCard
-            title={adminAr.dashboard.totalRevenue}
-            value={formatCurrency(summary.totalRevenue)}
-            icon={<IconCurrencyDollar stroke={2} />}
-            trend={{ value: 12.5, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="purple"
-          />
-          <KpiCard
-            title={adminAr.dashboard.totalOrders}
-            value={formatNumber(summary.totalOrders)}
-            icon={<IconShoppingCart stroke={2} />}
-            trend={{ value: 8.2, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="blue"
-          />
-          <KpiCard
-            title={adminAr.dashboard.totalCustomers}
-            value={formatNumber(summary.totalCustomers)}
-            icon={<IconUsers stroke={2} />}
-            trend={{ value: 5.4, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="emerald"
-          />
-          <KpiCard
-            title="نسبة التحويل"
-            value={`${summary.conversionRate}%`}
-            icon={<IconTrendingUp stroke={2} />}
-            trend={{ value: 1.1, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="cyan"
-          />
-        </div>
-      </StaggerItem>
-
-      {/* ── Operations KPIs ─────────────────── */}
-      <StaggerItem>
-        <p className="text-xs font-bold text-[var(--admin-text-subtle)] uppercase tracking-widest mb-3 px-1">العمليات والمخزون</p>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <KpiCard
-            title="طلبات معلقة"
-            value={formatNumber(s.pendingOrders ?? 0)}
-            icon={<IconClock stroke={2} />}
-            trend={{ value: 0, label: "تحتاج مراجعة", isPositive: false }}
-            accentColor="orange"
-          />
-          <KpiCard
-            title="طلبات مكتملة"
-            value={formatNumber(s.completedOrders ?? 0)}
-            icon={<IconCheck stroke={2} />}
-            trend={{ value: 15, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="emerald"
-          />
-          <KpiCard
-            title="مخزون منخفض"
-            value={formatNumber(s.lowStockCount ?? 0)}
-            icon={<IconAlertTriangle stroke={2} />}
-            trend={{ value: 0, label: "منتجات تحت 10 وحدات", isPositive: false }}
-            accentColor="orange"
-          />
-          <KpiCard
-            title="قيمة المخزون"
-            value={formatCurrency(s.inventoryValue ?? 0)}
-            icon={<IconPackage stroke={2} />}
-            trend={{ value: 3, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-            accentColor="indigo"
-          />
-        </div>
-      </StaggerItem>
-
-      {/* ── Order Status KPIs ─────────────────── */}
-      <StaggerItem>
-        <p className="text-xs font-bold text-[var(--admin-text-subtle)] uppercase tracking-widest mb-3 px-1">حالة الطلبات</p>
-        <div className="grid grid-cols-2 xl:grid-cols-5 gap-4">
-          <KpiCard
-            title="بانتظار المراجعة"
-            value={formatNumber(s.pendingOrders ?? 0)}
-            icon={<IconClock stroke={2} />}
-            accentColor="orange"
-          />
-          <KpiCard
-            title="جاري التجهيز"
-            value={formatNumber(s.preparingOrders ?? 0)}
-            icon={<IconActivity stroke={2} />}
-            accentColor="indigo"
-          />
-          <KpiCard
-            title="تم الشحن"
-            value={formatNumber(s.shippedOrders ?? 0)}
-            icon={<IconPackage stroke={2} />}
-            accentColor="blue"
-          />
-          <KpiCard
-            title="تم التسليم"
-            value={formatNumber(s.completedOrders ?? 0)}
-            icon={<IconCheck stroke={2} />}
-            accentColor="emerald"
-          />
-          <KpiCard
-            title="ملغاة"
-            value={formatNumber(s.cancelledOrders ?? 0)}
-            icon={<IconAlertTriangle stroke={2} />}
-            accentColor="pink"
-          />
-        </div>
-      </StaggerItem>
-
-      {/* ── Finance KPIs ─────────────────── */}
-      {financeSummary && (
-        <StaggerItem>
-          <div className="flex items-center justify-between mb-3 px-1">
-            <p className="text-xs font-bold text-[var(--admin-text-subtle)] uppercase tracking-widest">المالية</p>
-            <Link href="/admin/business" className="text-xs font-semibold text-[var(--admin-primary)] hover:underline">
-              النظرة المالية الكاملة ←
-            </Link>
+    <div className="space-y-6 pb-12">
+      <section className="relative overflow-hidden rounded-[var(--admin-radius-2xl)] border border-[#E7DDD0] bg-[#FBF8F3] p-6 md:p-8 shadow-[var(--admin-shadow-sm)]">
+        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-[linear-gradient(135deg,rgba(196,160,122,0.18),rgba(255,255,255,0))] md:block" />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E5D6C3] bg-white px-3 py-1 text-xs font-semibold text-[#8F6B4A]">
+              <IconSparkles size={15} />
+              Dữ liệu trực tiếp từ Supabase
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-[#1C1C1B] md:text-4xl">Bảng điều khiển Soft Muse</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6B6259]">
+              Theo dõi doanh thu, đơn hàng, tồn kho và khách hàng theo dữ liệu vận hành thực tế của cửa hàng.
+            </p>
           </div>
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-            <KpiCard
-              title="صافي الربح"
-              value={formatCurrency(financeSummary.netProfit ?? 0)}
-              icon={<IconTrendingUp stroke={2} />}
-              trend={{ value: 18, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-              accentColor="emerald"
-            />
-            <KpiCard
-              title="إجمالي المصروفات"
-              value={formatCurrency(financeSummary.totalExpenses ?? 0)}
-              icon={<IconReceipt2 stroke={2} />}
-              trend={{ value: 2, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-              accentColor="pink"
-            />
-            <KpiCard
-              title="رأس المال"
-              value={formatCurrency(financeSummary.totalCapital ?? 0)}
-              icon={<IconCoin stroke={2} />}
-              trend={{ value: 0, label: "لا يوجد تغيير", isPositive: true }}
-              accentColor="yellow"
-            />
-            <KpiCard
-              title="التدفق النقدي"
-              value={formatCurrency(financeSummary.cashFlow ?? 0)}
-              icon={<IconWallet stroke={2} />}
-              trend={{ value: 8, label: adminAr.dashboard.vsLastMonth, isPositive: true }}
-              accentColor="blue"
-            />
-          </div>
-        </StaggerItem>
-      )}
-
-      {/* ── Marketing KPIs ─────────────────── */}
-      <StaggerItem>
-        <p className="text-xs font-bold text-[var(--admin-text-subtle)] uppercase tracking-widest mb-3 px-1">التسويق</p>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <KpiCard
-            title="كوبونات نشطة"
-            value={formatNumber(s.activeCoupons ?? 0)}
-            icon={<IconTicket stroke={2} />}
-            trend={{ value: 0, label: "متاحة للاستخدام", isPositive: true }}
-            accentColor="orange"
-          />
-          <KpiCard
-            title="تقييمات جديدة"
-            value={formatNumber(s.pendingReviews ?? 0)}
-            icon={<IconStar stroke={2} />}
-            trend={{ value: 0, label: "بانتظار المراجعة", isPositive: false }}
-            accentColor="yellow"
-          />
-          <KpiCard
-            title="إجمالي المنتجات"
-            value={formatNumber(s.totalProducts ?? 0)}
-            icon={<IconPackage stroke={2} />}
-            accentColor="indigo"
-          />
-          <KpiCard
-            title="نفد من المخزون"
-            value={formatNumber(s.outOfStockCount ?? 0)}
-            icon={<IconAlertTriangle stroke={2} />}
-            trend={{ value: 0, label: "تحتاج إعادة تخزين", isPositive: false }}
-            accentColor="pink"
-          />
-        </div>
-      </StaggerItem>
-
-      {/* ── Charts Row ── */}
-      <StaggerItem className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="xl:col-span-2 overflow-hidden flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)]">
-            <div className="flex items-center gap-3">
-              <IconContainer icon={<IconChartArea />} color="indigo" size="sm" />
-              <div>
-                <CardTitle>{adminAr.dashboard.revenueOverview}</CardTitle>
-                <p className="text-xs font-medium text-[var(--admin-text-subtle)] mt-0.5">الإيرادات خلال الشهر الحالي</p>
-              </div>
-            </div>
-            <Link href="/admin/analytics">
-              <Button variant="ghost" size="sm" rightIcon={<IconArrowUpRight size={16} />}>
-                التقرير الكامل
-              </Button>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/admin/products/new">
+              <Button leftIcon={<IconPlus size={17} />}>Thêm sản phẩm</Button>
             </Link>
-          </CardHeader>
-          <CardContent className="flex-1 p-6 min-h-[350px]">
-            <RevenueChart data={revenueData as any} />
-          </CardContent>
-        </Card>
-
-        <Card className="flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)]">
-            <div className="flex items-center gap-3">
-              <IconContainer icon={<IconUsers />} color="cyan" size="sm" />
-              <CardTitle>{adminAr.dashboard.latestCustomers}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0 flex-1 overflow-hidden">
-            <div className="divide-y divide-[var(--admin-border-light)]">
-              {latestCustomers.map((c) => (
-                <HoverScale key={c.id} className="flex items-center gap-4 p-4 hover:bg-[var(--admin-bg-hover)] cursor-pointer transition-colors group">
-                  <div className="w-10 h-10 rounded-full bg-[var(--admin-primary-muted)] border-2 border-[var(--admin-bg-surface)] shadow-sm flex items-center justify-center text-sm font-bold text-[var(--admin-primary)] shrink-0">
-                    {(c.fullName ?? c.name)?.charAt(0)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-[var(--admin-text-base)] truncate group-hover:text-[var(--admin-primary)] transition-colors">
-                      {c.fullName ?? c.name}
-                    </p>
-                    <p className="text-xs font-medium text-[var(--admin-text-muted)] truncate">{c.email}</p>
-                  </div>
-                  <Badge variant="primary" size="sm" className="shrink-0 font-bold tabular-nums">
-                    {formatCurrency(c.totalSpent ?? c.spent ?? 0)}
-                  </Badge>
-                </HoverScale>
-              ))}
-            </div>
-          </CardContent>
-          <div className="p-3 border-t border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] text-center">
-            <Link href="/admin/customers" className="text-sm font-semibold text-[var(--admin-primary)] hover:text-[var(--admin-primary-hover)] transition-colors">
-              عرض كل العملاء
-            </Link>
-          </div>
-        </Card>
-      </StaggerItem>
-
-      {/* ── Bottom Row ── */}
-      <StaggerItem className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="xl:col-span-2 flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)]">
-            <div className="flex items-center gap-3">
-              <IconContainer icon={<IconShoppingCart />} color="blue" size="sm" />
-              <CardTitle>{adminAr.dashboard.recentOrders}</CardTitle>
-            </div>
             <Link href="/admin/orders">
-              <Button variant="ghost" size="sm" rightIcon={<IconArrowUpRight size={16} />}>
-                جميع الطلبات
-              </Button>
+              <Button variant="secondary" leftIcon={<IconReceipt2 size={17} />}>Xử lý đơn</Button>
             </Link>
-          </CardHeader>
-          <div className="overflow-x-auto">
-            <DataTable
-              columns={[
-                { accessor: "orderNumber", header: "رقم الطلب" },
-                { accessor: "customerName", header: "العميل" },
-                { accessor: "date", header: "التاريخ", type: "date" },
-                {
-                  accessor: "status",
-                  header: "الحالة",
-                  render: (_: any, row: any) => {
-                    const meta = getStatusMeta(row.status);
-                    return <Badge variant={meta.badge} size="sm">{meta.label}</Badge>;
-                  },
-                },
-                { accessor: "total", header: "الإجمالي", type: "price", align: "end" },
-              ]}
-              data={recentOrders}
-              pageSize={5}
-              className="border-0 shadow-none rounded-none [&_th]:bg-[var(--admin-bg-surface)]"
-            />
           </div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiTile title="Doanh thu đã thanh toán" value={money(metrics.paidRevenue)} helper={`Giá trị đơn trung bình ${money(metrics.averageOrder)}`} icon={<IconWallet size={22} />} tone="success" />
+        <KpiTile title="Đơn cần xử lý" value={number(metrics.pendingOrders)} helper={`${number(metrics.shippingOrders)} đơn đang vận chuyển`} icon={<IconShoppingBag size={22} />} tone="info" />
+        <KpiTile title="Khách hàng" value={number(data.customers.length)} helper="Tổng hồ sơ khách hàng trên hệ thống" icon={<IconUsers size={22} />} tone="neutral" />
+        <KpiTile title="Cảnh báo tồn kho" value={number(stockAlerts.length)} helper={`${number(metrics.outOfStock.length)} sản phẩm hết hàng`} icon={<IconAlertTriangle size={22} />} tone={stockAlerts.length ? "warning" : "success"} />
+      </section>
+
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <Card className="xl:col-span-2 overflow-hidden">
+          <CardHeader className="border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] p-5">
+            <SectionHeader title="Doanh thu theo tháng" subtitle="Tổng hợp trực tiếp từ các đơn hàng" href="/admin/analytics" />
+          </CardHeader>
+          <CardContent className="h-[360px] p-5">
+            <RevenueChart data={data.revenueData} />
+          </CardContent>
         </Card>
 
-        <div className="flex flex-col gap-4">
-          {/* Low Stock Alert */}
-          <Card className="flex-1 flex flex-col border-[var(--admin-danger-muted)]">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[var(--admin-border-light)]">
-              <CardTitle className="flex items-center gap-2 text-[var(--admin-danger)]">
-                <IconAlertTriangle size={18} />
-                تنبيهات المخزون
-              </CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] p-5">
+            <SectionHeader title="Việc cần làm" subtitle="Lối tắt thao tác thường dùng" />
+          </CardHeader>
+          <CardContent className="space-y-3 p-4">
+            {[
+              { href: "/admin/products", icon: <IconPackage size={18} />, label: "Quản lý sản phẩm", helper: "Giá, ảnh, size, tồn kho" },
+              { href: "/admin/orders", icon: <IconTruckDelivery size={18} />, label: "Xử lý đơn hàng", helper: "Xác nhận và cập nhật giao hàng" },
+              { href: "/admin/coupons", icon: <IconDiscount2 size={18} />, label: "Mã giảm giá", helper: "Tạo ưu đãi và chiến dịch" },
+              { href: "/admin/website/home", icon: <IconChartBar size={18} />, label: "Trang chủ website", helper: "Banner, section và nội dung" },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border-light)] bg-[var(--admin-bg-card)] p-3 transition hover:border-[var(--admin-primary)] hover:bg-[var(--admin-bg-hover)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--admin-primary-muted)] text-[var(--admin-primary)]">{item.icon}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-[var(--admin-text-base)]">{item.label}</span>
+                  <span className="block truncate text-xs text-[var(--admin-text-muted)]">{item.helper}</span>
+                </span>
+                <IconArrowUpRight size={16} className="text-[var(--admin-text-subtle)]" />
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <Card className="xl:col-span-2 overflow-hidden">
+          <CardHeader className="border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] p-5">
+            <SectionHeader title="Đơn hàng gần đây" subtitle="Các đơn mới nhất từ cửa hàng" href="/admin/orders" />
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-[var(--admin-border-light)]">
+              {recentOrders.map((order) => {
+                const meta = statusLabel[order.status ?? ""] ?? { label: order.status ?? "Không rõ", variant: "neutral" as const };
+                return (
+                  <Link key={order.id} href={`/admin/orders/${order.id}`} className="grid grid-cols-1 gap-3 p-4 transition hover:bg-[var(--admin-bg-hover)] md:grid-cols-[1.1fr_1fr_auto] md:items-center">
+                    <div>
+                      <p className="text-sm font-bold text-[var(--admin-text-base)]">{order.orderNumber ?? order.id}</p>
+                      <p className="mt-1 text-xs text-[var(--admin-text-muted)]">{order.customerName ?? "Khách lẻ"}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant={meta.variant} size="sm">{meta.label}</Badge>
+                      <Badge variant={order.paymentStatus === "paid" ? "success" : "warning"} size="sm">
+                        {order.paymentStatus === "paid" ? "Đã thanh toán" : "Chờ thanh toán"}
+                      </Badge>
+                    </div>
+                    <p className="text-sm font-bold tabular-nums text-[var(--admin-text-base)] md:text-right">{money(order.total ?? 0)}</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-5">
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] p-5">
+              <SectionHeader title="Tồn kho cần chú ý" subtitle={`Giá trị tồn kho: ${money(metrics.inventoryValue)}`} href="/admin/inventory" />
             </CardHeader>
-            <CardContent className="p-0 flex-1">
-              {lowStock.length === 0 ? (
+            <CardContent className="p-0">
+              {stockAlerts.length === 0 ? (
                 <div className="p-6 text-center">
-                  <IconPackage size={32} className="mx-auto text-[var(--admin-success)] mb-2" />
-                  <p className="text-sm font-semibold text-[var(--admin-text-base)]">المخزون ممتاز</p>
+                  <IconChecklist size={34} className="mx-auto text-emerald-600" />
+                  <p className="mt-2 text-sm font-semibold">Tồn kho đang ổn</p>
                 </div>
               ) : (
                 <div className="divide-y divide-[var(--admin-border-light)]">
-                  {lowStock.slice(0, 4).map(p => (
-                    <div key={p.id} className="flex items-center justify-between gap-3 p-3 hover:bg-[var(--admin-bg-hover)] transition-colors">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-[var(--admin-text-base)] truncate">{p.name}</p>
-                        <p className="text-xs font-mono text-[var(--admin-text-subtle)]">{p.sku}</p>
-                      </div>
-                      <Badge variant={p.stock <= 0 ? "danger" : "warning"} size="sm" animated>
-                        {p.stock <= 0 ? 'نفد' : `${p.stock} متبقي`}
+                  {stockAlerts.map((product) => (
+                    <Link key={product.id} href={`/admin/products/${product.id}`} className="flex items-center justify-between gap-3 p-4 transition hover:bg-[var(--admin-bg-hover)]">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-[var(--admin-text-base)]">{product.name}</span>
+                        <span className="block text-xs font-mono text-[var(--admin-text-muted)]">{product.sku}</span>
+                      </span>
+                      <Badge variant={(product.stock ?? 0) <= 0 ? "danger" : "warning"} size="sm">
+                        {(product.stock ?? 0) <= 0 ? "Hết hàng" : `Còn ${product.stock}`}
                       </Badge>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}
             </CardContent>
-            {lowStock.length > 0 && (
-              <div className="p-3 border-t border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] text-center">
-                <Link href="/admin/inventory" className="text-xs font-semibold text-[var(--admin-danger)] hover:underline">
-                  إدارة المخزون
-                </Link>
-              </div>
-            )}
           </Card>
 
-          {/* Pending Reviews */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-[var(--admin-warning-muted)] to-transparent border-[var(--admin-warning-muted)]">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="flex items-center gap-2 text-[var(--admin-warning)]">
-                <IconStar size={18} />
-                تقييمات جديدة
-              </CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-[var(--admin-border-light)] bg-[var(--admin-bg-surface)] p-5">
+              <SectionHeader title="Khách mới" href="/admin/customers" />
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-4xl font-black text-[var(--admin-text-base)] tracking-tighter tabular-nums mt-1">
-                {formatNumber(s.pendingReviews ?? 0)}
+            <CardContent className="p-0">
+              <div className="divide-y divide-[var(--admin-border-light)]">
+                {latestCustomers.map((customer) => (
+                  <Link key={customer.id} href={`/admin/customers/${customer.id}`} className="flex items-center gap-3 p-4 transition hover:bg-[var(--admin-bg-hover)]">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1E7DA] text-sm font-bold text-[#8F6B4A]">
+                      {(customer.fullName ?? customer.name ?? "K").charAt(0)}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{customer.fullName ?? customer.name}</span>
+                      <span className="block truncate text-xs text-[var(--admin-text-muted)]">{customer.email}</span>
+                    </span>
+                    <span className="text-xs font-bold tabular-nums text-[var(--admin-text-muted)]">{money(customer.totalSpent ?? customer.spent ?? 0)}</span>
+                  </Link>
+                ))}
               </div>
-              <div className="flex items-center gap-2 mt-3">
-                <IconClock size={14} className="text-[var(--admin-warning)]" />
-                <p className="text-sm font-semibold text-[var(--admin-text-muted)]">بحاجة للمراجعة والموافقة</p>
-              </div>
-              <Link href="/admin/reviews" className="inline-block mt-3 text-sm font-bold text-[var(--admin-warning)] hover:underline">
-                مراجعة التقييمات &rarr;
-              </Link>
             </CardContent>
-            <IconStar size={100} className="absolute -bottom-6 -left-6 text-[var(--admin-warning)] opacity-10 rotate-12 pointer-events-none" />
           </Card>
         </div>
-      </StaggerItem>
-
-    </StaggerContainer>
+      </section>
+    </div>
   );
 }

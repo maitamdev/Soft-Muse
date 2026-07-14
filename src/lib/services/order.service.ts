@@ -1,11 +1,8 @@
-import { Order, OrderStatus, OrderPaymentStatus, OrderItem, mockOrders, updateMockOrders } from '@/data/mock/orders';
-import { IOrderRepository } from '@/lib/contracts/IOrderRepository';
-import { eventBus } from '@/lib/events/EventBus';
-import { addTimelineEvent } from '@/data/mock/timeline';
-import { InventoryService } from '@/lib/services/inventory.service';
-import { CustomerService } from '@/lib/services/customer.service';
-import { CustomerNotificationService } from '@/lib/services/customer-notification.service';
-import { fulfillmentForStatus, normalizeOrderNumber } from '@/lib/orders/order-status';
+import type { Order, OrderItem, OrderPaymentStatus, OrderStatus } from "@/data/mock/orders";
+import type { IOrderRepository } from "@/lib/contracts/IOrderRepository";
+import { eventBus } from "@/lib/events/EventBus";
+import { fulfillmentForStatus, normalizeOrderNumber } from "@/lib/orders/order-status";
+import { createClient } from "@/lib/supabase/client";
 
 export interface OrderFilters {
   search?: string;
@@ -25,370 +22,235 @@ export interface CreateOrderInput {
   items: Array<{ productId: string; productName: string; sku: string; quantity: number; price: number; variantId?: string; image?: string; size?: string; color?: string }>;
   shippingAddress?: string;
   shipping?: number;
-  taxRate?: number;       // e.g. 0.15
+  taxRate?: number;
   discount?: number;
   couponCode?: string | null;
   couponId?: string | null;
   discountValue?: number;
-  discountType?: 'percentage' | 'fixed' | 'shipping';
+  discountType?: "percentage" | "fixed" | "shipping";
   paymentMethod?: string;
   notes?: string;
-  /** Where the order originated, used to tailor the customer-facing note. */
-  source?: 'storefront' | 'admin';
+  source?: "storefront" | "admin";
 }
 
-/** A delivered order is the "completed" state that recognizes revenue & deducts stock. */
-const COMPLETED_STATUS: OrderStatus = 'delivered';
-const REVERSING_STATUSES: OrderStatus[] = ['cancelled', 'returned', 'refunded'];
+type OrderRow = Record<string, unknown> & {
+  order_items?: Array<Record<string, unknown>>;
+  order_timeline?: Array<Record<string, unknown>>;
+};
 
-const delay = (ms = 400) => new Promise(res => setTimeout(res, ms));
+const orderSelect = "*, order_items(*), order_timeline(*)";
 
-function persist(next: Order[]) {
-  updateMockOrders(next);
+function mapOrder(row: OrderRow): Order {
+  const metadata = (row.metadata as Record<string, unknown> | null) ?? {};
+  const items: OrderItem[] = (row.order_items ?? []).map((item) => ({
+    id: String(item.id),
+    productId: String(item.product_id ?? ""),
+    variantId: item.variant_id ? String(item.variant_id) : undefined,
+    productName: String(item.product_name ?? ""),
+    name: String(item.product_name ?? ""),
+    sku: String(item.sku ?? ""),
+    quantity: Number(item.quantity ?? 0),
+    price: Number(item.price ?? 0),
+    total: Number(item.total ?? 0),
+    image: item.image_url ? String(item.image_url) : undefined,
+    size: item.size ? String(item.size) : undefined,
+    color: item.color ? String(item.color) : undefined,
+  }));
+  const timeline = [...(row.order_timeline ?? [])]
+    .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+    .map((item) => ({
+      status: String(item.status) as OrderStatus,
+      timestamp: String(item.created_at),
+      adminId: item.created_by ? String(item.created_by) : undefined,
+      note: item.note ? String(item.note) : undefined,
+      type: "status" as const,
+    }));
+
+  return {
+    id: String(row.id),
+    orderNumber: String(row.order_number),
+    customerId: String(row.customer_id ?? ""),
+    customerName: String(row.customer_name ?? ""),
+    customerEmail: String(row.customer_email ?? ""),
+    customerPhone: String(row.customer_phone ?? ""),
+    customerNotes: String(row.customer_notes ?? ""),
+    items,
+    subtotal: Number(row.subtotal ?? 0),
+    discount: Number(row.discount ?? 0),
+    tax: Number(row.tax ?? 0),
+    shipping: Number(row.shipping ?? 0),
+    total: Number(row.total ?? 0),
+    status: String(row.status) as OrderStatus,
+    paymentStatus: String(row.payment_status) as OrderPaymentStatus,
+    fulfillmentStatus: String(row.fulfillment_status) as Order["fulfillmentStatus"],
+    paymentMethod: String(row.payment_method ?? "cod"),
+    shippingMethod: String(row.shipping_method ?? "standard"),
+    shippingAddress: String(row.shipping_address ?? ""),
+    shippingCompany: row.shipping_company ? String(row.shipping_company) : undefined,
+    trackingNumber: row.tracking_number ? String(row.tracking_number) : undefined,
+    courierName: row.courier_name ? String(row.courier_name) : undefined,
+    estimatedDeliveryDate: metadata.estimatedDeliveryDate ? String(metadata.estimatedDeliveryDate) : undefined,
+    customerUpdate: metadata.customerUpdate ? String(metadata.customerUpdate) : undefined,
+    customerUpdatedAt: metadata.customerUpdatedAt ? String(metadata.customerUpdatedAt) : undefined,
+    internalNotes: (row.internal_notes as Order["internalNotes"]) ?? [],
+    timeline,
+    couponId: row.coupon_id ? String(row.coupon_id) : null,
+    couponCode: row.coupon_code ? String(row.coupon_code) : null,
+    date: String(row.created_at),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
 }
 
-function replaceOrder(updated: Order) {
-  const next = mockOrders.map(o => (o.id === updated.id ? updated : o));
-  persist(next);
-}
-
-/** Recompute a customer's order aggregates from the live order list (idempotent). */
-async function recomputeCustomerStats(customerId: string): Promise<void> {
-  if (!customerId) return;
-  const customerOrders = mockOrders.filter(o => o.customerId === customerId);
-  const delivered = customerOrders.filter(o => o.status === COMPLETED_STATUS);
-  const cancelled = customerOrders.filter(o => o.status === 'cancelled');
-  const returned = customerOrders.filter(o => o.status === 'returned' || o.status === 'refunded');
-  const totalSpent = delivered.reduce((sum, o) => sum + o.total, 0);
-  const totalOrders = delivered.length;
-  const averageOrderValue = totalOrders > 0 ? Math.round(totalSpent / totalOrders) : 0;
-  try {
-    await CustomerService.updateCustomer(customerId, {
-      totalOrders,
-      ordersCount: totalOrders,
-      totalSpent,
-      lifetimeValue: totalSpent,
-      averageOrderValue,
-      averagePurchaseValue: averageOrderValue,
-      cancelledOrdersCount: cancelled.length,
-      returnedOrdersCount: returned.length,
-    } as Partial<import('@/data/mock/customers').Customer>);
-  } catch {
-    /* customer may not exist for guest orders — ignore */
-  }
-}
-
-/** Deduct stock for every line in a completed order, recording order-referenced movements. */
-async function deductInventoryForOrder(order: Order): Promise<void> {
-  for (const item of order.items) {
-    try {
-      await InventoryService.deductStock(
-        item.productId,
-        item.quantity,
-        `بيع - طلب ${order.orderNumber}`,
-        { type: 'order', id: order.id }
-      );
-    } catch {
-      /* product missing from catalog — skip that line */
-    }
-  }
-}
-
-/** Restore stock for a previously-completed order that is now cancelled/returned. */
-async function restoreInventoryForOrder(order: Order): Promise<void> {
-  for (const item of order.items) {
-    try {
-      await InventoryService.receiveStock(
-        item.productId,
-        item.quantity,
-        `إرجاع مخزون - طلب ${order.orderNumber}`,
-        { type: 'order', id: order.id }
-      );
-    } catch {
-      /* product missing — skip */
-    }
-  }
-}
-
-class MockOrderRepositoryImpl implements IOrderRepository {
+class SupabaseOrderRepository implements IOrderRepository {
   async getOrder(id: string): Promise<Order | undefined> {
-    await delay(200);
-    return mockOrders.find(o => o.id === id);
+    const { data, error } = await createClient().from("orders").select(orderSelect).eq("id", id).maybeSingle();
+    if (error) throw new Error(`Không thể tải đơn hàng: ${error.message}`);
+    return data ? mapOrder(data) : undefined;
   }
 
-  /** Tolerant lookup by order number (case/symbol-insensitive) for the tracking page. */
-  async getOrderByNumber(orderNumber: string): Promise<Order | undefined> {
-    await delay(300);
-    const target = normalizeOrderNumber(orderNumber);
-    if (!target) return undefined;
-    return mockOrders.find(o => normalizeOrderNumber(o.orderNumber) === target);
+  async getOrderByNumber(orderNumber: string, contact?: string): Promise<Order | undefined> {
+    if (contact) {
+      const { data, error } = await createClient().rpc("track_order", { order_code: orderNumber, contact_value: contact });
+      if (error) throw new Error(`Không thể tra cứu đơn hàng: ${error.message}`);
+      return data ? mapOrder(data as OrderRow) : undefined;
+    }
+    const number = normalizeOrderNumber(orderNumber);
+    const { data, error } = await createClient().from("orders").select(orderSelect).eq("order_number", number).maybeSingle();
+    if (error) throw new Error(`Không thể tra cứu đơn hàng: ${error.message}`);
+    return data ? mapOrder(data) : undefined;
   }
 
   async getOrders(filters?: OrderFilters): Promise<Order[]> {
-    await delay(300);
-    let result = [...mockOrders];
-    if (filters?.search) {
-      const q = filters.search.toLowerCase();
-      result = result.filter(o => o.orderNumber.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q));
-    }
-    if (filters?.status && filters.status !== 'all') result = result.filter(o => o.status === filters.status);
-    if (filters?.fulfillmentStatus && filters.fulfillmentStatus !== 'all') result = result.filter(o => o.fulfillmentStatus === filters.fulfillmentStatus);
-    if (filters?.paymentStatus && filters.paymentStatus !== 'all') result = result.filter(o => o.paymentStatus === filters.paymentStatus);
-    if (filters?.paymentMethod && filters.paymentMethod !== 'all') result = result.filter(o => o.paymentMethod === filters.paymentMethod);
-    return result;
+    let query = createClient().from("orders").select(orderSelect).order("created_at", { ascending: false });
+    if (filters?.search) query = query.or(`order_number.ilike.%${filters.search}%,customer_name.ilike.%${filters.search}%`);
+    if (filters?.status && filters.status !== "all") query = query.eq("status", filters.status);
+    if (filters?.paymentStatus && filters.paymentStatus !== "all") query = query.eq("payment_status", filters.paymentStatus);
+    if (filters?.fulfillmentStatus && filters.fulfillmentStatus !== "all") query = query.eq("fulfillment_status", filters.fulfillmentStatus);
+    if (filters?.paymentMethod && filters.paymentMethod !== "all") query = query.eq("payment_method", filters.paymentMethod);
+    if (filters?.dateFrom) query = query.gte("created_at", filters.dateFrom);
+    if (filters?.dateTo) query = query.lte("created_at", filters.dateTo);
+    const { data, error } = await query;
+    if (error) throw new Error(`Không thể tải đơn hàng: ${error.message}`);
+    return (data ?? []).map(mapOrder);
   }
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
-    await delay(500);
-    const items: OrderItem[] = input.items.map((it, idx) => ({
-      id: `item_${Date.now()}_${idx}`,
-      productId: it.productId,
-      variantId: it.variantId,
-      productName: it.productName,
-      name: it.productName,
-      sku: it.sku,
-      quantity: it.quantity,
-      price: it.price,
-      total: it.price * it.quantity,
-      image: it.image,
-      size: it.size,
-      color: it.color,
-    }));
-    const subtotal = items.reduce((sum, it) => sum + it.total, 0);
-    const discount = input.discount ?? 0;
-    const shipping = input.shipping ?? 0;
-    const tax = Math.round((subtotal - discount) * (input.taxRate ?? 0.15));
-    const total = subtotal - discount + tax + shipping;
-    const now = new Date().toISOString();
-    const seq = mockOrders.length + 10025;
-
-    const order: Order = {
-      id: `ord_${Date.now()}`,
-      orderNumber: `AURA-${seq}`,
-      customerId: input.customerId,
-      customerName: input.customerName,
-      customerEmail: input.customerEmail,
-      customerPhone: input.customerPhone,
-      customerNotes: input.couponCode ? `كوبون مستخدم: ${input.couponCode}` : undefined,
-      couponId: input.couponId ?? null,
-      couponCode: input.couponCode ?? null,
-      discountValue: input.discountValue ?? 0,
-      discountType: input.discountType,
-      items,
-      subtotal,
-      discount,
-      tax,
-      shipping,
-      total,
-      status: 'pending',
-      paymentStatus: 'unpaid',
-      fulfillmentStatus: 'new',
-      paymentMethod: input.paymentMethod ?? 'cod',
-      shippingAddress: input.shippingAddress ?? '',
-      internalNotes: [],
-      timeline: [{ status: 'pending', timestamp: now, adminId: 'admin_1', note: input.notes || 'تم إنشاء الطلب', type: 'created' }],
-      date: now,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    persist([order, ...mockOrders]);
-    eventBus.emit('order.created', order);
-    CustomerNotificationService.notifyOrderStatus(order);
-    addTimelineEvent({
-      entityType: 'order',
-      entityId: order.id,
-      action: 'created',
-      description: `تم إنشاء الطلب ${order.orderNumber}`,
-      adminId: 'admin_1',
-      adminName: 'مدير النظام',
+    const { data, error } = await createClient().rpc("create_storefront_order", {
+      payload: {
+        customer_name: input.customerName,
+        customer_email: input.customerEmail,
+        customer_phone: input.customerPhone ?? "",
+        customer_notes: input.notes ?? "",
+        shipping_address: input.shippingAddress ?? "",
+        payment_method: input.paymentMethod ?? "cod",
+        shipping_method: "standard",
+        coupon_code: input.couponCode ?? null,
+        items: input.items.map((item) => ({
+          product_id: item.productId,
+          variant_id: item.variantId ?? null,
+          quantity: item.quantity,
+          image_url: item.image ?? null,
+          size: item.size ?? null,
+          color: item.color ?? null,
+        })),
+      },
     });
-    eventBus.emit('business.changed');
+    if (error) throw new Error(error.message);
+    const result = data as { id: string };
+    const order = await this.getOrder(result.id);
+    if (!order) {
+      return {
+        id: result.id,
+        orderNumber: String((data as Record<string, unknown>).order_number),
+        customerId: "",
+        customerName: input.customerName,
+        customerEmail: input.customerEmail,
+        customerPhone: input.customerPhone,
+        items: [], subtotal: 0, discount: 0, tax: 0, shipping: 0,
+        total: Number((data as Record<string, unknown>).total ?? 0),
+        status: "pending", paymentStatus: "unpaid", fulfillmentStatus: "unfulfilled",
+        shippingAddress: input.shippingAddress ?? "", timeline: [],
+        date: new Date().toISOString(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      };
+    }
+    eventBus.emit("order.created", order);
     return order;
   }
 
-  async updateOrder(id: string, data: Partial<Order>): Promise<Order> {
-    await delay(400);
-    const existing = mockOrders.find(o => o.id === id);
-    if (!existing) throw new Error('Order not found');
-    const updated: Order = { ...existing, ...data, id: existing.id, updatedAt: new Date().toISOString() };
-    if (updated.items) {
-      updated.subtotal = updated.items.reduce((sum, it) => sum + it.total, 0);
-      updated.total = updated.subtotal - (updated.discount ?? 0) + (updated.tax ?? 0) + (updated.shipping ?? 0);
-    }
-    replaceOrder(updated);
-    eventBus.emit('order.updated', updated);
-    eventBus.emit('business.changed');
-    return updated;
+  async updateOrder(id: string, input: Partial<Order>): Promise<Order> {
+    const metadata = { customerUpdate: input.customerUpdate, customerUpdatedAt: input.customerUpdatedAt, estimatedDeliveryDate: input.estimatedDeliveryDate };
+    const { error } = await createClient().from("orders").update({
+      customer_name: input.customerName,
+      customer_email: input.customerEmail,
+      customer_phone: input.customerPhone,
+      customer_notes: input.customerNotes,
+      shipping_address: input.shippingAddress,
+      shipping_company: input.shippingCompany,
+      tracking_number: input.trackingNumber,
+      courier_name: input.courierName,
+      internal_notes: input.internalNotes,
+      metadata,
+    }).eq("id", id);
+    if (error) throw new Error(`Không thể cập nhật đơn hàng: ${error.message}`);
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Không tìm thấy đơn hàng.");
+    eventBus.emit("order.updated", order);
+    return order;
   }
 
   async updateOrderStatus(id: string, status: OrderStatus, note?: string): Promise<Order> {
-    await delay(450);
-    const oldOrder = mockOrders.find(o => o.id === id);
-    if (!oldOrder) throw new Error('Order not found');
-
-    const updatedOrder: Order = {
-      ...oldOrder,
-      status,
-      fulfillmentStatus: fulfillmentForStatus(status),
-      timeline: [
-        { status, timestamp: new Date().toISOString(), adminId: 'admin_1', note: note || `تم تغيير حالة الطلب إلى ${status}`, type: 'status' },
-        ...oldOrder.timeline,
-      ],
-      updatedAt: new Date().toISOString(),
-    };
-    replaceOrder(updatedOrder);
-
-    // Notify the customer of the new status (persistent feed + live EventBus push).
-    if (status !== oldOrder.status) {
-      CustomerNotificationService.notifyOrderStatus(updatedOrder);
-    }
-
-    const wasCompleted = oldOrder.status === COMPLETED_STATUS;
-    const nowCompleted = status === COMPLETED_STATUS;
-
-    // Entering "completed": deduct inventory, recompute customer stats, recognize revenue.
-    if (nowCompleted && !wasCompleted) {
-      await deductInventoryForOrder(updatedOrder);
-      await recomputeCustomerStats(updatedOrder.customerId);
-      eventBus.emit('order.completed', updatedOrder);
-    }
-    // Leaving "completed" into a reversing state: restore inventory, recompute stats.
-    else if (wasCompleted && REVERSING_STATUSES.includes(status)) {
-      await restoreInventoryForOrder(updatedOrder);
-      await recomputeCustomerStats(updatedOrder.customerId);
-    }
-    // Cancelled/returned from a non-completed state still affects customer counters.
-    else if (REVERSING_STATUSES.includes(status)) {
-      await recomputeCustomerStats(updatedOrder.customerId);
-    }
-
-    eventBus.emit('order.updated', updatedOrder);
-    addTimelineEvent({
-      entityType: 'order',
-      entityId: id,
-      action: 'status_changed',
-      description: `تم تغيير حالة الطلب ${updatedOrder.orderNumber} من ${oldOrder.status} إلى ${status}`,
-      diff: { status: { before: oldOrder.status, after: status } },
-      adminId: 'admin_1',
-      adminName: 'مدير النظام',
-    });
-
-    if (status === 'shipped') {
-      eventBus.emit('email.send', { to: updatedOrder.customerEmail, type: 'order_shipped', orderId: id });
-    }
-    // Finance/revenue depends on delivered orders → refresh dashboard.
-    eventBus.emit('business.changed');
-    return updatedOrder;
+    const nextStatus: OrderStatus = status === "processing" ? "preparing" : status === "packed" || status === "ready" ? "ready_to_ship" : status;
+    const { error } = await createClient().rpc("change_order_status", { target_order_id: id, next_status: nextStatus, status_note: note ?? null });
+    if (error) throw new Error(`Không thể đổi trạng thái: ${error.message}`);
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Không tìm thấy đơn hàng.");
+    eventBus.emit("order.updated", order);
+    return order;
   }
 
-  async cancelOrder(id: string, reason?: string): Promise<Order> {
-    return this.updateOrderStatus(id, 'cancelled', reason || 'تم إلغاء الطلب');
-  }
+  async cancelOrder(id: string, reason?: string) { return this.updateOrderStatus(id, "cancelled", reason || "Đơn hàng đã hủy"); }
 
   async deleteOrder(id: string): Promise<void> {
-    await delay(400);
-    const order = mockOrders.find(o => o.id === id);
-    if (!order) throw new Error('Order not found');
-    // If a completed order is deleted, restore its stock first.
-    if (order.status === COMPLETED_STATUS) {
-      await restoreInventoryForOrder(order);
-    }
-    persist(mockOrders.filter(o => o.id !== id));
-    if (order.customerId) await recomputeCustomerStats(order.customerId);
-    eventBus.emit('order.deleted', id);
-    eventBus.emit('business.changed');
+    const { error } = await createClient().from("orders").delete().eq("id", id);
+    if (error) throw new Error(`Không thể xóa đơn hàng: ${error.message}`);
+    eventBus.emit("order.deleted", id);
   }
 
   async updatePaymentStatus(id: string, paymentStatus: OrderPaymentStatus): Promise<Order> {
-    await delay(400);
-    const existing = mockOrders.find(o => o.id === id);
-    if (!existing) throw new Error('Order not found');
-    const updated: Order = { ...existing, paymentStatus, updatedAt: new Date().toISOString() };
-    replaceOrder(updated);
-    eventBus.emit('order.updated', updated);
-    eventBus.emit('business.changed');
-    return updated;
+    const { error } = await createClient().from("orders").update({ payment_status: paymentStatus }).eq("id", id);
+    if (error) throw new Error(error.message);
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Không tìm thấy đơn hàng.");
+    return order;
   }
 
   async addInternalNote(id: string, note: string): Promise<Order> {
-    await delay(300);
-    const existing = mockOrders.find(o => o.id === id);
-    if (!existing) throw new Error('Order not found');
-    const noteEntry = { id: `note_${Date.now()}`, adminName: 'Admin', text: note, date: new Date().toISOString() };
-    const updated: Order = { ...existing, internalNotes: [...(existing.internalNotes ?? []), noteEntry] };
-    replaceOrder(updated);
-    return updated;
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Không tìm thấy đơn hàng.");
+    const internalNotes = [...(order.internalNotes ?? []), { id: crypto.randomUUID(), adminName: "Quản trị", text: note, date: new Date().toISOString() }];
+    return this.updateOrder(id, { internalNotes });
   }
 
-  /** Update shipment information (company, tracking number, courier, ETA) — appears on the customer tracking page. */
-  async updateShipping(
-    id: string,
-    data: { shippingCompany?: string; trackingNumber?: string; courierName?: string; estimatedDeliveryDate?: string }
-  ): Promise<Order> {
-    await delay(350);
-    const existing = mockOrders.find(o => o.id === id);
-    if (!existing) throw new Error('Order not found');
-
-    const changes: string[] = [];
-    if (data.trackingNumber && data.trackingNumber !== existing.trackingNumber) changes.push(`رقم التتبع: ${data.trackingNumber}`);
-    if (data.shippingCompany && data.shippingCompany !== existing.shippingCompany) changes.push(`شركة الشحن: ${data.shippingCompany}`);
-    if (data.courierName && data.courierName !== existing.courierName) changes.push(`المندوب: ${data.courierName}`);
-    if (data.estimatedDeliveryDate && data.estimatedDeliveryDate !== existing.estimatedDeliveryDate) changes.push('تم تحديث موعد التسليم المتوقع');
-
-    const now = new Date().toISOString();
-    const updated: Order = {
-      ...existing,
-      ...data,
-      timeline: changes.length
-        ? [{ status: existing.status, timestamp: now, adminId: 'admin_1', note: `تحديث الشحن — ${changes.join(' • ')}`, type: 'shipping' }, ...existing.timeline]
-        : existing.timeline,
-      updatedAt: now,
-    };
-    replaceOrder(updated);
-    eventBus.emit('order.updated', updated);
-    eventBus.emit('business.changed');
-    return updated;
+  async updateShipping(id: string, data: { shippingCompany?: string; trackingNumber?: string; courierName?: string; estimatedDeliveryDate?: string }) {
+    return this.updateOrder(id, data);
   }
 
-  /** Post a customer-facing update: shown on tracking, pushed as a notification, recorded in history. */
-  async addCustomerUpdate(id: string, text: string): Promise<Order> {
-    await delay(300);
-    const existing = mockOrders.find(o => o.id === id);
-    if (!existing) throw new Error('Order not found');
-    const now = new Date().toISOString();
-    const updated: Order = {
-      ...existing,
-      customerUpdate: text,
-      customerUpdatedAt: now,
-      timeline: [{ status: existing.status, timestamp: now, adminId: 'admin_1', note: text, type: 'customer_update' }, ...existing.timeline],
-      updatedAt: now,
-    };
-    replaceOrder(updated);
-    CustomerNotificationService.notifyCustom(updated, text);
-    eventBus.emit('order.updated', updated);
-    return updated;
+  async addCustomerUpdate(id: string, text: string) {
+    return this.updateOrder(id, { customerUpdate: text, customerUpdatedAt: new Date().toISOString() });
   }
 
   async deleteMultiple(ids: string[]): Promise<void> {
-    await delay(500);
-    // Restore stock for any completed orders being deleted.
-    for (const order of mockOrders.filter(o => ids.includes(o.id) && o.status === COMPLETED_STATUS)) {
-      await restoreInventoryForOrder(order);
-    }
-    const affectedCustomers = new Set(mockOrders.filter(o => ids.includes(o.id)).map(o => o.customerId));
-    persist(mockOrders.filter(o => !ids.includes(o.id)));
-    for (const cid of affectedCustomers) await recomputeCustomerStats(cid);
-    eventBus.emit('orders.bulk_deleted', ids);
-    eventBus.emit('business.changed');
+    const { error } = await createClient().from("orders").delete().in("id", ids);
+    if (error) throw new Error(error.message);
+    eventBus.emit("orders.bulk_deleted", ids);
   }
 
   async markAsPaidMultiple(ids: string[]): Promise<void> {
-    await delay(500);
-    persist(mockOrders.map(o => (ids.includes(o.id) ? { ...o, paymentStatus: 'paid' as OrderPaymentStatus } : o)));
-    eventBus.emit('orders.bulk_updated', ids);
-    eventBus.emit('business.changed');
+    const { error } = await createClient().from("orders").update({ payment_status: "paid" }).in("id", ids);
+    if (error) throw new Error(error.message);
+    eventBus.emit("orders.bulk_updated", ids);
   }
 }
 
-export const OrderService = new MockOrderRepositoryImpl();
+export const OrderService = new SupabaseOrderRepository();

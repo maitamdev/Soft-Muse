@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "حسابي | AURA",
-  description: "إدارة بياناتكِ وتاريخ طلباتكِ في دار أورا.",
-  robots: { index: false, follow: false },
+ title: "| AURA",
+ description: "Quản lý trong hộp AURA.",
+ robots: { index: false, follow: false },
 };
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
-  return children;
+ return children;
 }

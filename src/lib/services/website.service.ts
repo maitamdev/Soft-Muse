@@ -6,20 +6,20 @@
  * exported from here so consumers can import from one place.
  *
  * Persistence: mockStorage (localStorage) — Supabase-ready when the time comes.
- * EventBus:    every mutation emits 'website.changed' so storefront components
- *              update instantly without a page reload.
+ * EventBus: every mutation emits 'website.changed' so storefront components
+ * update instantly without a page reload.
  */
 
 // ── Individual service re-exports ─────────────────────────────────────────────
 export {
-  HomepageService,
-  DEFAULT_SECTION_SETTINGS,
-  SECTION_TYPE_LABELS_AR,
+ HomepageService,
+ DEFAULT_SECTION_SETTINGS,
+ SECTION_TYPE_LABELS_AR,
 } from './storefront/homepage.service';
 export type {
-  HomepageSection,
-  HomepageSectionType,
-  HeroSlide,
+ HomepageSection,
+ HomepageSectionType,
+ HeroSlide,
 } from './storefront/homepage.service';
 
 export { FooterService } from './storefront/footer.service';
@@ -56,25 +56,25 @@ import { SEOService } from './storefront/seo.service';
 
 /** Full snapshot of everything the CMS controls. */
 export interface WebsiteConfiguration {
-  store: StoreInfo;
-  appearance: StoreAppearance;
-  homepage: HomepageSection[];
-  navigation: NavMenu[];
-  footer: FooterSettings;
-  seo: SEOSettings[];
+ store: StoreInfo;
+ appearance: StoreAppearance;
+ homepage: HomepageSection[];
+ navigation: NavMenu[];
+ footer: FooterSettings;
+ seo: SEOSettings[];
 }
 
 /** Fetch the complete website configuration in a single call. */
 export const WebsiteService = {
-  async getFullConfig(): Promise<WebsiteConfiguration> {
-    const [store, appearance, homepage, navigation, footer, seo] = await Promise.all([
-      StoreService.getInfo(),
-      AppearanceService.getSettings(),
-      HomepageService.getSections(),
-      NavigationService.getMenus(),
-      FooterService.getSettings(),
-      SEOService.getAll(),
-    ]);
-    return { store, appearance, homepage, navigation, footer, seo };
-  },
+ async getFullConfig(): Promise<WebsiteConfiguration> {
+ const [store, appearance, homepage, navigation, footer, seo] = await Promise.all([
+ StoreService.getInfo(),
+ AppearanceService.getSettings(),
+ HomepageService.getSections(),
+ NavigationService.getMenus(),
+ FooterService.getSettings(),
+ SEOService.getAll(),
+ ]);
+ return { store, appearance, homepage, navigation, footer, seo };
+ },
 };

@@ -7,14 +7,14 @@ import { mockStorage } from '@/lib/storage/mock-storage';
  * is the internal admin feed.
  */
 export interface CustomerNotification {
-  id: string;
-  orderId: string;
-  orderNumber: string;
-  status: string;
-  title: string;
-  message: string;
-  date: string;
-  isRead: boolean;
+ id: string;
+ orderId: string;
+ orderNumber: string;
+ status: string;
+ title: string;
+ message: string;
+ date: string;
+ isRead: boolean;
 }
 
 export let mockCustomerNotifications: CustomerNotification[] = [];
@@ -22,6 +22,6 @@ export let mockCustomerNotifications: CustomerNotification[] = [];
 mockCustomerNotifications = mockStorage.read('customer_notifications', mockCustomerNotifications);
 
 export const updateMockCustomerNotifications = (data: CustomerNotification[]) => {
-  mockCustomerNotifications = data;
-  mockStorage.write('customer_notifications', data);
+ mockCustomerNotifications = data;
+ mockStorage.write('customer_notifications', data);
 };

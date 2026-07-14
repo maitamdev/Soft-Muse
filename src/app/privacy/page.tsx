@@ -2,79 +2,46 @@ import type { Metadata } from "next";
 import { LegalPageLayout, SectionTitle, LegalParagraph, LegalList } from "@/components/ui/PageComponents";
 
 export const metadata: Metadata = {
-  title: "سياسة الخصوصية | AURA",
-  description: "سياسة خصوصية دار أورا للأزياء الراقية. كيف نجمع بياناتكِ ونحمي خصوصيتكِ.",
+ title: "Chính sách bảo mật | AURA",
+ description: "AURA.",
 };
 
 export default function PrivacyPage() {
-  return (
-    <LegalPageLayout
-      title="سياسة الخصوصية"
-      subtitle="نحن ندرك قيمة خصوصيتكِ ونلتزم بحماية بياناتكِ الشخصية بأعلى معايير الأمان والشفافية."
-      lastUpdated="يونيو ٢٠٢٦"
-    >
-
-      <SectionTitle number="01" title="البيانات التي نجمعها" />
-      <LegalParagraph>
-        تقوم دار أورا بجمع المعلومات الضرورية فقط لإتمام خدماتنا بأفضل صورة ممكنة. تشمل هذه البيانات:
-      </LegalParagraph>
-      <LegalList items={[
-        "الاسم الكامل وعنوان الشحن ورقم الهاتف لغرض التوصيل.",
-        "عنوان البريد الإلكتروني للتواصل وإرسال إشعارات الطلبات.",
-        "معلومات الدفع المشفرة عبر بوابات آمنة (لا نحتفظ ببيانات البطاقات).",
-        "تفاصيل المقاسات التي تُدخلينها طوعاً في مذكرة القياسات.",
-        "بيانات التصفح العامة من خلال ملفات الكوكيز لتحسين تجربتكِ.",
-      ]} />
-
-      <SectionTitle number="02" title="كيف نستخدم بياناتكِ" />
-      <LegalParagraph>
-        تُستخدم المعلومات التي نجمعها حصراً في الأغراض التالية:
-      </LegalParagraph>
-      <LegalList items={[
-        "معالجة طلباتكِ وتتبع الشحن وإخطاركِ بمراحل التسليم.",
-        "التواصل معكِ لتأكيد المقاسات والتفاصيل الحرفية الخاصة بقطعتكِ.",
-        "إرسال نشرة أورا البريدية الخاصة إذا اخترتِ الاشتراك بها.",
-        "تحسين خدماتنا وتجربة الموقع بناءً على سلوك الاستخدام العام.",
-        "الوفاء بالمتطلبات القانونية والتنظيمية المعمول بها في مصر.",
-      ]} />
-
-      <SectionTitle number="03" title="حماية بياناتكِ" />
-      <LegalParagraph>
-        نستخدم بروتوكولات تشفير SSL وتقنيات أمان متقدمة لحماية جميع البيانات المنقولة عبر موقعنا. لا يتم مشاركة بياناتكِ الشخصية مع أي طرف ثالث إلا في الحالات الضرورية لإتمام خدمة الشحن والتوصيل، وبموجب اتفاقيات سرية صارمة.
-      </LegalParagraph>
-      <LegalParagraph>
-        تُحفظ بياناتكِ على خوادم آمنة ومحمية ولا يتم الاحتفاظ بها بعد انتهاء الغرض منها إلا إذا كان ذلك مطلوباً قانونياً.
-      </LegalParagraph>
-
-      <SectionTitle number="04" title="ملفات الكوكيز" />
-      <LegalParagraph>
-        يستخدم موقع أورا ملفات الكوكيز لتحسين تجربة التصفح، وتذكر تفضيلاتكِ، وتحليل حركة الزيارات بشكل مجهول الهوية. يمكنكِ التحكم في إعدادات الكوكيز من متصفحكِ في أي وقت. إلغاء الكوكيز قد يؤثر على بعض وظائف الموقع.
-      </LegalParagraph>
-
-      <SectionTitle number="05" title="خدمات الطرف الثالث" />
-      <LegalParagraph>
-        قد يستخدم موقعنا خدمات تحليل بيانات من طرف ثالث (مثل Google Analytics) لفهم سلوك الزوار. هذه الخدمات تعمل بسياسات خصوصية خاصة بها. كذلك نستخدم بوابات دفع آمنة ومعتمدة لا نمتلك أي وصول إلى بياناتها المالية.
-      </LegalParagraph>
-
-      <SectionTitle number="06" title="حقوقكِ كعميلة" />
-      <LegalList items={[
-        "حق الوصول: طلب نسخة من بياناتكِ الشخصية المحفوظة لدينا.",
-        "حق التصحيح: تعديل أي معلومات غير دقيقة في أي وقت.",
-        "حق الحذف: طلب حذف بياناتكِ الشخصية بشكل نهائي.",
-        "حق الاعتراض: رفض استخدام بياناتكِ لأغراض التسويق.",
-        "حق سحب الموافقة: إلغاء الاشتراك في النشرة البريدية في أي وقت.",
-      ]} />
-
-      <SectionTitle number="07" title="تواصلي معنا" />
-      <LegalParagraph>
-        لأي استفسار متعلق بسياسة الخصوصية أو لممارسة أي من حقوقكِ، يُرجى التواصل معنا عبر:
-      </LegalParagraph>
-      <LegalList items={[
-        "واتساب: متاح على موقعنا ضمن صفحة التواصل.",
-        "البريد الإلكتروني: privacy@aura-fashion-virid.vercel.app",
-        "العنوان: المهندسين، الجيزة، جمهورية مصر العربية.",
-      ]} />
-
-    </LegalPageLayout>
-  );
+ return (
+ <LegalPageLayout
+ title="Chính sách bảo mật"
+ subtitle="."
+ lastUpdated="2026"
+ > <SectionTitle number="01" title="AURA" /> <LegalParagraph>
+ AURA ảnh. này :</LegalParagraph> <LegalList items={[
+ "Họ và tên Vận chuyển vàSố điện thoại giao hàng.",
+ "tiêu đềEmail Đơn hàng.",
+ "(không ).",
+ "Chi tiết Kích cỡ trong.",
+ "từ.",
+ ]} /> <SectionTitle number="02" title="AURA" /> <LegalParagraph>
+ trong :</LegalParagraph> <LegalList items={[
+ "Vận chuyển.",
+ "Kích cỡ vàChi tiết Tay nghề.",
+ "AURA.",
+ "Vị trí trên.",
+ "trongViệt Nam.",
+ ]} /> <SectionTitle number="03" title="AURA" /> <LegalParagraph>
+ SSL Tất cả. không với trongVận chuyển và giao hàng, ...</LegalParagraph> <LegalParagraph>
+ Lưu trên.</LegalParagraph> <SectionTitle number="04" title="AURA" /> <LegalParagraph>
+ AURA,, ...trong từ trong.Hủy trênVị trí.
+ </LegalParagraph> <SectionTitle number="05" title="AURA" /> <LegalParagraph>
+ từ (Google Analytics). này. không đến.</LegalParagraph> <SectionTitle number="06" title="AURA" /> <LegalList items={[
+ ": đơn hàngBản sao từ.",
+ ":Sửa không trong.",
+ "Xóa: đơn hàngXóa.",
+ ":.",
+ "Đồngý:Hủy trongBản tin trong.",
+ ]} /> <SectionTitle number="07" title="Liên hệ với chúng tôi" /> <LegalParagraph>
+ Yêu cầu hỗ trợ Chính sách bảo mật từ,Liên hệ :</LegalParagraph> <LegalList items={[
+ "WhatsApp: trên.",
+ "Email: privacy@aura-fashion-virid.vercel.app",
+ "Địa chỉ: TP. Hồ Chí Minh, Việt Nam.",
+ ]} /> </LegalPageLayout>
+ );
 }

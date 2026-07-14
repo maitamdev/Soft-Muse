@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "إتمام الطلب | AURA",
-  description: "أكملي بيانات الشحن والدفع لإتمام طلبكِ من دار أورا.",
-  robots: { index: false, follow: false },
+ title: "Thanh toán | Soft Muse",
+ description: "Hoàn tất đơn hàng Soft Muse.",
+ robots: { index: false, follow: false },
 };
 
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
-  return children;
+ return children;
 }

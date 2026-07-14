@@ -37,14 +37,15 @@ import { generatePageMetadata } from "@/utils/seo-helper";
 
 export async function generateMetadata(): Promise<Metadata> {
   const meta = await generatePageMetadata(
-    'homepage',
-    'AURA | دار الأزياء المصرية الراقية',
-    'أورا - دار أزياء نسائية مصرية فاخرة تقدم مفهومًا متطورًا للأناقة والأنوثة العصرية بأيدي حرفية متقنة وتفاصيل فريدة.'
+    "homepage",
+    "Soft Muse | Thời trang công sở nữ thanh lịch",
+    "Soft Muse là thương hiệu thời trang công sở nữ hiện đại với áo sơ mi, áo kiểu, chân váy, váy, quần tây, blazer, set đồ và phụ kiện trong mức giá hợp lý."
   );
+
   return {
     ...meta,
-    metadataBase: new URL("https://aura-fashion-virid.vercel.app"),
-    authors: [{ name: "AURA Fashion House" }],
+    metadataBase: new URL("https://softmuse.vn"),
+    authors: [{ name: "Soft Muse" }],
     icons: {
       icon: "/logo.svg",
       apple: "/logo.svg",
@@ -53,14 +54,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({
-  children,
+ children,
 }: Readonly<{
-  children: React.ReactNode;
+ children: React.ReactNode;
 }>) {
   return (
     <html
-      lang="ar"
-      dir="rtl"
+      lang="vi"
+      dir="ltr"
       suppressHydrationWarning
       className={`${inter.variable} ${alexandria.variable} ${elMessiri.variable} ${playfairDisplay.variable} h-full antialiased overflow-x-hidden`}
     >
@@ -73,59 +74,57 @@ export default function RootLayout({
               {
                 "@context": "https://schema.org",
                 "@type": "Organization",
-                "name": "AURA",
-                "url": "https://aura-fashion-virid.vercel.app",
-                "logo": "https://aura-fashion-virid.vercel.app/logo.svg",
-                "sameAs": [
-                  "https://www.instagram.com/aura.eg",
-                  "https://www.facebook.com/aura.eg"
-                ]
+                name: "Soft Muse",
+                url: "https://softmuse.vn",
+                logo: "https://softmuse.vn/logo.svg",
+                sameAs: [
+                  "https://www.instagram.com/softmuse.vn",
+                  "https://www.facebook.com/softmuse.vn",
+                ],
               },
               {
                 "@context": "https://schema.org",
-                "@type": "LocalBusiness",
-                "name": "AURA Atelier",
-                "image": "https://aura-fashion-virid.vercel.app/aura_hero_campaign.png",
-                "@id": "https://aura-fashion-virid.vercel.app/#localbusiness",
-                "url": "https://aura-fashion-virid.vercel.app",
-                "telephone": "+201000000000",
-                "priceRange": "$$$",
-                "address": {
+                "@type": "ClothingStore",
+                name: "Soft Muse",
+                image: "https://softmuse.vn/images/campaign/campaign_4.png",
+                "@id": "https://softmuse.vn/#store",
+                url: "https://softmuse.vn",
+                telephone: "+84900000000",
+                priceRange: "200000-1000000 VND",
+                address: {
                   "@type": "PostalAddress",
-                  "streetAddress": "المهندسين",
-                  "addressLocality": "الجيزة",
-                  "addressRegion": "الجيزة",
-                  "postalCode": "12611",
-                  "addressCountry": "EG"
+                  streetAddress: "",
+                  addressLocality: "TP. Hồ Chí Minh",
+                  addressRegion: "TP. Hồ Chí Minh",
+                  postalCode: "700000",
+                  addressCountry: "VN",
                 },
-                "geo": {
+                geo: {
                   "@type": "GeoCoordinates",
-                  "latitude": 30.0596,
-                  "longitude": 31.2018
+                  latitude: 10.7769,
+                  longitude: 106.7009,
                 },
-                "openingHoursSpecification": {
+                openingHoursSpecification: {
                   "@type": "OpeningHoursSpecification",
-                  "dayOfWeek": [
+                  dayOfWeek: [
                     "Monday",
                     "Tuesday",
                     "Wednesday",
                     "Thursday",
                     "Saturday",
-                    "Sunday"
+                    "Sunday",
                   ],
-                  "opens": "10:00",
-                  "closes": "22:00"
-                }
-              }
-            ])
+                  opens: "10:00",
+                  closes: "22:00",
+                },
+              },
+            ]),
           }}
         />
         <NotificationProvider>
           <StoreProvider>
             <ScrollProgressClient />
-            <StorefrontLayoutWrapper>
-              {children}
-            </StorefrontLayoutWrapper>
+            <StorefrontLayoutWrapper>{children}</StorefrontLayoutWrapper>
           </StoreProvider>
         </NotificationProvider>
       </body>

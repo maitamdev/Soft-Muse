@@ -2,7 +2,7 @@
  * Canonical type barrel — import all domain types from here.
  *
  * Usage:
- *   import type { Product, Category, Order } from '@/types';
+ * import type { Product, Category, Order } from '@/types';
  *
  * Never import from individual domain files directly in pages or hooks.
  */

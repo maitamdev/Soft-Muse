@@ -1,77 +1,77 @@
 export interface JournalArticle {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string; // Markdown or simple HTML strings for now
-  category: string;
-  publishDate: string;
-  isoDate: string;
-  readTime: string;
-  image: string;
+ slug: string;
+ title: string;
+ excerpt: string;
+ content: string; // Markdown or simple HTML strings for now
+ category: string;
+ publishDate: string;
+ isoDate: string;
+ readTime: string;
+ image: string;
 }
 
 export const journalCategories = [
-  "نصائح الموضة",
-  "الأقمشة والخامات",
-  "تنسيق الإطلالات",
-  "اتجاهات الموسم",
-  "دليل الأناقة"
+ "Thời trang",
+ "",
+ "",
+ "Mùa",
+ "Thanh lịch"
 ];
 
 export const mockArticles: JournalArticle[] = [
-  {
-    slug: "fashion-colors-summer-2026",
-    title: "ألوان الموضة لصيف 2026",
-    excerpt: "استكشفي أحدث اتجاهات الألوان التي ستسيطر على مدارج الموضة هذا الصيف، وكيفية تنسيقها بأسلوب الكوتور الهادئ.",
-    content: "الصيف القادم يحمل معه لوحة ألوان مستوحاة من الطبيعة الصامتة والتدرجات الترابية الفاخرة... <br/><br/> نرى سيطرة قوية للون البرونزي المطفأ والأبيض العاجي الذي يعكس النقاء. في دار أورا، نتبنى هذه الألوان لنمنحكِ إطلالة مشرقة لا تفقد بريقها مع الزمن.",
-    category: "اتجاهات الموسم",
-    publishDate: "20 مايو 2026",
-    isoDate: "2026-05-20T10:00:00Z",
-    readTime: "4 دقائق",
-    image: "/images/campaign/campaign_2.png"
-  },
-  {
-    slug: "how-to-choose-perfect-look-every-occasion",
-    title: "كيف تختارين الإطلالة المناسبة لكل مناسبة",
-    excerpt: "دليلكِ الشامل لاختيار الأزياء التي تعكس ثقتكِ وأناقتكِ سواء في اجتماعات العمل أو حفلات المساء الراقية.",
-    content: "سر الأناقة يكمن في اختيار القطعة المناسبة للمكان والزمان المناسبين... <br/><br/> للعمل، ننصح بالأطقم المكونة من قطعتين من الكتان الفاخر. أما للمساء، فالحرير يعكس إضاءة خافتة تبرز جمالكِ وتضفي طابعاً رومانسياً كلاسيكياً لا يقاوم.",
-    category: "تنسيق الإطلالات",
-    publishDate: "15 مايو 2026",
-    isoDate: "2026-05-15T10:00:00Z",
-    readTime: "5 دقائق",
-    image: "/images/campaign/campaign_3.png"
-  },
-  {
-    slug: "luxury-fabrics-guide",
-    title: "دليل الأقمشة الفاخرة",
-    excerpt: "تعرفي على الفروق الدقيقة بين الحرير الطبيعي، الكتان البلجيكي، والأورجانزا الفرنسية وكيفية العناية بها.",
-    content: "الجودة تبدأ من الخيوط الأولى. الكتان البلجيكي المعالج يوفر تنفساً رائعاً للبشرة، بينما الحرير الإيطالي الخالص يعانق الجسد ببرودة فاخرة... <br/><br/> العناية بهذه الأقمشة تتطلب دقة: يُنصح بالتنظيف الجاف دائماً للحفاظ على رونقها لسنوات.",
-    category: "الأقمشة والخامات",
-    publishDate: "10 مايو 2026",
-    isoDate: "2026-05-10T10:00:00Z",
-    readTime: "6 دقائق",
-    image: "/images/flatlay/flatlay_1.png"
-  },
-  {
-    slug: "secrets-of-quiet-luxury-styling",
-    title: "أسرار تنسيق الإطلالات الهادئة",
-    excerpt: "الفخامة الهادئة (Quiet Luxury) ليست مجرد تريند، بل هي أسلوب حياة. كيف تبنين خزانة خالية من الشعارات الصاخبة؟",
-    content: "الفخامة الهادئة تعتمد على جودة الخياطة ونقاء الأقمشة بدلاً من الشعارات التجارية... <br/><br/> استثمري في معطف كشمير بلون جملي، وبنطلون كريب أسود بقصة مستقيمة. هذه القطع هي حجر الأساس لخزانة لا تعترف بمرور الزمن.",
-    category: "دليل الأناقة",
-    publishDate: "5 مايو 2026",
-    isoDate: "2026-05-05T10:00:00Z",
-    readTime: "3 دقائق",
-    image: "/images/detail/detail_fabric.png"
-  },
-  {
-    slug: "building-elegant-wardrobe",
-    title: "كيف تبنين خزانة أزياء أنيقة",
-    excerpt: "خطوات عملية للانتقال من خزانة مكدسة بالملابس التي لا تُلبس، إلى كبسولة أزياء كوتور تخدمك في كل أوقاتك.",
-    content: "الخزانة الأنيقة لا تقاس بعدد القطع، بل بقدرة هذه القطع على التناغم معاً... <br/><br/> ابدأي بتحديد الألوان المحايدة التي تليق ببشرتك. أضف قمصاناً حريرية وفساتين ميدي بسيطة يمكن تحويلها لإطلالة مسائية بلمسات بسيطة من المجوهرات الفاخرة.",
-    category: "نصائح الموضة",
-    publishDate: "1 مايو 2026",
-    isoDate: "2026-05-01T10:00:00Z",
-    readTime: "5 دقائق",
-    image: "/images/lifestyle/lifestyle_interior.png"
-  }
+ {
+ slug: "fashion-colors-summer-2026",
+ title: "Màu sắc thời trang mùa hè 2026",
+ excerpt: "Màu sắc thời trang mùa hè này, couture.",
+ content: "Mùa hè màu sắc từcao cấp.. <br/><br/> ĐồngTrắng Ngà. trong hộp AURA, nàyMàu sắc không với.",
+ category: "Mùa",
+ publishDate: "20 2026",
+ isoDate: "2026-05-20T10:00:00Z",
+ readTime: "4 ",
+ image: "/images/campaign/campaign_2.png"
+ },
+ {
+ slug: "how-to-choose-perfect-look-every-occasion",
+ title: "",
+ excerpt: "trong.",
+ content: "Thanh lịch trong..<br/><br/>, từ từ linen cao cấp.,lụa không.",
+ category: "",
+ publishDate: "15 2026",
+ isoDate: "2026-05-15T10:00:00Z",
+ readTime: "5 ",
+ image: "/images/campaign/campaign_3.png"
+ },
+ {
+ slug: "luxury-fabrics-guide",
+ title: "cao cấp",
+ excerpt: "trênlụa,linen,Bảo quản.",
+ content: "từ.linen,lụa cao cấp.. <br/><br/> Bảo quản : trên.",
+ category: "",
+ publishDate: "10 2026",
+ isoDate: "2026-05-10T10:00:00Z",
+ readTime: "6 ",
+ image: "/images/flatlay/flatlay_1.png"
+ },
+ {
+ slug: "secrets-of-quiet-luxury-styling",
+ title: "",
+ excerpt: "(Quiet Luxury), ...từLogo؟",
+ content: "trênmay đo từLogo..<br/><br/> trongcashmere,Đen. này không.",
+ category: "Thanh lịch",
+ publishDate: "5 2026",
+ isoDate: "2026-05-05T10:00:00Z",
+ readTime: "3 ",
+ image: "/images/detail/detail_fabric.png"
+ },
+ {
+ slug: "building-elegant-wardrobe",
+ title: "",
+ excerpt: "từ không, đếncouture trong tất cả.",
+ content: "không, này trên..<br/><br/> Màu sắc. vàVáy từcao cấp.",
+ category: "Thời trang",
+ publishDate: "1 2026",
+ isoDate: "2026-05-01T10:00:00Z",
+ readTime: "5 ",
+ image: "/images/lifestyle/lifestyle_interior.png"
+ }
 ];

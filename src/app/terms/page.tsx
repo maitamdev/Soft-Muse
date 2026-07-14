@@ -2,99 +2,59 @@ import type { Metadata } from "next";
 import { LegalPageLayout, SectionTitle, LegalParagraph, LegalList } from "@/components/ui/PageComponents";
 
 export const metadata: Metadata = {
-  title: "الشروط والأحكام | AURA",
-  description: "الشروط والأحكام الخاصة بالتسوق والطلبات والشحن عبر موقع دار أورا للأزياء الراقية.",
+ title: "Điều khoản | AURA",
+ description: "Điều khoản vàĐơn hàng vàVận chuyển AURA.",
 };
 
 export default function TermsPage() {
-  return (
-    <LegalPageLayout
-      title="الشروط والأحكام"
-      subtitle="يرجى قراءة هذه الشروط بعناية قبل استخدام الموقع أو إتمام أي عملية شراء عبر دار أورا."
-      lastUpdated="يونيو ٢٠٢٦"
-    >
-
-      <SectionTitle number="01" title="مقدمة وقبول الشروط" />
-      <LegalParagraph>
-        باستخدامكِ لموقع دار أورا للأزياء الراقية (aura-fashion-virid.vercel.app) أو إجرائكِ لأي عملية شراء، فإنكِ توافقين على الالتزام بهذه الشروط والأحكام كاملةً. إذا كنتِ لا توافقين على أي بند من هذه البنود، يُرجى الامتناع عن استخدام الموقع.
-      </LegalParagraph>
-      <LegalParagraph>
-        تحتفظ دار أورا بحق تحديث هذه الشروط في أي وقت. سيتم إخطار العملاء المسجلين بأي تغييرات جوهرية عبر البريد الإلكتروني.
-      </LegalParagraph>
-
-      <SectionTitle number="02" title="الطلبات والمشتريات" />
-      <LegalParagraph>
-        جميع الطلبات تخضع للتأكيد والتوفر. بعد إتمام طلبكِ ستتلقين رسالة تأكيد على بريدكِ الإلكتروني. يحق لفريق أورا التواصل معكِ لتأكيد تفاصيل المقاسات أو الأقمشة قبل البدء في التنفيذ.
-      </LegalParagraph>
-      <LegalList items={[
-        "الطلبات الحرفية المخصصة تستغرق من 7 إلى 14 يوم عمل للإعداد.",
-        "لا يمكن إلغاء الطلبات بعد بدء مرحلة الخياطة والتجهيز.",
-        "في حال الرغبة في التعديل، يجب التواصل خلال 24 ساعة من التأكيد.",
-        "الأسعار المعروضة بالجنيه المصري وتشمل ضريبة القيمة المضافة.",
-      ]} />
-
-      <SectionTitle number="03" title="الدفع" />
-      <LegalParagraph>
-        تقبل دار أورا وسائل الدفع الإلكترونية الآتية بشكل آمن ومشفر:
-      </LegalParagraph>
-      <LegalList items={[
-        "InstaPay — الدفع الفوري عبر تطبيق الهاتف.",
-        "Vodafone Cash — محفظة فودافون كاش.",
-        "الدفع عند الاستلام — متاح في القاهرة الكبرى والجيزة.",
-        "التحويل البنكي — للطلبات ذات القيمة العالية فقط.",
-      ]} />
-      <LegalParagraph>
-        تُعدّ الطلبات غير مؤكدة حتى يتم استلام الدفع أو إثباته. في حالة الدفع عند الاستلام، يحق لأورا إلغاء الطلب في حال عدم الاستلام.
-      </LegalParagraph>
-
-      <SectionTitle number="04" title="الشحن والتوصيل" />
-      <LegalList items={[
-        "الشحن مجاني لجميع محافظات مصر بدون حد أدنى للطلب.",
-        "مدة التوصيل من 2 إلى 5 أيام عمل بعد جاهزية القطعة.",
-        "سيتم إرسال رقم التتبع فور تسليم الطلب لشركة الشحن.",
-        "أورا غير مسؤولة عن أي تأخير ناتج عن ظروف شركة الشحن.",
-        "في حال التلف أثناء الشحن، يرجى التواصل خلال 48 ساعة مع الصور.",
-      ]} />
-
-      <SectionTitle number="05" title="الإرجاع والاستبدال" />
-      <LegalParagraph>
-        نظراً لطبيعة منتجات دار أورا الحرفية المصنوعة حسب الطلب، فإن سياسة الإرجاع تختلف عن المنتجات التجارية المعيارية:
-      </LegalParagraph>
-      <LegalList items={[
-        "القطع الجاهزة: يمكن استبدالها خلال 7 أيام من الاستلام في حال وجود عيب مصنعي.",
-        "القطع المخصصة حسب المقاسات: لا تقبل الإرجاع إلا في حالة الخطأ من جانبنا.",
-        "يجب أن تكون القطعة بحالتها الأصلية غير مرتداة وبعبوتها الفاخرة.",
-        "رسوم إعادة الشحن للإرجاع تتحملها العميلة إلا في حالة الخطأ من أورا.",
-        "يتم رد المبلغ خلال 5 أيام عمل من استلام وفحص القطعة المرتجعة.",
-      ]} />
-
-      <SectionTitle number="06" title="توفر المنتجات" />
-      <LegalParagraph>
-        بعض قطع أورا تُنتج بأعداد محدودة جداً للحفاظ على طابع الحرفية والتميز. نحتفظ بالحق في تعديل أو إيقاف أي منتج دون إشعار مسبق. في حال عدم توفر قطعة بعد الطلب، سيتم التواصل معكِ فوراً وإعادة المبلغ كاملاً.
-      </LegalParagraph>
-
-      <SectionTitle number="07" title="استخدام الموقع" />
-      <LegalList items={[
-        "الاستخدام مقتصر على الأغراض الشخصية غير التجارية فقط.",
-        "يُحظر نسخ أو توزيع أي محتوى من الموقع دون إذن خطي.",
-        "أورا غير مسؤولة عن أي أضرار ناتجة عن استخدام أو تعذر استخدام الموقع.",
-        "يُحظر استخدام الموقع لأي غرض غير قانوني أو مخالف للآداب العامة.",
-      ]} />
-
-      <SectionTitle number="08" title="الملكية الفكرية" />
-      <LegalParagraph>
-        جميع المحتويات المعروضة على موقع دار أورا — بما تشمل الصور والتصاميم والشعارات والنصوص — هي ملكية فكرية حصرية لدار أورا محمية بموجب قوانين حقوق الملكية الفكرية المصرية والدولية. أي استخدام غير مرخص يُعرّض صاحبه للمساءلة القانونية.
-      </LegalParagraph>
-
-      <SectionTitle number="09" title="مسؤوليات العميلة" />
-      <LegalList items={[
-        "تقديم معلومات دقيقة وصحيحة عند التسجيل وإتمام الطلب.",
-        "الحفاظ على سرية بيانات الدخول لحسابكِ في الموقع.",
-        "إخطارنا فوراً في حال الشك باختراق حسابكِ.",
-        "التأكد من صحة عنوان الشحن قبل إتمام الطلب.",
-        "الاطلاع على دليل العناية بالمنسوجات المرفق مع كل قطعة.",
-      ]} />
-
-    </LegalPageLayout>
-  );
+ return (
+ <LegalPageLayout
+ title="Điều khoản"
+ subtitle="Đọc nàyVị trí AURA."
+ lastUpdated="2026"
+ > <SectionTitle number="01" title="AURA" /> <LegalParagraph>
+ AURA (aura-fashion-virid.vercel.app), trênĐiều khoản. không trên từ này, vềVị trí.
+ </LegalParagraph> <LegalParagraph>
+ AURA này trong.Khách hàng Email.
+ </LegalParagraph> <SectionTitle number="02" title="Đơn hàng " /> <LegalParagraph>
+ Tất cả Đơn hàng. thông báo trênEmail của bạn. AURA Chi tiết Kích cỡ trong.</LegalParagraph> <LegalList items={[
+ "Đơn hàng Tay nghề Tùy chỉnhtừ 7 đến 14.",
+ "khôngHủy Đơn hàng may đo.",
+ "trong trongSửa, 24 từ.",
+ "Việt NamVAT.",
+ ]} /> <SectionTitle number="03" title="AURA" /> <LegalParagraph>
+ AURA :</LegalParagraph> <LegalList items={[
+ "InstaPay — Áp dụng Điện thoại.",
+ "Vodafone Cash — Lưu.",
+ "— trong vàTP. Hồ Chí Minh.",
+ "—.",
+ ]} /> <LegalParagraph>
+ Đơn hàng không. trong,AURA Hủy Đơn hàng trong.</LegalParagraph> <SectionTitle number="04" title="Vận chuyển và giao hàng" /> <LegalList items={[
+ "Miễn phí vận chuyển toàn quốc.",
+ "giao hàng từ 2 đến 5.",
+ "Mã Đơn hàng Vận chuyển.",
+ "AURA không về vềVận chuyển.",
+ "trongVận chuyển, 48 vớiHình ảnh.",
+ ]} /> <SectionTitle number="05" title="AURA" /> <LegalParagraph>
+ sản phẩmAURA Tay nghề Đơn hàng, vềSản phẩm :</LegalParagraph> <LegalList items={[
+ ": 7 từ trong.",
+ "Tùy chỉnhKích cỡ: không trong từ.",
+ "khôngcao cấp.",
+ "Vận chuyển Khách hàngtrong từ AURA.",
+ "Số tiền 5 từ.",
+ ]} /> <SectionTitle number="06" title="Sản phẩm" /> <LegalParagraph>
+ AURA trênTay nghề. trongSửa sản phẩm. trongĐơn hàng, Số tiền.</LegalParagraph> <SectionTitle number="07" title="Vị trí" /> <LegalList items={[
+ "trên không.",
+ "từVị trí.",
+ "AURA không về vềVị trí.",
+ "Vị trí không.",
+ ]} /> <SectionTitle number="08" title="AURA" /> <LegalParagraph>
+ Tất cả trênAURA — Hình ảnh vàLogo—AURA Việt Nam. không.</LegalParagraph> <SectionTitle number="09" title="Khách hàng" /> <LegalList items={[
+ "Đơn hàng.",
+ "trên trongVị trí.",
+ "trong.",
+ "từ tiêu đềVận chuyển Đơn hàng.",
+ "trênBảo quản với tất cả.",
+ ]} /> </LegalPageLayout>
+ );
 }

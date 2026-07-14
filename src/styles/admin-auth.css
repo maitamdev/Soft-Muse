@@ -1,54 +1,54 @@
 /* ═══════════════════════════════════════════
-   AURA Admin — Login experience
-   Signature "aurora" motion + entrance choreography.
-   Colors live in the components (design tokens only);
-   this file owns motion so it can honor reduced-motion globally.
+ AURA Admin — Login experience
+ Signature "aurora" motion + entrance choreography.
+ Colors live in the components (design tokens only);
+ this file owns motion so it can honor reduced-motion globally.
 ═══════════════════════════════════════════ */
 
 @keyframes aura-drift-a {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(6%, 8%, 0) scale(1.12); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
+ 0% { transform: translate3d(0, 0, 0) scale(1); }
+ 50% { transform: translate3d(6%, 8%, 0) scale(1.12); }
+ 100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes aura-drift-b {
-  0%   { transform: translate3d(0, 0, 0) scale(1.05); }
-  50%  { transform: translate3d(-8%, -6%, 0) scale(0.95); }
-  100% { transform: translate3d(0, 0, 0) scale(1.05); }
+ 0% { transform: translate3d(0, 0, 0) scale(1.05); }
+ 50% { transform: translate3d(-8%, -6%, 0) scale(0.95); }
+ 100% { transform: translate3d(0, 0, 0) scale(1.05); }
 }
 
 @keyframes aura-drift-c {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(5%, -7%, 0) scale(1.08); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
+ 0% { transform: translate3d(0, 0, 0) scale(1); }
+ 50% { transform: translate3d(5%, -7%, 0) scale(1.08); }
+ 100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes aura-sheen {
-  0%, 100% { opacity: 0.35; }
-  50%      { opacity: 0.7; }
+ 0%, 100% { opacity: 0.35; }
+ 50% { opacity: 0.7; }
 }
 
 @keyframes aura-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+ from { opacity: 0; transform: translateY(12px); }
+ to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes aura-pop {
-  0%   { opacity: 0; transform: scale(0.96); }
-  60%  { opacity: 1; }
-  100% { opacity: 1; transform: scale(1); }
+ 0% { opacity: 0; transform: scale(0.96); }
+ 60% { opacity: 1; }
+ 100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes aura-check {
-  from { stroke-dashoffset: 24; }
-  to   { stroke-dashoffset: 0; }
+ from { stroke-dashoffset: 24; }
+ to { stroke-dashoffset: 0; }
 }
 
 .aura-orb {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(60px);
-  will-change: transform, opacity;
+ position: absolute;
+ border-radius: 9999px;
+ filter: blur(60px);
+ will-change: transform, opacity;
 }
 .aura-orb--a { animation: aura-drift-a 18s ease-in-out infinite; }
 .aura-orb--b { animation: aura-drift-b 22s ease-in-out infinite; }
@@ -57,67 +57,67 @@
 .aura-sheen { animation: aura-sheen 12s ease-in-out infinite; }
 
 .aura-enter { animation: aura-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.aura-pop   { animation: aura-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.aura-pop { animation: aura-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .aura-check-path {
-  stroke-dasharray: 24;
-  stroke-dashoffset: 24;
-  animation: aura-check 0.4s ease-out 0.05s forwards;
+ stroke-dasharray: 24;
+ stroke-dashoffset: 24;
+ animation: aura-check 0.4s ease-out 0.05s forwards;
 }
 
 @keyframes aura-shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
-  20%, 40%, 60%, 80% { transform: translateX(6px); }
+ 0%, 100% { transform: translateX(0); }
+ 10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+ 20%, 40%, 60%, 80% { transform: translateX(6px); }
 }
 .aura-shake {
-  animation: aura-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+ animation: aura-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 /* Custom Checkbox Styles */
 .custom-checkbox {
-  position: relative;
-  display: flex;
-  height: 18px;
-  width: 18px;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--admin-radius-sm);
-  border: 1.5px solid var(--admin-border-strong);
-  background: var(--admin-bg-surface);
-  color: white;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+ position: relative;
+ display: flex;
+ height: 18px;
+ width: 18px;
+ align-items: center;
+ justify-content: center;
+ border-radius: var(--admin-radius-sm);
+ border: 1.5px solid var(--admin-border-strong);
+ background: var(--admin-bg-surface);
+ color: white;
+ transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .custom-checkbox:hover {
-  border-color: var(--admin-primary);
-  background: var(--admin-bg-active);
+ border-color: var(--admin-primary);
+ background: var(--admin-bg-active);
 }
 .custom-checkbox-checked {
-  background: var(--admin-primary);
-  border-color: var(--admin-primary);
-  box-shadow: 0 0 10px var(--admin-primary-muted);
+ background: var(--admin-primary);
+ border-color: var(--admin-primary);
+ box-shadow: 0 0 10px var(--admin-primary-muted);
 }
 .custom-checkbox-checkmark {
-  height: 12px;
-  width: 12px;
-  stroke-dasharray: 20;
-  stroke-dashoffset: 20;
-  transition: stroke-dashoffset 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+ height: 12px;
+ width: 12px;
+ stroke-dasharray: 20;
+ stroke-dashoffset: 20;
+ transition: stroke-dashoffset 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.custom-checkbox-checked .custom-checkbox-checkmark {
-  stroke-dashoffset: 0;
+.custom-checkbox-checked.custom-checkbox-checkmark {
+ stroke-dashoffset: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aura-orb,
-  .aura-sheen,
-  .aura-enter,
-  .aura-pop,
-  .aura-check-path,
-  .aura-shake {
-    animation: none !important;
-  }
-  .aura-check-path { stroke-dashoffset: 0; }
+ .aura-orb,
+ .aura-sheen,
+ .aura-enter,
+ .aura-pop,
+ .aura-check-path,
+ .aura-shake {
+ animation: none !important;
+ }
+ .aura-check-path { stroke-dashoffset: 0; }
 }
 
 /* Fix for Webkit Autofill styling (prevents white layer on inputs) */
@@ -125,8 +125,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 40px var(--admin-bg-surface) inset !important;
-  -webkit-text-fill-color: var(--admin-text-base) !important;
-  caret-color: var(--admin-text-base) !important;
-  border-radius: inherit;
+ -webkit-box-shadow: 0 0 0 40px var(--admin-bg-surface) inset !important;
+ -webkit-text-fill-color: var(--admin-text-base) !important;
+ caret-color: var(--admin-text-base) !important;
+ border-radius: inherit;
 }

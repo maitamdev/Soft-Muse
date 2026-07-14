@@ -10,11 +10,11 @@ import type { CustomerNotification } from "@/data/mock/customer-notifications";
  * Renders nothing; mounted once inside the storefront layout.
  */
 export default function CustomerNotificationListener() {
-  const { showNotification } = useNotification();
+ const { showNotification } = useNotification();
 
-  useEventSubscribe<CustomerNotification>("customer.notification", (n) => {
-    if (n?.message) showNotification(n.message, "info");
-  });
+ useEventSubscribe<CustomerNotification>("customer.notification", (n) => {
+ if (n?.message) showNotification(n.message, "info");
+ });
 
-  return null;
+ return null;
 }

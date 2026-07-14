@@ -3,28 +3,16 @@ import Link from "next/link";
 import { LegalPageLayout, SectionTitle, LegalParagraph, LegalList } from "@/components/ui/PageComponents";
 
 export const metadata: Metadata = {
-  title: "الشحن والتوصيل | AURA",
-  description: "تفاصيل الشحن والتوصيل لطلبات دار AURA داخل مصر ومتابعة الطلبات الخاصة.",
+ title: "Vận chuyển và giao hàng | AURA",
+ description: "Chi tiết Vận chuyển và giao hàng nhà mốtAURA Việt Nam Đơn hàng.",
 };
 
 export default function ShippingPage() {
-  return (
-    <LegalPageLayout
-      title="الشحن والتوصيل"
-      subtitle="نهتم بوصول قطع AURA إليكِ بتغليف آمن وتجربة تسليم تليق بقيمة القطعة."
-      lastUpdated="يونيو ٢٠٢٦"
-    >
-      <SectionTitle number="01" title="نطاق التوصيل" />
-      <LegalParagraph>تقدم AURA خدمة التوصيل إلى جميع محافظات مصر، مع مراجعة العنوان وتفاصيل التواصل قبل تسليم الطلب لشريك الشحن.</LegalParagraph>
-      <LegalList items={["الشحن مجاني لجميع الطلبات داخل مصر.", "تأكيد الطلب يتم عبر مستشارة AURA قبل بدء التجهيز.", "يمكن طلب تنسيق موعد تسليم مناسب عبر واتساب."]} />
-
-      <SectionTitle number="02" title="مدة التجهيز والتسليم" />
-      <LegalParagraph>القطع الجاهزة تُجهز عادة خلال 24 إلى 48 ساعة. القطع التي تحتاج ضبط مقاس أو مراجعة أتيلييه قد تستغرق من 3 إلى 7 أيام عمل قبل الشحن.</LegalParagraph>
-      <LegalList items={["القاهرة والجيزة: غالبًا خلال 2 إلى 3 أيام عمل بعد الجاهزية.", "باقي المحافظات: غالبًا خلال 3 إلى 5 أيام عمل بعد الجاهزية.", "طلبات المناسبات العاجلة تُراجع بشكل فردي حسب توفر القطعة."]} />
-
-      <SectionTitle number="03" title="متابعة الطلب" />
-      <LegalParagraph>بعد اعتماد الطلب، يصلكِ رقم مرجعي لمتابعة حالة التجهيز والتسليم من صفحة تتبع الطلب أو عبر مستشارة AURA.</LegalParagraph>
-      <Link href="/tracking" className="font-sans text-xs text-accent underline underline-offset-4">الانتقال إلى تتبع الطلب</Link>
-    </LegalPageLayout>
-  );
+ return (
+ <LegalPageLayout
+ title="Vận chuyển và giao hàng"
+ subtitle="AURA."
+ lastUpdated="2026"
+ > <SectionTitle number="01" title="giao hàng" /> <LegalParagraph>AURA giao hàng đếnTất cả Việt Nam, vớiĐịa chỉ vàChi tiết Đơn hàng Vận chuyển.</LegalParagraph> <LegalList items={["Vận chuyển Tất cả Đơn hàng Việt Nam.", "Đơn hàng AURA.", "đơn hàngWhatsApp."]} /> <SectionTitle number="02" title="AURA" /> <LegalParagraph>24 đến 48. kích cỡatelier từ 3 đến 7Vận chuyển.</LegalParagraph> <LegalList items={["vàTP. Hồ Chí Minh: 2 đến 3.", ": 3 đến 5.", "."]} /> <SectionTitle number="03" title="Đơn hàng" /> <LegalParagraph>Đơn hàng, Mã từTheo dõi đơn hàng AURA.</LegalParagraph> <Link href="/tracking" className="font-sans text-xs text-accent underline underline-offset-4">đếnTheo dõi đơn hàng</Link> </LegalPageLayout>
+ );
 }

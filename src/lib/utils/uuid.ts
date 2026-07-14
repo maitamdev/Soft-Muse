@@ -5,7 +5,7 @@
  */
 
 export function generateId(): string {
-  return crypto.randomUUID();
+ return crypto.randomUUID();
 }
 
 /**
@@ -13,7 +13,7 @@ export function generateId(): string {
  * e.g. orderNumber("ORD", 5) → "ORD-00042" when sequence = 42
  */
 export function generateDocumentNumber(prefix: string, sequence: number, pad = 5): string {
-  return `${prefix}${String(sequence).padStart(pad, '0')}`;
+ return `${prefix}${String(sequence).padStart(pad, '0')}`;
 }
 
 /**
@@ -21,11 +21,11 @@ export function generateDocumentNumber(prefix: string, sequence: number, pad = 5
  * e.g. generateCode(4, 4) → "AURA-X3K9-P2QZ-7FNR"
  */
 export function generateCode(prefix: string, segments = 3, segmentLength = 4): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No 0/O or 1/I to avoid confusion
-  const segmentParts = Array.from({ length: segments }, () =>
-    Array.from({ length: segmentLength }, () =>
-      chars[Math.floor(Math.random() * chars.length)]
-    ).join('')
-  );
-  return prefix ? `${prefix}-${segmentParts.join('-')}` : segmentParts.join('-');
+ const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No 0/O or 1/I to avoid confusion
+ const segmentParts = Array.from({ length: segments }, () =>
+ Array.from({ length: segmentLength }, () =>
+ chars[Math.floor(Math.random() * chars.length)]
+ ).join('')
+ );
+ return prefix ? `${prefix}-${segmentParts.join('-')}` : segmentParts.join('-');
 }

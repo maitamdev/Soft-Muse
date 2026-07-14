@@ -1,139 +1,139 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Typography Mappings */
-  --font-sans: var(--font-alexandria), sans-serif;
-  --font-display: var(--font-el-messiri), serif;
-  --font-serif: var(--font-el-messiri), serif;
-  --font-english: var(--font-inter), sans-serif;
+ /* Brand Typography Mappings */
+ --font-sans: var(--font-alexandria), sans-serif;
+ --font-display: var(--font-el-messiri), serif;
+ --font-serif: var(--font-el-messiri), serif;
+ --font-english: var(--font-inter), sans-serif;
 
-  /* Custom Brand Luxury Colors */
-  --color-background-primary: #FAF8F5; /* Ivory */
-  --color-background-secondary: #FFFFFF; /* Off White */
-  --color-background-tertiary: #E8E4DC; /* Warm Beige */
-  --color-text-primary: #1C1C1B; /* Graphite / Black */
-  --color-text-secondary: #5C5A56; /* Charcoal / Muted Grey */
-  --color-accent: #C5A880; /* Muted Gold */
-  --color-accent-dark: #8E6B4B; /* Deep Bronze — selected/emphasis states */
-  --color-brand-border: #E5E0D8;
+ /* Soft Muse Minimal Luxury Colors */
+ --color-background-primary: #FBF7F2;
+ --color-background-secondary: #FFFFFF;
+ --color-background-tertiary: #EFE7DF;
+ --color-text-primary: #181313;
+ --color-text-secondary: #5E5753;
+ --color-accent: #B9827A;
+ --color-accent-dark: #8D5F59;
+ --color-brand-border: #E8DED7;
 }
 
 :root {
-  --background: #FAF8F5;
-  --foreground: #1E1512;
+ --background: #FAF8F5;
+ --foreground: #1E1512;
 }
 
 body {
-  background-color: var(--color-background-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  padding-bottom: 4rem;
+ background-color: var(--color-background-primary);
+ color: var(--color-text-primary);
+ font-family: var(--font-sans);
+ min-height: 100vh;
+ padding-bottom: 4rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif), var(--font-sans), serif !important;
-  font-weight: 400 !important;
+ font-family: var(--font-serif), var(--font-sans), serif !important;
+ font-weight: 400 !important;
 }
 
 @media (min-width: 768px) {
-  body {
-    padding-bottom: 0;
-  }
+ body {
+ padding-bottom: 0;
+ }
 }
 
 /* Custom Editorial Animation keyframes & details */
 .campaign-text-hover {
-  position: relative;
+ position: relative;
 }
 
 .campaign-text-hover::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  right: 0;
-  width: 100%;
-  height: 1px;
-  background-color: var(--color-accent);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+ content: '';
+ position: absolute;
+ bottom: -2px;
+ right: 0;
+ width: 100%;
+ height: 1px;
+ background-color: var(--color-accent);
+ transform: scaleX(0);
+ transform-origin: right;
+ transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .campaign-text-hover:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+ transform: scaleX(1);
+ transform-origin: left;
 }
 
 /* Scroll Snap Campaign Slider details */
 .scroll-snap-x {
-  scroll-snap-type: x mandatory;
+ scroll-snap-type: x mandatory;
 }
 
 .scroll-snap-align-start {
-  scroll-snap-align: start;
+ scroll-snap-align: start;
 }
 
 /* Hide scrollbar utility */
 .scrollbar-none::-webkit-scrollbar {
-  display: none;
+ display: none;
 }
 .scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+ -ms-overflow-style: none;
+ scrollbar-width: none;
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+ 0% {
+ background-position: 200% 0;
+ }
+ 100% {
+ background-position: -200% 0;
+ }
 }
 
 /* ══════════════════════════════════════════
-   LUXURY CUSTOM SCROLLBAR — AURA Brand
+ LUXURY CUSTOM SCROLLBAR — Soft Muse
 ══════════════════════════════════════════ */
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+ width: 5px;
+ height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF8F5;
-  border-left: none;
+ background: #FAF8F5;
+ border-left: none;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    #E5E0D8 0%,
-    #C5A880 50%,
-    #E5E0D8 100%
-  );
-  border-radius: 100px;
-  border: none;
-  transition: background 0.3s ease;
+ background: linear-gradient(
+ 180deg,
+ #E5E0D8 0%,
+ #B9827A 50%,
+ #E5E0D8 100%
+ );
+ border-radius: 100px;
+ border: none;
+ transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    180deg,
-    #C5A880 0%,
-    #B89C72 50%,
-    #C5A880 100%
-  );
+ background: linear-gradient(
+ 180deg,
+ #B9827A 0%,
+ #8D5F59 50%,
+ #B9827A 100%
+ );
 }
 
 ::-webkit-scrollbar-corner {
-  background: #FAF8F5;
+ background: #FAF8F5;
 }
 
 /* Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #C5A880 #FAF8F5;
+ scrollbar-width: thin;
+ scrollbar-color: #C5A880 #FAF8F5;
 }

@@ -1,7 +1,8 @@
-import { Product, ProductStatus, mockProducts, updateMockProducts } from '@/data/mock/products';
-import { IProductRepository } from '@/lib/contracts/IProductRepository';
-import { eventBus } from '@/lib/events/EventBus';
-import { addTimelineEvent } from '@/data/mock/timeline';
+import type { Product, ProductStatus } from "@/data/mock/products";
+import type { IProductRepository } from "@/lib/contracts/IProductRepository";
+import { eventBus } from "@/lib/events/EventBus";
+import { createClient } from "@/lib/supabase/client";
+import { mapProductRow, productSelect, productToRow } from "@/lib/supabase/product-mapper";
 
 export interface ProductFilters {
   search?: string;
@@ -9,294 +10,158 @@ export interface ProductFilters {
   collection?: string;
   season?: string;
   status?: string;
-  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'all';
+  stockStatus?: "in_stock" | "low_stock" | "out_of_stock" | "all";
   featured?: boolean;
   minPrice?: number;
   maxPrice?: number;
 }
 
-class MockProductRepositoryImpl implements IProductRepository {
-  // --- INTEGRITY GUARDS ---
-
-  /**
-   * Reject mutations that would corrupt the unified catalog. Throws an Arabic
-   * Error (surfaced as an admin toast) on: duplicate SKU/slug, negative
-   * price/comparePrice/stock, invalid discount, or a product with no image.
-   */
-  private assertCatalogIntegrity(candidate: Product): void {
-    if (mockProducts.some((p) => p.id !== candidate.id && p.sku === candidate.sku)) {
-      throw new Error('رمز التخزين (SKU) مستخدم مسبقاً');
-    }
-    if (mockProducts.some((p) => p.id !== candidate.id && p.slug === candidate.slug)) {
-      throw new Error('الرابط الدائم (Slug) مستخدم مسبقاً');
-    }
-    if (candidate.price < 0) throw new Error('السعر لا يمكن أن يكون سالباً');
-    if (candidate.comparePrice < 0) throw new Error('سعر المقارنة لا يمكن أن يكون سالباً');
-    if (candidate.stock < 0) throw new Error('المخزون لا يمكن أن يكون سالباً');
-    if (candidate.comparePrice > 0 && candidate.comparePrice < candidate.price) {
-      throw new Error('سعر المقارنة يجب أن يكون أكبر من أو يساوي السعر الحالي');
-    }
-    if (!candidate.images || candidate.images.length === 0) {
-      throw new Error('يجب إضافة صورة واحدة على الأقل للمنتج');
-    }
-  }
-
-  // --- COMPUTED PROPERTIES HELPERS ---
-  
+class SupabaseProductRepository implements IProductRepository {
   getProfitMargin(price: number, costPrice: number): number {
-    if (!price || price <= 0) return 0;
-    if (!costPrice || costPrice < 0) return 100;
-    const margin = ((price - costPrice) / price) * 100;
-    return Number(margin.toFixed(2));
+    if (price <= 0) return 0;
+    return Number((((price - Math.max(0, costPrice)) / price) * 100).toFixed(2));
   }
 
   getDiscountPercentage(price: number, comparePrice: number): number {
-    if (!price || !comparePrice || comparePrice <= price) return 0;
-    const discount = ((comparePrice - price) / comparePrice) * 100;
-    return Number(discount.toFixed(0));
+    if (price <= 0 || comparePrice <= price) return 0;
+    return Number((((comparePrice - price) / comparePrice) * 100).toFixed(0));
   }
 
-  getStockStatus(stock: number, lowStockLimit: number): 'in_stock' | 'low_stock' | 'out_of_stock' {
-    if (stock <= 0) return 'out_of_stock';
-    if (stock <= lowStockLimit) return 'low_stock';
-    return 'in_stock';
+  getStockStatus(stock: number, lowStockLimit: number) {
+    if (stock <= 0) return "out_of_stock" as const;
+    if (stock <= lowStockLimit) return "low_stock" as const;
+    return "in_stock" as const;
   }
-
-  // --- CRUD OPERATIONS ---
 
   async getProducts(filters?: ProductFilters): Promise<Product[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let filtered = [...mockProducts];
-        
-        if (filters) {
-          if (filters.search) {
-            const query = filters.search.toLowerCase();
-            filtered = filtered.filter(p => 
-              p.name.toLowerCase().includes(query) || 
-              p.sku.toLowerCase().includes(query) ||
-              p.barcode.toLowerCase().includes(query)
-            );
-          }
-          if (filters.category && filters.category !== 'all') {
-            filtered = filtered.filter(p => p.category === filters.category);
-          }
-          if (filters.collection && filters.collection !== 'all') {
-            filtered = filtered.filter(p => p.collection === filters.collection);
-          }
-          if (filters.season && filters.season !== 'all') {
-            filtered = filtered.filter(p => p.season === filters.season);
-          }
-          if (filters.status && filters.status !== 'all') {
-            filtered = filtered.filter(p => p.status === filters.status);
-          }
-          if (filters.stockStatus && filters.stockStatus !== 'all') {
-            filtered = filtered.filter(p => this.getStockStatus(p.stock, p.lowStockLimit) === filters.stockStatus);
-          }
-          if (filters.featured !== undefined) {
-            filtered = filtered.filter(p => p.featured === filters.featured);
-          }
-          if (filters.minPrice !== undefined) {
-            filtered = filtered.filter(p => p.price >= filters.minPrice!);
-          }
-          if (filters.maxPrice !== undefined) {
-            filtered = filtered.filter(p => p.price <= filters.maxPrice!);
-          }
-        }
-        
-        filtered.sort((a, b) => b.id.localeCompare(a.id));
-        resolve(filtered);
-      }, 500);
-    });
+    const supabase = createClient();
+    let query = supabase.from("products").select(productSelect).order("created_at", { ascending: false });
+
+    if (filters?.search) query = query.or(`name.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`);
+    if (filters?.category && filters.category !== "all") query = query.eq("category", filters.category);
+    if (filters?.collection && filters.collection !== "all") query = query.eq("collection", filters.collection);
+    if (filters?.season && filters.season !== "all") query = query.eq("season", filters.season);
+    if (filters?.status && filters.status !== "all") query = query.eq("status", filters.status);
+    if (filters?.featured !== undefined) query = query.eq("featured", filters.featured);
+    if (filters?.minPrice !== undefined) query = query.gte("price", filters.minPrice);
+    if (filters?.maxPrice !== undefined) query = query.lte("price", filters.maxPrice);
+
+    const { data, error } = await query;
+    if (error) throw new Error(`Không thể tải sản phẩm: ${error.message}`);
+    let products = ((data ?? []) as Array<Record<string, unknown>>).map((row) => mapProductRow(row));
+    if (filters?.stockStatus && filters.stockStatus !== "all") {
+      products = products.filter(
+        (product: Product) => this.getStockStatus(product.stock, product.lowStockLimit) === filters.stockStatus,
+      );
+    }
+    return products;
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockProducts.find(p => p.id === id)), 300);
-    });
+    const { data, error } = await createClient().from("products").select(productSelect).eq("id", id).maybeSingle();
+    if (error) throw new Error(`Không thể tải sản phẩm: ${error.message}`);
+    return data ? mapProductRow(data) : undefined;
   }
 
-  async createProduct(data: Omit<Product, 'id'>): Promise<Product> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const newProduct: Product = {
-          ...data,
-          id: `prod_${Date.now()}`
-        };
-        try {
-          this.assertCatalogIntegrity(newProduct);
-        } catch (err) {
-          return reject(err);
-        }
-        updateMockProducts([newProduct, ...mockProducts]);
+  async createProduct(input: Omit<Product, "id">): Promise<Product> {
+    const supabase = createClient();
+    const { data, error } = await supabase.from("products").insert(productToRow(input)).select("id").single();
+    if (error) throw new Error(`Không thể tạo sản phẩm: ${error.message}`);
 
-        eventBus.emit('product.created', newProduct);
-        eventBus.emit('products.changed');
-        eventBus.emit('inventory.changed');
-        addTimelineEvent({
-          entityType: 'product',
-          entityId: newProduct.id,
-          action: 'created',
-          description: `تم إنشاء المنتج: ${newProduct.name}`,
-          adminId: 'admin_1',
-          adminName: 'مدير النظام'
-        });
+    try {
+      await this.replaceRelations(data.id, input);
+    } catch (relationError) {
+      await supabase.from("products").delete().eq("id", data.id);
+      throw relationError;
+    }
 
-        resolve(newProduct);
-      }, 500);
-    });
+    const product = await this.getProduct(data.id);
+    if (!product) throw new Error("Sản phẩm vừa tạo không thể tải lại.");
+    eventBus.emit("products.changed");
+    return product;
   }
 
-  async updateProduct(id: string, data: Partial<Product>): Promise<Product> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const index = mockProducts.findIndex(p => p.id === id);
-        if (index === -1) return reject(new Error('Product not found'));
-        
-        const oldProduct = mockProducts[index];
-        const updated = { ...oldProduct, ...data };
+  async updateProduct(id: string, input: Partial<Product>): Promise<Product> {
+    const supabase = createClient();
+    const current = await this.getProduct(id);
+    if (!current) throw new Error("Không tìm thấy sản phẩm.");
+    const merged = { ...current, ...input } as Product;
+    const { error } = await supabase.from("products").update(productToRow(merged)).eq("id", id);
+    if (error) throw new Error(`Không thể cập nhật sản phẩm: ${error.message}`);
+    await this.replaceRelations(id, merged);
+    const product = await this.getProduct(id);
+    if (!product) throw new Error("Không thể tải sản phẩm sau khi cập nhật.");
+    eventBus.emit("products.changed");
+    return product;
+  }
 
-        try {
-          this.assertCatalogIntegrity(updated);
-        } catch (err) {
-          return reject(err);
-        }
+  private async replaceRelations(productId: string, product: Partial<Product>) {
+    const supabase = createClient();
+    const [imagesDelete, variantsDelete] = await Promise.all([
+      supabase.from("product_images").delete().eq("product_id", productId),
+      supabase.from("product_variants").delete().eq("product_id", productId),
+    ]);
+    if (imagesDelete.error) throw new Error(imagesDelete.error.message);
+    if (variantsDelete.error) throw new Error(variantsDelete.error.message);
 
-        // Handle Revisions Logging
-        const revision = {
-          versionId: `rev_${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          adminId: 'admin_1',
-          changesSummary: 'Autosave Update',
-          snapshot: JSON.parse(JSON.stringify(oldProduct)) // Deep copy
-        };
-        
-        updated.revisions = [revision, ...(oldProduct.revisions || [])].slice(0, 50); // Keep last 50
-        
-        const newArray = [...mockProducts];
-        newArray[index] = updated;
-        updateMockProducts(newArray);
+    if (product.images?.length) {
+      const { error } = await supabase.from("product_images").insert(
+        product.images.map((url, sortOrder) => ({ product_id: productId, url, alt_text: product.name ?? "", sort_order: sortOrder })),
+      );
+      if (error) throw new Error(`Không thể lưu ảnh: ${error.message}`);
+    }
 
-        eventBus.emit('product.updated', updated);
-        eventBus.emit('products.changed');
-        if (oldProduct.stock !== updated.stock) {
-          eventBus.emit('inventory.changed');
-        }
-        addTimelineEvent({
-          entityType: 'product',
-          entityId: id,
-          action: 'updated',
-          description: `تم تحديث المنتج: ${updated.name}`,
-          adminId: 'admin_1',
-          adminName: 'مدير النظام'
-        });
-
-        resolve(updated);
-      }, 500);
-    });
+    if (product.variants?.length) {
+      const { error } = await supabase.from("product_variants").insert(
+        product.variants.map((variant) => ({
+          product_id: productId,
+          sku: variant.sku,
+          color: variant.color,
+          size: variant.size,
+          price: variant.price,
+          cost: variant.cost ?? 0,
+          stock: variant.stock,
+          weight: variant.weight ?? 0,
+          image_url: variant.image ?? null,
+          status: variant.status ?? "active",
+        })),
+      );
+      if (error) throw new Error(`Không thể lưu biến thể: ${error.message}`);
+    }
   }
 
   async deleteProduct(id: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const index = mockProducts.findIndex(p => p.id === id);
-        if (index === -1) return reject(new Error('Product not found'));
-        
-        const product = mockProducts[index];
-        updateMockProducts(mockProducts.filter(p => p.id !== id));
-        
-        eventBus.emit('product.deleted', id);
-        eventBus.emit('products.changed');
-        eventBus.emit('inventory.changed');
-        addTimelineEvent({
-          entityType: 'product',
-          entityId: id,
-          action: 'deleted',
-          description: `تم حذف المنتج: ${product.name}`,
-          adminId: 'admin_1',
-          adminName: 'مدير النظام'
-        });
-        
-        resolve();
-      }, 500);
-    });
+    const { error } = await createClient().from("products").delete().eq("id", id);
+    if (error) throw new Error(`Không thể xóa sản phẩm: ${error.message}`);
+    eventBus.emit("products.changed");
   }
 
   async duplicateProduct(id: string): Promise<Product> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const product = mockProducts.find(p => p.id === id);
-        if (!product) return reject(new Error('Product not found'));
-        
-        const duplicated: Product = {
-          ...product,
-          id: `prod_${Date.now()}`,
-          name: `${product.name} (نسخة)`,
-          sku: `${product.sku}-COPY-${Math.floor(Math.random() * 1000)}`,
-          slug: `${product.slug}-copy-${Math.floor(Math.random() * 1000)}`,
-          status: 'draft',
-          revisions: [] // Clear revisions for the copy
-        };
-        
-        updateMockProducts([duplicated, ...mockProducts]);
-
-        eventBus.emit('product.created', duplicated);
-        eventBus.emit('products.changed');
-        addTimelineEvent({
-          entityType: 'product',
-          entityId: duplicated.id,
-          action: 'created',
-          description: `تم نسخ المنتج من: ${product.name}`,
-          adminId: 'admin_1',
-          adminName: 'مدير النظام'
-        });
-        
-        resolve(duplicated);
-      }, 500);
-    });
+    const source = await this.getProduct(id);
+    if (!source) throw new Error("Không tìm thấy sản phẩm.");
+    const suffix = Date.now().toString().slice(-6);
+    const { id: _id, ...copy } = source;
+    return this.createProduct({ ...copy, name: `${source.name} (Bản sao)`, slug: `${source.slug}-${suffix}`, sku: `${source.sku}-${suffix}`, status: "draft" });
   }
 
-  // --- BULK OPERATIONS ---
-
   async deleteMultiple(ids: string[]): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        updateMockProducts(mockProducts.filter(p => !ids.includes(p.id)));
-        eventBus.emit('products.bulk_deleted', ids);
-        eventBus.emit('products.changed');
-        eventBus.emit('inventory.changed');
-        resolve();
-      }, 500);
-    });
+    const { error } = await createClient().from("products").delete().in("id", ids);
+    if (error) throw new Error(`Không thể xóa sản phẩm: ${error.message}`);
+    eventBus.emit("products.changed");
   }
 
   async bulkUpdateStatus(ids: string[], status: ProductStatus): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newArray = mockProducts.map(p => 
-          ids.includes(p.id) ? { ...p, status } : p
-        );
-        updateMockProducts(newArray);
-        eventBus.emit('products.bulk_updated', ids);
-        eventBus.emit('products.changed');
-        resolve();
-      }, 500);
-    });
+    const safeStatus = ["draft", "published", "hidden", "archived"].includes(status) ? status : "draft";
+    const { error } = await createClient().from("products").update({ status: safeStatus }).in("id", ids);
+    if (error) throw new Error(`Không thể cập nhật trạng thái: ${error.message}`);
+    eventBus.emit("products.changed");
   }
 
   async bulkUpdateCategory(ids: string[], category: string): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newArray = mockProducts.map(p => 
-          ids.includes(p.id) ? { ...p, category } : p
-        );
-        updateMockProducts(newArray);
-        eventBus.emit('products.bulk_updated', ids);
-        eventBus.emit('products.changed');
-        resolve();
-      }, 500);
-    });
+    const { error } = await createClient().from("products").update({ category }).in("id", ids);
+    if (error) throw new Error(`Không thể cập nhật danh mục: ${error.message}`);
+    eventBus.emit("products.changed");
   }
 }
 
-export const ProductService = new MockProductRepositoryImpl();
+export const ProductService = new SupabaseProductRepository();

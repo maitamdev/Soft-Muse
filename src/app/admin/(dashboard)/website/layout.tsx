@@ -5,10 +5,7 @@ import { WebsiteManagerTabs } from "@/components/admin/storefront/WebsiteManager
 // surface (home, pages, collections merchandising, banners, navigation, media,
 // SEO, redirects, appearance, footer, store settings) behind one tabbed shell.
 export default function WebsiteManagerLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="space-y-4">
-      <WebsiteManagerTabs />
-      <div>{children}</div>
-    </div>
-  );
+ return (
+ <div className="space-y-4"> <WebsiteManagerTabs /> <div>{children}</div> </div>
+ );
 }

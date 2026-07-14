@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/utils/seo-helper';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return generatePageMetadata(
-    'shop',
-    'متجر أورا | أزياء نسائية فاخرة',
-    'تسوقي أحدث تصاميم دار أورا من فساتين ومجموعات راقية مصنوعة من أجود الأقمشة الطبيعية.'
-  );
+ return generatePageMetadata(
+ 'shop',
+ 'Sản phẩm | Soft Muse',
+ 'Mua áo sơ mi, áo kiểu, chân váy, váy, quần tây, blazer, set đồ và phụ kiện Soft Muse.'
+ );
 }
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+ return <>{children}</>;
 }

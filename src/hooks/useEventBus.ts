@@ -2,17 +2,17 @@ import { useEffect, useRef, useCallback } from 'react';
 import { eventBus, EventCallback } from '@/lib/events/EventBus';
 
 export function useEventSubscribe<T>(event: string, callback: EventCallback<T>) {
-  const savedCallback = useRef(callback);
+ const savedCallback = useRef(callback);
 
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+ useEffect(() => {
+ savedCallback.current = callback;
+ }, [callback]);
 
-  useEffect(() => {
-    const handler = (data: T) => savedCallback.current(data);
-    const unsubscribe = eventBus.subscribe<T>(event, handler);
-    return () => unsubscribe();
-  }, [event]);
+ useEffect(() => {
+ const handler = (data: T) => savedCallback.current(data);
+ const unsubscribe = eventBus.subscribe<T>(event, handler);
+ return () => unsubscribe();
+ }, [event]);
 }
 
 /**
@@ -24,37 +24,37 @@ export function useEventSubscribe<T>(event: string, callback: EventCallback<T>) 
  * to stay in sync after any mutation, without page reloads.
  */
 export function useEventSubscribeMany(
-  events: readonly string[],
-  callback: () => void,
-  options?: { debounceMs?: number }
+ events: readonly string[],
+ callback: () => void,
+ options?: { debounceMs?: number }
 ) {
-  const savedCallback = useRef(callback);
-  const debounceMs = options?.debounceMs ?? 120;
+ const savedCallback = useRef(callback);
+ const debounceMs = options?.debounceMs ?? 120;
 
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+ useEffect(() => {
+ savedCallback.current = callback;
+ }, [callback]);
 
-  // Stable dependency key so identical event lists don't re-subscribe each render.
-  const key = events.join('|');
+ // Stable dependency key so identical event lists don't re-subscribe each render.
+ const key = events.join('|');
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const handler = () => {
-      if (debounceMs <= 0) { savedCallback.current(); return; }
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => savedCallback.current(), debounceMs);
-    };
-    const unsubs = key.split('|').filter(Boolean).map(e => eventBus.subscribe(e, handler));
-    return () => {
-      if (timer) clearTimeout(timer);
-      unsubs.forEach(u => u());
-    };
-  }, [key, debounceMs]);
+ useEffect(() => {
+ let timer: ReturnType<typeof setTimeout> | null = null;
+ const handler = () => {
+ if (debounceMs <= 0) { savedCallback.current(); return; }
+ if (timer) clearTimeout(timer);
+ timer = setTimeout(() => savedCallback.current(), debounceMs);
+ };
+ const unsubs = key.split('|').filter(Boolean).map(e => eventBus.subscribe(e, handler));
+ return () => {
+ if (timer) clearTimeout(timer);
+ unsubs.forEach(u => u());
+ };
+ }, [key, debounceMs]);
 }
 
 export function useEventEmit() {
-  return useCallback(<T,>(event: string, payload?: T) => {
-    eventBus.emit(event, payload);
-  }, []);
+ return useCallback(<T,>(event: string, payload?: T) => {
+ eventBus.emit(event, payload);
+ }, []);
 }

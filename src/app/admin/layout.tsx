@@ -9,5 +9,5 @@ import { ThemeProvider } from "@/components/admin/providers/ThemeProvider";
 // it is never torn down and re-created purely on the client, which is what
 // previously triggered React's "script tag" warning.
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
-  return <ThemeProvider>{children}</ThemeProvider>;
+ return <ThemeProvider>{children}</ThemeProvider>;
 }

@@ -6,6 +6,7 @@ import { adminAr } from '@/lib/i18n/admin-ar';
 import { Product, ProductVariant, ProductSeo } from '@/data/mock/products';
 import { ProductValidator } from '@/lib/validations/product';
 import { ProductService } from '@/lib/services/product.service';
+import { CategoryService } from '@/lib/services/category.service';
 import { ImageUpload } from '@/components/admin/ui/ImageUpload';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,12 +16,12 @@ import { Card } from '@/components/admin/design-system/Card';
 import { Input } from '@/components/admin/design-system/Input';
 import { Button } from '@/components/admin/design-system/Button';
 import { Tabs } from '@/components/admin/design-system/Layout';
-import { 
- IconDeviceFloppy, 
- IconArrowRight, 
- IconEye, 
- IconPlus, 
- IconTrash 
+import {
+ IconDeviceFloppy,
+ IconArrowRight,
+ IconEye,
+ IconPlus,
+ IconTrash
 } from '@tabler/icons-react';
 
 interface ProductFormProps {
@@ -69,8 +70,9 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  const [activeTab, setActiveTab] = useState('general');
  const [saving, setSaving] = useState(false);
  const [allProducts, setAllProducts] = useState<Product[]>([]);
+ const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
  const [skuManuallyEdited, setSkuManuallyEdited] = useState(Boolean(isEdit && initialData?.sku));
- 
+
  const [formData, setFormData] = useState<Partial<Product>>({
  name: '', sku: '', slug: '', shortDescription: '', description: '',
  category: 'Áo sơ mi', collection: 'Office Essentials', season: 'summer', brand: 'Soft Muse',
@@ -84,7 +86,15 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  useEffect(() => {
  ProductService.getProducts().then(setAllProducts);
+ CategoryService.getCategories()
+ .then((items) => setCategoryOptions(items.filter((category) => category.status === 'active').map((category) => category.name)))
+ .catch(() => setCategoryOptions([]));
  }, []);
+
+ useEffect(() => {
+ if (isEdit || categoryOptions.length === 0) return;
+ setFormData((current) => current.category ? current : { ...current, category: categoryOptions[0] });
+ }, [categoryOptions, isEdit]);
 
  useEffect(() => {
  if (isEdit || skuManuallyEdited) return;
@@ -133,7 +143,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
- 
+
  const validation = ProductValidator.validate(formData, allProducts);
  if (!validation.isValid) {
  const firstError = Object.values(validation.errors)[0];
@@ -175,97 +185,97 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  >
  {/* General Tab */}
  {activeTab === 'general' && (
- <div className="space-y-6"> <Input 
- label="Tên sản phẩm" 
- required 
- value={formData.name || ''} 
+ <div className="space-y-6"> <Input
+ label="Tên sản phẩm"
+ required
+ value={formData.name || ''}
  onChange={(e) => handleNameChange(e.target.value)}
- placeholder="Ví dụ: Áo sơ mi lụa mềm Muse" 
- /> <Input 
+ placeholder="Ví dụ: Áo sơ mi lụa mềm Muse"
+ /> <Input
  label="Đường dẫn sản phẩm"
- required 
- value={formData.slug || ''} 
- onChange={(e) => handleChange('slug', e.target.value)} 
+ required
+ value={formData.slug || ''}
+ onChange={(e) => handleChange('slug', e.target.value)}
  placeholder="Tự tạo từ tên sản phẩm"
- className="dir-ltr text-left" 
+ className="dir-ltr text-left"
  /> <p className="-mt-4 text-[10px] text-[var(--admin-text-muted)]">Dùng trong URL và SEO, ví dụ: ao-so-mi-lua-mem-muse.</p> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mô tả ngắn</label> <textarea
- rows={2} 
- value={formData.shortDescription || ''} 
- onChange={(e) => handleChange('shortDescription', e.target.value)} 
- className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] focus:border-[var(--admin-primary)] outline-none resize-y text-sm bg-transparent" 
- placeholder="Mô tả ngắn hiển thị trong danh sách sản phẩm" 
- /> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mô tả </label> <textarea 
- rows={6} 
- value={formData.description || ''} 
- onChange={(e) => handleChange('description', e.target.value)} 
- className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] focus:border-[var(--admin-primary)] outline-none resize-y text-sm bg-transparent" 
- placeholder="Mô tả phom dáng, chất liệu và hướng dẫn bảo quản" 
- /> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <Input 
- label="Chất liệu (Material)" 
- value={formData.material || ''} 
- onChange={(e) => handleChange('material', e.target.value)} 
- /> <Input 
- label="Khối lượng (kg)" 
- type="number" 
- step="0.01" 
- value={formData.weight || 0} 
- onChange={(e) => handleChange('weight', Number(e.target.value))} 
+ rows={2}
+ value={formData.shortDescription || ''}
+ onChange={(e) => handleChange('shortDescription', e.target.value)}
+ className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] focus:border-[var(--admin-primary)] outline-none resize-y text-sm bg-transparent"
+ placeholder="Mô tả ngắn hiển thị trong danh sách sản phẩm"
+ /> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mô tả </label> <textarea
+ rows={6}
+ value={formData.description || ''}
+ onChange={(e) => handleChange('description', e.target.value)}
+ className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] focus:border-[var(--admin-primary)] outline-none resize-y text-sm bg-transparent"
+ placeholder="Mô tả phom dáng, chất liệu và hướng dẫn bảo quản"
+ /> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <Input
+ label="Chất liệu (Material)"
+ value={formData.material || ''}
+ onChange={(e) => handleChange('material', e.target.value)}
+ /> <Input
+ label="Khối lượng (kg)"
+ type="number"
+ step="0.01"
+ value={formData.weight || 0}
+ onChange={(e) => handleChange('weight', Number(e.target.value))}
  /> </div> </div>
  )}
 
  {/* Images Tab */}
  {activeTab === 'images' && (
  <div className="space-y-4"> <p className="text-sm text-[var(--admin-text-muted)]">Tải tối đa 6 ảnh. Ảnh đầu tiên được dùng làm ảnh đại diện sản phẩm.</p> <ImageUpload
- multiple 
- images={formData.images || []} 
- onChange={(images) => handleChange('images', images.slice(0, 6))} 
+ multiple
+ images={formData.images || []}
+ onChange={(images) => handleChange('images', images.slice(0, 6))}
  /> </div>
  )}
 
  {/* Pricing & Inventory Tab */}
  {activeTab === 'pricing_inventory' && (
- <div className="space-y-6"> <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <Input 
- label="Giá" 
- required 
- type="number" 
- value={formData.price || 0} 
- onChange={(e) => handleChange('price', Number(e.target.value))} 
- /> <Input 
- label="Giá gốc (nếu giảm)" 
- type="number" 
- value={formData.comparePrice || 0} 
- onChange={(e) => handleChange('comparePrice', Number(e.target.value))} 
- /> <Input 
- label="Giá vốn" 
- type="number" 
- value={formData.costPrice || 0} 
- onChange={(e) => handleChange('costPrice', Number(e.target.value))} 
+ <div className="space-y-6"> <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <Input
+ label="Giá"
+ required
+ type="number"
+ value={formData.price || 0}
+ onChange={(e) => handleChange('price', Number(e.target.value))}
+ /> <Input
+ label="Giá gốc (nếu giảm)"
+ type="number"
+ value={formData.comparePrice || 0}
+ onChange={(e) => handleChange('comparePrice', Number(e.target.value))}
+ /> <Input
+ label="Giá vốn"
+ type="number"
+ value={formData.costPrice || 0}
+ onChange={(e) => handleChange('costPrice', Number(e.target.value))}
  /> </div> <div className="bg-[var(--admin-bg-elevated)] p-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border-base)] flex items-center justify-between"> <div> <p className="text-xs font-semibold text-[var(--admin-text-muted)] mb-1"></p> <p className="text-xl font-bold text-[var(--admin-primary)]">
  {ProductService.getProfitMargin(formData.price || 0, formData.costPrice || 0)}%
  </p> </div> <div className="text-left"> <p className="text-xs font-semibold text-[var(--admin-text-muted)] mb-1">Giảm giá</p> <p className="text-xl font-bold text-[var(--admin-danger)]">
  {ProductService.getDiscountPercentage(formData.price || 0, formData.comparePrice || 0)}%
- </p> </div> </div> <hr className="my-6 border-[var(--admin-border-light)]" /> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <Input 
- label="Mã SKU" 
- required 
- value={formData.sku || ''} 
+ </p> </div> </div> <hr className="my-6 border-[var(--admin-border-light)]" /> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <Input
+ label="Mã SKU"
+ required
+ value={formData.sku || ''}
  onChange={(e) => { setSkuManuallyEdited(true); handleChange('sku', e.target.value.toUpperCase()); }}
- placeholder="SM-ASM-001" 
- className="dir-ltr text-left" 
+ placeholder="SM-ASM-001"
+ className="dir-ltr text-left"
  /> <p className="-mt-3 text-[10px] text-[var(--admin-text-muted)]">Mã quản lý tồn kho được tạo tự động và không trùng với sản phẩm hiện có.</p> <Input
- label="Mã vạch" 
- value={formData.barcode || ''} 
- onChange={(e) => handleChange('barcode', e.target.value)} 
- className="dir-ltr text-left" 
- /> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <div className="space-y-1.5"> <Input 
- label="Tồn kho tổng" 
- type="number" 
- value={formData.stock || 0} 
- onChange={(e) => handleChange('stock', Number(e.target.value))} 
- /> <p className="text-[10px] text-[var(--admin-text-muted)]">.</p> </div> <Input 
- label="Ngưỡng cảnh báo tồn kho" 
- type="number" 
- value={formData.lowStockLimit || 0} 
- onChange={(e) => handleChange('lowStockLimit', Number(e.target.value))} 
+ label="Mã vạch"
+ value={formData.barcode || ''}
+ onChange={(e) => handleChange('barcode', e.target.value)}
+ className="dir-ltr text-left"
+ /> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <div className="space-y-1.5"> <Input
+ label="Tồn kho tổng"
+ type="number"
+ value={formData.stock || 0}
+ onChange={(e) => handleChange('stock', Number(e.target.value))}
+ /> <p className="text-[10px] text-[var(--admin-text-muted)]">.</p> </div> <Input
+ label="Ngưỡng cảnh báo tồn kho"
+ type="number"
+ value={formData.lowStockLimit || 0}
+ onChange={(e) => handleChange('lowStockLimit', Number(e.target.value))}
  /> </div> </div>
  )}
 
@@ -295,24 +305,24 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  {/* SEO Tab */}
  {activeTab === 'seo' && (
- <div className="space-y-6"> <div className="space-y-1.5"> <Input 
- label="Meta title (Meta Title)" 
- value={formData.seo?.metaTitle || ''} 
- onChange={(e) => handleSeoChange('metaTitle', e.target.value)} 
- /> <p className="text-[10px] text-[var(--admin-text-muted)]">trongCông cụ tìm kiếm. 50-60.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Meta description (Meta Description)</label> <textarea 
- rows={3} 
- value={formData.seo?.metaDescription || ''} 
- onChange={(e) => handleSeoChange('metaDescription', e.target.value)} 
- className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-transparent outline-none focus:border-[var(--admin-primary)] resize-y text-sm" 
- /> </div> <Input 
- label="Từ khóa" 
- value={formData.seo?.keywords || ''} 
- onChange={(e) => handleSeoChange('keywords', e.target.value)} 
- placeholder="Nhập nội dung" 
- /> <Input 
- label="tiêu đềOpenGraph ()" 
- value={formData.seo?.ogTitle || ''} 
- onChange={(e) => handleSeoChange('ogTitle', e.target.value)} 
+ <div className="space-y-6"> <div className="space-y-1.5"> <Input
+ label="Meta title (Meta Title)"
+ value={formData.seo?.metaTitle || ''}
+ onChange={(e) => handleSeoChange('metaTitle', e.target.value)}
+ /> <p className="text-[10px] text-[var(--admin-text-muted)]">trongCông cụ tìm kiếm. 50-60.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Meta description (Meta Description)</label> <textarea
+ rows={3}
+ value={formData.seo?.metaDescription || ''}
+ onChange={(e) => handleSeoChange('metaDescription', e.target.value)}
+ className="w-full px-3 py-2 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-transparent outline-none focus:border-[var(--admin-primary)] resize-y text-sm"
+ /> </div> <Input
+ label="Từ khóa"
+ value={formData.seo?.keywords || ''}
+ onChange={(e) => handleSeoChange('keywords', e.target.value)}
+ placeholder="Nhập nội dung"
+ /> <Input
+ label="tiêu đềOpenGraph ()"
+ value={formData.seo?.ogTitle || ''}
+ onChange={(e) => handleSeoChange('ogTitle', e.target.value)}
  /> </div>
  )}
 
@@ -329,18 +339,18 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  </motion.div> </AnimatePresence> </Card> </div>
 
  {/* Sidebar */}
- <div className="space-y-6"> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">sản phẩm</h3> <select 
- value={formData.status} 
+ <div className="space-y-6"> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">sản phẩm</h3> <select
+ value={formData.status}
  onChange={(e) => handleChange('status', e.target.value)}
  className="w-full px-3 py-2 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
- > <option value="draft">Nháp</option> <option value="published">Đã xuất bản</option> <option value="hidden"></option> <option value="archived">Đã lưu trữ</option> </select> </Card> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">Phân loại</h3> <div className="space-y-3"> <Input 
- label="Thương hiệu" 
- value={formData.brand || ''} 
- onChange={(e) => handleChange('brand', e.target.value)} 
- /> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">(Category)</label> <select value={formData.category} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="Thời trang đông">Thời trang đông (Winter Collection)</option> <option value="Thời trang hè">Thời trang hè (Summer Collection)</option> <option value="Cửa hàng">Cửa hàng (Shop)</option> </select> <p className="text-[10px] text-[var(--admin-text-muted)]">Cửa hàng —Lọc Sản phẩm trongBảng điều khiển.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">(Collection)</label> <select value={formData.collection} onChange={(e) => handleChange('collection', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="couture">couture</option> <option value="Bộ sưu tập ">Bộ sưu tập </option> <option value="vàmùa đông 2027">vàmùa đông 2027</option> <option value="vàmùa hè 2027">vàmùa hè 2027</option> </select> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mùa (Season)</label> <select value={formData.season || 'summer'} onChange={(e) => handleChange('season', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="summer">mùa hè (Summer)</option> <option value="winter">mùa đông (Winter)</option> </select> </div> <Input 
- label="Thẻ sản phẩm" 
- value={formData.tags?.join(', ') || ''} 
- onChange={(e) => handleChange('tags', e.target.value.split(',').map(t=>t.trim()).filter(Boolean))} 
+ > <option value="draft">Nháp</option> <option value="published">Đã xuất bản</option> <option value="hidden"></option> <option value="archived">Đã lưu trữ</option> </select> </Card> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">Phân loại</h3> <div className="space-y-3"> <Input
+ label="Thương hiệu"
+ value={formData.brand || ''}
+ onChange={(e) => handleChange('brand', e.target.value)}
+ /> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Danh mục</label> <select value={formData.category} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> {categoryOptions.length ? categoryOptions.map((category) => <option key={category} value={category}>{category}</option>) : <option value={formData.category || ''}>{formData.category || 'Chưa có danh mục'}</option>} </select> <p className="text-[10px] text-[var(--admin-text-muted)]">Danh mục lấy từ trang quản lý danh mục và dùng để lọc sản phẩm ngoài website.</p> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">(Collection)</label> <select value={formData.collection} onChange={(e) => handleChange('collection', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="couture">couture</option> <option value="Bộ sưu tập ">Bộ sưu tập </option> <option value="vàmùa đông 2027">vàmùa đông 2027</option> <option value="vàmùa hè 2027">vàmùa hè 2027</option> </select> </div> <div className="space-y-1.5"> <label className="text-xs font-semibold text-[var(--admin-text-muted)]">Mùa (Season)</label> <select value={formData.season || 'summer'} onChange={(e) => handleChange('season', e.target.value)} className="w-full px-3 h-10 border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] bg-[var(--admin-bg-base)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"> <option value="summer">mùa hè (Summer)</option> <option value="winter">mùa đông (Winter)</option> </select> </div> <Input
+ label="Thẻ sản phẩm"
+ value={formData.tags?.join(', ') || ''}
+ onChange={(e) => handleChange('tags', e.target.value.split(',').map(t=>t.trim()).filter(Boolean))}
  placeholder="(,)"
  /> </div> </Card> <Card className="p-5 space-y-4"> <h3 className="text-sm font-bold border-b border-[var(--admin-border-light)] pb-2">sản phẩm (Flags)</h3> <div className="space-y-3"> <label className="flex items-center gap-3 cursor-pointer group"> <input type="checkbox" checked={formData.featured || false} onChange={(e) => handleChange('featured', e.target.checked)} className="w-4 h-4 rounded border-[var(--admin-border-strong)] text-[var(--admin-primary)] focus:ring-[var(--admin-primary)] transition-colors" /> <span className="text-sm text-[var(--admin-text-base)] group-hover:text-[var(--admin-primary)] transition-colors">Sản phẩm nổi bật</span> </label> <label className="flex items-center gap-3 cursor-pointer group"> <input type="checkbox" checked={formData.bestSeller || false} onChange={(e) => handleChange('bestSeller', e.target.checked)} className="w-4 h-4 rounded border-[var(--admin-border-strong)] text-[var(--admin-primary)] focus:ring-[var(--admin-primary)] transition-colors" /> <span className="text-sm text-[var(--admin-text-base)] group-hover:text-[var(--admin-primary)] transition-colors">Bán chạy nhất</span> </label> <label className="flex items-center gap-3 cursor-pointer group"> <input type="checkbox" checked={formData.newArrival || false} onChange={(e) => handleChange('newArrival', e.target.checked)} className="w-4 h-4 rounded border-[var(--admin-border-strong)] text-[var(--admin-primary)] focus:ring-[var(--admin-primary)] transition-colors" /> <span className="text-sm text-[var(--admin-text-base)] group-hover:text-[var(--admin-primary)] transition-colors">Hàng mới về</span> </label> </div> </Card> </div> </div> </form>
  );

@@ -11,9 +11,9 @@ import {
 import { ProductCard } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { useStorefrontCategories } from "@/hooks/useStorefrontCategories";
 import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/mock/products";
 
-const CATEGORIES = ["", "Áo sơ mi", "Áo kiểu", "Chân váy", "Váy", "Quần tây", "Blazer", "Set đồ", "Phụ kiện"];
 const SIZES = ["XS", "S", "M", "L", "XL", "F"];
 const COLORS = ["Trắng kem", "Đen", "Hồng đất", "Be", "Nâu mocha", "Xám ghi", "Xanh navy", "Xanh sage"];
 const PAGE_SIZE = 12;
@@ -21,6 +21,7 @@ const PAGE_SIZE = 12;
 function ShopContent() {
   const searchParams = useSearchParams();
   const products = useStorefrontProducts();
+  const categories = useStorefrontCategories();
   const categoryParam = searchParams.get("category");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,12 +34,14 @@ function ShopContent() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    if (categoryParam && CATEGORIES.includes(categoryParam)) {
-      setSelectedCategory(categoryParam);
-    } else {
-      setSelectedCategory("");
-    }
+    setSelectedCategory(categoryParam ?? "");
   }, [categoryParam]);
+
+  const categoryOptions = useMemo(() => {
+    const adminCategories = categories.map((category) => category.name);
+    const productCategories = products.map((product) => product.category).filter(Boolean);
+    return ["", ...Array.from(new Set([...adminCategories, ...productCategories]))];
+  }, [categories, products]);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -47,9 +50,10 @@ function ShopContent() {
       const matchesSearch =
         !query ||
         product.name.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query) ||
         product.collection.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query);
-      const matchesCategory = selectedCategory === "" || product.collection === selectedCategory;
+      const matchesCategory = selectedCategory === "" || product.category === selectedCategory;
       const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
       const matchesSize =
         selectedSizes.length === 0 || Boolean(product.sizes?.some((size) => selectedSizes.includes(size)));
@@ -104,7 +108,7 @@ function ShopContent() {
 
       <section className="w-full max-w-[1280px] px-6 md:px-12 py-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-brand-border/60">
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-          {CATEGORIES.map((category) => (
+          {categoryOptions.map((category) => (
             <button
               key={category || "all"}
               onClick={() => setSelectedCategory(category)}

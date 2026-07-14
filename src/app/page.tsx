@@ -8,17 +8,11 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Button from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/Card";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { useStorefrontCategories } from "@/hooks/useStorefrontCategories";
 import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/mock/products";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { heroFadeUp, scrollViewport } from "@/lib/animations";
 import { HOME_CONTENT, usePageContent } from "@/hooks/usePageContent";
-
-const categories = [
-  { title: "Áo sơ mi", href: "/shop?category=Áo sơ mi", image: "/images/campaign/campaign_2.png" },
-  { title: "Váy công sở", href: "/shop?category=Váy", image: "/images/products/product_evening_gown.png" },
-  { title: "Blazer", href: "/shop?category=Blazer", image: "/images/products/product_winter_coat.png" },
-  { title: "Set đồ", href: "/shop?category=Set đồ", image: "/images/campaign/campaign_4.png" },
-];
 
 const testimonials = [
   {
@@ -39,12 +33,27 @@ export default function HomePage() {
   const content = usePageContent(HOME_CONTENT);
   const reduceMotion = useReducedMotion();
   const products = useStorefrontProducts();
+  const categories = useStorefrontCategories();
   const [heroSlide, setHeroSlide] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const newArrivals = products.filter((product) => product.newArrival).slice(0, 4);
   const bestSellers = products.filter((product) => product.bestSeller).slice(0, 4);
+  const homepageCategories = useMemo(() => {
+    const visible = categories
+      .filter((category) => category.showOnHomepage)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+    return (visible.length ? visible : categories).slice(0, 4).map((category) => {
+      const firstProduct = products.find((product) => product.category === category.name);
+      return {
+        id: category.id,
+        title: category.name,
+        href: `/shop?category=${encodeURIComponent(category.name)}`,
+        image: category.thumbnail || (firstProduct ? primaryImage(firstProduct) : "") || "/images/campaign/campaign_2.png",
+      };
+    });
+  }, [categories, products]);
   const heroImages = useMemo(() => Array.from(new Set([
     content.home_hero_image,
     content.home_hero_image_2,
@@ -154,8 +163,8 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {categories.map((category) => (
-            <Link key={category.title} href={category.href} className="relative aspect-[3/4] overflow-hidden border border-brand-border group bg-background-secondary">
+          {homepageCategories.map((category) => (
+            <Link key={category.id} href={category.href} className="relative aspect-[3/4] overflow-hidden border border-brand-border group bg-background-secondary">
               <Image src={category.image} alt={category.title} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-[1200ms] group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-text-primary/65 via-transparent to-transparent" />
               <h3 className="absolute bottom-5 left-5 right-5 font-sans text-xl text-background-secondary font-medium">

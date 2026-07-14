@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ProductCard } from "@/components/ui/Card";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { useStorefrontCategories } from "@/hooks/useStorefrontCategories";
+import type { Category } from "@/lib/services/category.service";
 import { discountOriginalPrice, primaryImage, resolveStockStatus, type Product } from "@/data/mock/products";
 
 interface ProductCollectionPageProps {
@@ -20,8 +22,9 @@ export default function ProductCollectionPage({
   filter,
 }: ProductCollectionPageProps) {
   const products = useStorefrontProducts();
+  const categories = useStorefrontCategories();
   const visibleProducts = resolveProducts(products, filter);
-  const grouped = groupByCollection(products);
+  const grouped = groupByCategory(products, categories);
 
   return (
     <div className="min-h-screen bg-background-primary">
@@ -49,7 +52,7 @@ export default function ProductCollectionPage({
                 className="group relative aspect-[4/5] overflow-hidden border border-brand-border bg-background-secondary"
               >
                 <Image
-                  src={primaryImage(collection.products[0])}
+                  src={collection.image}
                   alt={collection.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
@@ -99,16 +102,33 @@ function resolveProducts(products: Product[], filter: ProductCollectionPageProps
   return products;
 }
 
-function groupByCollection(products: Product[]): { name: string; products: Product[] }[] {
-  const map = new Map<string, Product[]>();
+function groupByCategory(
+  products: Product[],
+  categories: Category[],
+): { name: string; image: string; products: Product[] }[] {
+  const byCategory = new Map<string, Product[]>();
   products.forEach((product) => {
-    const current = map.get(product.collection) ?? [];
+    if (!product.category) return;
+    const current = byCategory.get(product.category) ?? [];
     current.push(product);
-    map.set(product.collection, current);
+    byCategory.set(product.category, current);
   });
 
-  return Array.from(map.entries()).map(([name, groupedProducts]) => ({
+  if (categories.length) {
+    return categories
+      .map((category) => {
+        const groupedProducts = byCategory.get(category.name) ?? [];
+        return {
+          name: category.name,
+          image: category.thumbnail || (groupedProducts[0] ? primaryImage(groupedProducts[0]) : "") || "/images/campaign/campaign_2.png",
+          products: groupedProducts,
+        };
+      });
+  }
+
+  return Array.from(byCategory.entries()).map(([name, groupedProducts]) => ({
     name,
+    image: groupedProducts[0] ? primaryImage(groupedProducts[0]) : "/images/campaign/campaign_2.png",
     products: groupedProducts,
   }));
 }

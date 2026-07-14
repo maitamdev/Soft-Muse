@@ -139,9 +139,9 @@ function TrackingContent({ c, supportUrl }: { c: typeof DEFAULT_CONTENT; support
  className="w-full flex flex-col gap-12"
  >
  {/* Timeline Container */}
- <div className="bg-background-secondary border border-brand-border p-6 md:p-10 flex flex-col gap-8 text-left" dir="ltr"> <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-brand-border pb-4"> <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Đơn hàng :</span> <h2 className="font-sans text-lg font-bold text-accent mt-0.5">{meta.label}</h2> </div> <div className="md:text-left"> <span className="font-sans text-[10px] text-text-secondary font-medium block">:</span> <span className="font-sans text-sm font-semibold text-text-primary">
+ <div className="bg-background-secondary border border-brand-border p-6 md:p-10 flex flex-col gap-8 text-left" dir="ltr"> <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-brand-border pb-4"> <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Trạng thái đơn hàng</span> <h2 className="font-sans text-lg font-bold text-accent mt-0.5">{meta.label}</h2> </div> <div className="md:text-left"> <span className="font-sans text-[10px] text-text-secondary font-medium block">Dự kiến giao hàng</span> <span className="font-sans text-sm font-semibold text-text-primary">
  {order.status === "delivered"
- ? "đã"
+ ? "Đã giao thành công"
  : order.estimatedDeliveryDate
  ? formatDate(order.estimatedDeliveryDate)
  : estimateDelivery(order)}
@@ -187,7 +187,7 @@ function TrackingContent({ c, supportUrl }: { c: typeof DEFAULT_CONTENT; support
  src={item.image || "/images/products/product_evening_gown.png"}
  alt={item.productName} fill sizes="56px" className="object-cover"
  /> </div> <div className="flex-grow min-w-0"> <h4 className="font-sans text-xs font-semibold text-text-primary truncate">{item.productName}</h4> <span className="text-[10px] text-text-secondary font-light block mt-0.5">
- {item.size ? `Kích cỡ: ${item.size}` : ""}{item.size && item.color ? " | " : ""}{item.color ? `:${item.color}` : ""}{(item.size || item.color) ? " | " : ""}:{item.quantity}
+ {item.size ? `Kích cỡ: ${item.size}` : ""}{item.size && item.color ? " | " : ""}{item.color ? `Màu: ${item.color}` : ""}{(item.size || item.color) ? " | " : ""}Số lượng: {item.quantity}
  </span> </div> <span className="font-display text-xs font-bold text-accent shrink-0">
  {formatCurrency(item.price * item.quantity)}
  </span> </div>
@@ -200,10 +200,10 @@ function TrackingContent({ c, supportUrl }: { c: typeof DEFAULT_CONTENT; support
  <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Vận chuyển</span> <p className="font-sans text-xs font-bold text-text-primary mt-0.5">{order.shippingCompany}</p> </div>
  )}
  {order.trackingNumber && (
- <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Mã </span> <p className="font-sans text-xs font-bold text-text-primary mt-0.5" dir="ltr">{order.trackingNumber}</p> </div>
+ <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Mã vận đơn</span> <p className="font-sans text-xs font-bold text-text-primary mt-0.5" dir="ltr">{order.trackingNumber}</p> </div>
  )}
  {order.courierName && (
- <div> <span className="font-sans text-[10px] text-text-secondary font-medium">giao hàng</span> <p className="font-sans text-xs font-bold text-text-primary mt-0.5">{order.courierName}</p> </div>
+ <div> <span className="font-sans text-[10px] text-text-secondary font-medium">Nhân viên giao hàng</span> <p className="font-sans text-xs font-bold text-text-primary mt-0.5">{order.courierName}</p> </div>
  )}
  </div>
  )}

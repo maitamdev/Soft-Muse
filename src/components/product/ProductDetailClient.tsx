@@ -116,7 +116,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  color: selectedColor,
  collection: product.collection,
  variantImages: galleryImages,
- });
+ }, quantity);
  analytics.trackAddToCart(product.id, product.name, product.price, selectedSize, selectedColor, quantity);
  showNotification(
  "Đã thêm sản phẩm vào giỏ hàng.",

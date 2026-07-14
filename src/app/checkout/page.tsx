@@ -198,7 +198,7 @@ export default function CheckoutPage() {
  customerEmail: form.email.trim(),
  customerPhone: form.phone.trim(),
  shippingAddress: `${governorateLabelValue} - ${form.address}`,
- shipping: 0,
+ shipping: shippingFee,
  taxRate: 0,
  discount,
  couponCode: appliedCoupon?.code ?? null,

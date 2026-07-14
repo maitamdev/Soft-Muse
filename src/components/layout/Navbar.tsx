@@ -188,7 +188,7 @@ export default function Navbar() {
  <button
  onClick={() => setMobileMenuOpen(true)}
  className="md:hidden p-2 text-text-primary hover:text-accent transition-colors"
- aria-label="Thao tác"
+ aria-label="Mở menu"
  > <Menu className="w-6 h-6 stroke-[1.5]" /> </button>
 
  {/* Desktop Left Links */}
@@ -259,7 +259,7 @@ export default function Navbar() {
  > <PiMagnifyingGlassThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" /> </button>
 
  {/* Wishlist */}
- <Link href="/wishlist" className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center" aria-label="Thao tác"> <PiHeartThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
+ <Link href="/wishlist" className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center" aria-label="Danh sách yêu thích"> <PiHeartThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
  {wishlist.length > 0 && (
  <span className="absolute -top-1 -right-2 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-medium text-white shadow-sm border border-background-secondary leading-none">
  {wishlist.length > 9 ? "9+" : wishlist.length}
@@ -271,7 +271,7 @@ export default function Navbar() {
  <button
  onClick={() => setCartOpen(true)}
  className="text-text-primary hover:text-accent transition-all duration-300 relative group flex items-center justify-center"
- aria-label="Thao tác"
+ aria-label="Mở giỏ hàng"
  > <PiHandbagThin className="w-[25px] h-[25px] transition-transform duration-300 group-hover:scale-[1.05]" />
  {cartCount > 0 && (
  <span className="absolute -top-1 -right-2 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-medium text-white shadow-sm border border-background-secondary leading-none">
@@ -342,7 +342,7 @@ export default function Navbar() {
  initial={{ opacity: 0, y: 20 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
- > <div className="flex justify-between items-center border-t border-brand-border/40 pt-8"> <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"> <MessageCircle className="w-5 h-5 stroke-[1]" /> <span className="font-sans text-xs">Zalo</span> </a> <button onClick={() => { setCartOpen(true); setMobileMenuOpen(false); }} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors relative"> <span className="font-sans text-xs"></span> <ShoppingBag className="w-5 h-5 stroke-[1]" />
+ > <div className="flex justify-between items-center border-t border-brand-border/40 pt-8"> <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"> <MessageCircle className="w-5 h-5 stroke-[1]" /> <span className="font-sans text-xs">Zalo</span> </a> <button onClick={() => { setCartOpen(true); setMobileMenuOpen(false); }} className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors relative"> <span className="font-sans text-xs">Giỏ hàng</span> <ShoppingBag className="w-5 h-5 stroke-[1]" />
  {cartCount > 0 && (
  <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-background-secondary">
  {cartCount}
@@ -387,7 +387,7 @@ export default function Navbar() {
  addRecentSearch(searchQuery);
  }
  }}
- placeholder="Tìm kiếmvềVáy,,linen."
+ placeholder="Tìm váy, áo sơ mi, blazer..."
  className="w-full text-base font-sans font-light outline-none bg-transparent placeholder:text-text-secondary/40 text-left"
  dir="ltr"
  autoFocus
@@ -410,8 +410,8 @@ export default function Navbar() {
  {/* Left Column: Popular & Recent */}
  <div className="flex flex-col gap-6 border-e border-brand-border/40 pe-6">
  {/* Popular Suggestions */}
- <div> <h4 className="font-sans text-[10px] text-accent font-bold uppercase mb-3"></h4> <div className="flex flex-wrap gap-2">
- {["", "", "", ""].map((term) => (
+ <div> <h4 className="font-sans text-[10px] text-accent font-bold uppercase mb-3">Tìm kiếm phổ biến</h4> <div className="flex flex-wrap gap-2">
+ {["Áo sơ mi", "Váy công sở", "Blazer", "Set đồ"].map((term) => (
  <button
  key={term}
  onClick={() => handleSuggestionClick(term)}
@@ -424,10 +424,10 @@ export default function Navbar() {
 
  {/* Recent Searches */}
  {recentSearches.length > 0 && (
- <div className="flex flex-col gap-2"> <div className="flex justify-between items-center"> <h4 className="font-sans text-[10px] text-accent font-bold uppercase">Tìm kiếm </h4> <button
+ <div className="flex flex-col gap-2"> <div className="flex justify-between items-center"> <h4 className="font-sans text-[10px] text-accent font-bold uppercase">Tìm kiếm gần đây</h4> <button
  onClick={clearRecentSearches}
  className="text-[9px] text-text-secondary hover:text-accent transition-colors underline"
- >Thao tác</button> </div> <ul className="flex flex-col gap-1">
+ >Xóa</button> </div> <ul className="flex flex-col gap-1">
  {recentSearches.map((term, index) => (
  <li key={index} className="flex items-center justify-between group"> <button
  onClick={() => handleSuggestionClick(term)}
@@ -446,13 +446,13 @@ export default function Navbar() {
  /* Skeletons */
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6"> <div className="flex gap-3 items-center border border-brand-border/40 p-2"><Skeleton className="w-12 h-16 shrink-0" /><div className="flex flex-col gap-2 w-full"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-3 w-1/4" /></div></div> <div className="flex gap-3 items-center border border-brand-border/40 p-2"><Skeleton className="w-12 h-16 shrink-0" /><div className="flex flex-col gap-2 w-full"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-3 w-1/4" /></div></div> <div className="flex gap-3 items-center border border-brand-border/40 p-2"><Skeleton className="w-12 h-16 shrink-0" /><div className="flex flex-col gap-2 w-full"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-3 w-1/4" /></div></div> </div>
  ) : searchQuery.trim() === "" ? (
- <p className="text-xs text-text-secondary font-light">Tìm kiếm sản phẩm Soft Muse.</p>
+ <p className="text-xs text-text-secondary font-light">Nhập tên sản phẩm, bộ sưu tập hoặc chất liệu bạn cần tìm.</p>
  ) : searchResults.length === 0 ? (
  /* Premium empty state */
- <div className="py-12 flex flex-col justify-center items-center gap-2 border border-dashed border-brand-border bg-background-primary"> <p className="font-sans text-sm font-medium text-text-primary">Tìm kiếm</p> <p className="text-xs text-text-secondary font-light">từ</p> </div>
+ <div className="py-12 flex flex-col justify-center items-center gap-2 border border-dashed border-brand-border bg-background-primary"> <p className="font-sans text-sm font-medium text-text-primary">Không tìm thấy sản phẩm</p> <p className="text-xs text-text-secondary font-light">Thử một từ khóa ngắn hoặc danh mục khác.</p> </div>
  ) : (
  /* Results list */
- <div> <h4 className="font-sans text-[10px] text-accent font-bold uppercase mb-4">({searchResults.length})</h4> <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+ <div> <h4 className="font-sans text-[10px] text-accent font-bold uppercase mb-4">{searchResults.length} kết quả</h4> <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
  {searchResults.map((product) => (
  <Link
  href={`/product/${product.id}`}
@@ -492,8 +492,8 @@ export default function Navbar() {
  className="fixed top-0 right-0 bottom-0 w-full max-w-[450px] bg-background-secondary z-50 p-6 md:p-8 flex flex-col"
  role="dialog"
  aria-modal="true"
- aria-label="Thao tác"
- > <div className="flex justify-between items-center border-b border-brand-border pb-4"> <div className="flex items-center gap-2"> <span className="font-sans text-base font-semibold"></span> <span className="font-display text-xs text-text-secondary">({cartCount} )</span> </div> <button
+ aria-label="Giỏ hàng"
+ > <div className="flex justify-between items-center border-b border-brand-border pb-4"> <div className="flex items-center gap-2"> <span className="font-sans text-base font-semibold">Giỏ hàng</span> <span className="font-display text-xs text-text-secondary">({cartCount} sản phẩm)</span> </div> <button
  ref={cartCloseRef}
  onClick={() => setCartOpen(false)}
  className="p-1 hover:text-accent transition-colors"
@@ -503,12 +503,12 @@ export default function Navbar() {
  {/* Items List */}
  <div className="flex-grow overflow-y-auto py-4 flex flex-col gap-4">
  {cart.length === 0 ? (
- <div className="h-full flex flex-col justify-center items-center text-center gap-4 py-12"> <ShoppingBag className="w-12 h-12 stroke-[1] text-brand-border" /> <div> <p className="font-sans text-base font-semibold">trống</p> <p className="text-xs text-text-secondary font-light mt-1"></p> </div> <Link
+ <div className="h-full flex flex-col justify-center items-center text-center gap-4 py-12"> <ShoppingBag className="w-12 h-12 stroke-[1] text-brand-border" /> <div> <p className="font-sans text-base font-semibold">Giỏ hàng đang trống</p> <p className="text-xs text-text-secondary font-light mt-1">Khám phá những thiết kế mới từ Soft Muse.</p> </div> <Link
  href="/shop"
  onClick={() => setCartOpen(false)}
  className="inline-flex items-center justify-center bg-text-primary text-background-secondary font-sans text-xs min-h-[44px] px-8 hover:bg-accent transition-colors mt-4"
  >
- Cửa hàng
+ Mua sắm ngay
  </Link> </div>
  ) : (
  cart.map((item) => (
@@ -519,18 +519,18 @@ export default function Navbar() {
  {item.collection || "Soft Muse"}
  </span> <h4 className="font-sans text-sm font-medium text-text-primary leading-snug">
  {item.title}
- </h4> <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2"> <div>:<span className="text-text-primary font-medium">{item.color || ""}</span></div> <div>Kích cỡ: <span className="text-text-primary font-medium">{item.size || ""}</span></div> </div> </div> <div className="flex justify-between items-center mt-2">
+ </h4> {(item.color || item.size) && <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2">{item.color && <div>Màu: <span className="text-text-primary font-medium">{item.color}</span></div>}{item.size && <div>Kích cỡ: <span className="text-text-primary font-medium">{item.size}</span></div>}</div>} </div> <div className="flex justify-between items-center mt-2">
  {/* Quantity control */}
  <div className="flex items-center border border-brand-border bg-background-primary"> <button
  onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}
  className="px-2.5 py-1.5 text-xs text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
- aria-label="Số lượng"
+ aria-label="Giảm số lượng"
  > <Minus className="w-3 h-3" /> </button> <span className="px-2 text-xs font-semibold w-8 text-center font-display">
  {item.quantity}
  </span> <button
  onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
  className="px-2.5 py-1.5 text-xs text-text-secondary hover:text-accent hover:bg-background-secondary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
- aria-label="Số lượng"
+ aria-label="Tăng số lượng"
  > <Plus className="w-3 h-3" /> </button> </div> <span className="text-sm font-bold font-display">
  {(item.price * item.quantity).toLocaleString()} đ
  </span> </div> </div> <button
@@ -544,19 +544,19 @@ export default function Navbar() {
 
  {/* Summary Bottom */}
  {cart.length > 0 && (
- <div className="border-t border-brand-border pt-4 mt-auto"> <div className="flex justify-between items-center mb-4"> <span className="font-sans text-sm font-medium"></span> <span className="text-lg font-bold text-accent font-display">
+ <div className="border-t border-brand-border pt-4 mt-auto"> <div className="flex justify-between items-center mb-4"> <span className="font-sans text-sm font-medium">Tạm tính</span> <span className="text-lg font-bold text-accent font-display">
  {cartSubtotal.toLocaleString()} đ
  </span> </div> <p className="text-[11px] font-sans text-text-secondary mb-4 leading-relaxed">
- Đónggói cao cấp vàVận chuyển Tất cả Việt Nam.</p> <div className="flex flex-col gap-2"> <Link
+ Miễn phí vận chuyển cho đơn từ 800.000 đ.</p> <div className="flex flex-col gap-2"> <Link
  href="/checkout"
  onClick={() => setCartOpen(false)}
  className="inline-flex items-center justify-center bg-text-primary text-background-secondary font-sans text-xs min-h-[46px] hover:bg-accent transition-all duration-500 text-center w-full"
  >
- Đơn hàng
+ Thanh toán
  </Link> <button
  onClick={() => setCartOpen(false)}
  className="text-center text-xs text-text-secondary hover:text-text-primary py-2 underline underline-offset-4"
- > </button> </div> </div>
+ >Tiếp tục mua sắm</button> </div> </div>
  )}
  </motion.div> </>
  )}
@@ -592,7 +592,7 @@ export default function Navbar() {
  {wishlist.length}
  </span>
  )}
- <span className="text-[9px] font-sans"></span> </Link> <button
+ <span className="text-[9px] font-sans">Yêu thích</span> </Link> <button
  onClick={() => {
  setCartOpen(true);
  setMobileMenuOpen(false);
@@ -612,7 +612,7 @@ export default function Navbar() {
  {cartCount}
  </motion.span>
  )}
- <span className="text-[9px] font-sans"></span> </button> </nav> </div>
+ <span className="text-[9px] font-sans">Giỏ hàng</span> </button> </nav> </div>
  );
 }
 

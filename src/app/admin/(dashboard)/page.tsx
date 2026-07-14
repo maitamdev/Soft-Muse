@@ -267,7 +267,7 @@ export default function DashboardHome() {
               { href: "/admin/products", icon: <IconPackage size={18} />, label: "Quản lý sản phẩm", helper: "Giá, ảnh, size, tồn kho" },
               { href: "/admin/orders", icon: <IconTruckDelivery size={18} />, label: "Xử lý đơn hàng", helper: "Xác nhận và cập nhật giao hàng" },
               { href: "/admin/coupons", icon: <IconDiscount2 size={18} />, label: "Mã giảm giá", helper: "Tạo ưu đãi và chiến dịch" },
-              { href: "/admin/website/home", icon: <IconChartBar size={18} />, label: "Trang chủ website", helper: "Banner, section và nội dung" },
+              { href: "/admin/collections", icon: <IconChartBar size={18} />, label: "Bộ sưu tập", helper: "Sắp xếp nhóm sản phẩm nổi bật" },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border-light)] bg-[var(--admin-bg-card)] p-3 transition hover:border-[var(--admin-primary)] hover:bg-[var(--admin-bg-hover)]">
                 <span className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--admin-primary-muted)] text-[var(--admin-primary)]">{item.icon}</span>

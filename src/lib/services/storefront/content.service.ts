@@ -1,5 +1,5 @@
-import { mockStorage } from '@/lib/storage/mock-storage';
 import { eventBus } from '@/lib/events/EventBus';
+import { createClient } from '@/lib/supabase/client';
 
 export interface ContentBlock {
  id: string;
@@ -34,15 +34,15 @@ let mockContent: ContentBlock[] = [
 
  // ── Pages — Tracking ─────────────────────────────────────────────────
  { id: 'cnt-tracking-hero-title', group: 'pages', key: 'tracking_hero_title', value: 'Theo dõi đơn hàng', description: 'Theo dõi đơn hàng — tiêu đề' },
- { id: 'cnt-tracking-hero-label', group: 'pages', key: 'tracking_hero_label', value: '', description: 'Theo dõi đơn hàng — ' },
+ { id: 'cnt-tracking-hero-label', group: 'pages', key: 'tracking_hero_label', value: 'Soft Muse', description: 'Nhãn trang theo dõi đơn hàng' },
  { id: 'cnt-tracking-hero-subtitle', group: 'pages', key: 'tracking_hero_subtitle', value: 'Tra cứu tình trạng đơn hàng Soft Muse bằng mã đơn hoặc số điện thoại.', description: 'Theo dõi đơn hàng — mô tả' },
- { id: 'cnt-tracking-support-title', group: 'pages', key: 'tracking_support_title', value: 'đến ؟', description: 'Theo dõi đơn hàng — tiêu đềmã Hỗ trợ' },
+ { id: 'cnt-tracking-support-title', group: 'pages', key: 'tracking_support_title', value: 'Cần hỗ trợ thêm?', description: 'Tiêu đề khu vực hỗ trợ' },
  { id: 'cnt-tracking-support-text', group: 'pages', key: 'tracking_support_text', value: 'Soft Muse hỗ trợ qua Zalo, Messenger và email chăm sóc khách hàng.', description: 'Theo dõi đơn hàng — mô tả hỗ trợ' },
  { id: 'cnt-tracking-support-btn', group: 'pages', key: 'tracking_support_btn', value: 'Liên hệ với chúng tôi', description: 'Theo dõi đơn hàng — Hỗ trợ' },
 
  // ── Pages — Reviews ──────────────────────────────────────────────────
- { id: 'cnt-reviews-hero-label', group: 'pages', key: 'reviews_hero_label', value: '', description: 'Đánh giá — ' },
- { id: 'cnt-reviews-hero-title', group: 'pages', key: 'reviews_hero_title', value: '', description: 'Đánh giá — tiêu đề' },
+ { id: 'cnt-reviews-hero-label', group: 'pages', key: 'reviews_hero_label', value: 'Cảm nhận khách hàng', description: 'Nhãn trang đánh giá' },
+ { id: 'cnt-reviews-hero-title', group: 'pages', key: 'reviews_hero_title', value: 'Soft Muse trong những ngày đi làm thật', description: 'Tiêu đề trang đánh giá' },
  { id: 'cnt-reviews-hero-subtitle', group: 'pages', key: 'reviews_hero_subtitle', value: 'Cảm nhận thật từ khách hàng Soft Muse.', description: 'Đánh giá — mô tả' },
 
  // ── Pages — Wishlist ─────────────────────────────────────────────────
@@ -56,26 +56,27 @@ let mockContent: ContentBlock[] = [
  { id: 'cnt-cart-empty-btn', group: 'pages', key: 'cart_empty_btn', value: 'Vào cửa hàng', description: 'Trạng thái trống' },
 ];
 
-mockContent = mockStorage.read('storefront.content', mockContent);
-
 export const ContentService = {
  async getAllContent(): Promise<ContentBlock[]> {
+ const { data, error } = await createClient().rpc('get_storefront_setting', { setting_key: 'storefront.content' });
+ if (!error && Array.isArray(data)) mockContent = data as ContentBlock[];
  return [...mockContent];
  },
 
  async getContentByGroup(group: ContentBlock['group']): Promise<ContentBlock[]> {
- return mockContent.filter(c => c.group === group);
+ return (await this.getAllContent()).filter(c => c.group === group);
  },
 
  async getByKey(key: string): Promise<string | null> {
- return mockContent.find(c => c.key === key)?.value ?? null;
+ return (await this.getAllContent()).find(c => c.key === key)?.value ?? null;
  },
 
  async updateContent(id: string, value: string): Promise<ContentBlock> {
  const idx = mockContent.findIndex(c => c.id === id);
  if (idx > -1) {
  mockContent[idx] = { ...mockContent[idx], value };
- mockStorage.write('storefront.content', mockContent);
+ const { error } = await createClient().rpc('update_storefront_setting', { setting_key: 'storefront.content', setting_value: mockContent });
+ if (error) throw new Error(error.message);
  eventBus.emit('website.changed', { area: 'content' });
  return mockContent[idx];
  }

@@ -107,7 +107,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  toast.success('Đã cập nhật sản phẩm thành công');
  } else {
  await ProductService.createProduct(formData as Omit<Product, 'id'>);
- toast.success('đãThêm sản phẩm thành công');
+ toast.success('Đã thêm sản phẩm thành công');
  }
  router.push('/admin/products');
  } catch (err) {
@@ -122,7 +122,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  {/* Header Actions */}
  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> <div className="flex items-center gap-4"> <Button type="button" variant="ghost" onClick={() => router.back()} className="px-2" leftIcon={<IconArrowRight size={20} />} /> <h1 className="text-xl font-bold text-[var(--admin-text-base)]">
  {isEdit ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}
- </h1> </div> <div className="flex items-center gap-3 w-full sm:w-auto"> <Button type="button" variant="secondary" className="flex-1 sm:flex-none" leftIcon={<IconEye size={18} />}> </Button> <Button type="submit" isLoading={saving} className="flex-1 sm:flex-none" leftIcon={<IconDeviceFloppy size={18} />}>
+ </h1> </div> <div className="flex items-center gap-3 w-full sm:w-auto"> {isEdit && formData.id && <Button type="button" variant="secondary" className="flex-1 sm:flex-none" leftIcon={<IconEye size={18} />} onClick={() => window.open(`/product/${formData.id}`, '_blank', 'noopener,noreferrer')}>Xem ngoài cửa hàng</Button>} <Button type="submit" isLoading={saving} className="flex-1 sm:flex-none" leftIcon={<IconDeviceFloppy size={18} />}>
  Lưu sản phẩm</Button> </div> </div> <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
  {/* Main Content */}
  <div className="lg:col-span-2 space-y-4"> <Tabs tabs={TABS} active={activeTab} onChange={setActiveTab} className="mb-4" /> <Card className="p-6 min-h-[400px]"> <AnimatePresence mode="wait"> <motion.div
@@ -174,7 +174,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  {/* Images Tab */}
  {activeTab === 'images' && (
- <div className="space-y-4"> <p className="text-sm text-[var(--admin-text-muted)]">6.Hình ảnhTrang chủ.</p> <ImageUpload 
+ <div className="space-y-4"> <p className="text-sm text-[var(--admin-text-muted)]">Tải tối đa 6 ảnh. Ảnh đầu tiên được dùng làm ảnh đại diện sản phẩm.</p> <ImageUpload
  multiple 
  images={formData.images || []} 
  onChange={(images) => handleChange('images', images.slice(0, 6))} 

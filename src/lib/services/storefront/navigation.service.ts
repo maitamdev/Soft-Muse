@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { createClient } from '@/lib/supabase/client';
 
 export interface NavItem {
  id: string;
@@ -39,22 +39,23 @@ let mockMenus: NavMenu[] = [
  }
 ];
 
-mockMenus = mockStorage.read('storefront.navigation', mockMenus);
-
 export const NavigationService = {
  async getMenus(): Promise<NavMenu[]> {
+ const { data, error } = await createClient().rpc('get_storefront_setting', { setting_key: 'storefront.navigation' });
+ if (!error && Array.isArray(data)) mockMenus = data as NavMenu[];
  return [...mockMenus];
  },
 
  async getMenuByLocation(location: NavMenu['location']): Promise<NavMenu | undefined> {
- return mockMenus.find(m => m.location === location);
+ return (await this.getMenus()).find(m => m.location === location);
  },
 
  async updateMenu(id: string, items: NavItem[]): Promise<NavMenu> {
  const idx = mockMenus.findIndex(m => m.id === id);
  if (idx > -1) {
  mockMenus[idx].items = items;
- mockStorage.write('storefront.navigation', mockMenus);
+ const { error } = await createClient().rpc('update_storefront_setting', { setting_key: 'storefront.navigation', setting_value: mockMenus });
+ if (error) throw new Error(error.message);
  eventBus.emit('website.changed', { area: 'navigation' });
  return mockMenus[idx];
  }

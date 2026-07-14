@@ -1,5 +1,5 @@
 import { eventBus } from '@/lib/events/EventBus';
-import { mockStorage } from '@/lib/storage/mock-storage';
+import { createClient } from '@/lib/supabase/client';
 
 export interface AnnouncementBarSettings {
  enabled: boolean;
@@ -58,8 +58,6 @@ let mockStoreInfo: StoreInfo = {
  },
 };
 
-mockStoreInfo = mockStorage.read('storefront.store', mockStoreInfo);
-
 // Backfill announcementBar for stores saved before this field existed
 if (!mockStoreInfo.announcementBar) {
  mockStoreInfo.announcementBar = {
@@ -73,6 +71,8 @@ if (!mockStoreInfo.announcementBar) {
 
 export const StoreService = {
  async getInfo(): Promise<StoreInfo> {
+ const { data, error } = await createClient().rpc('get_storefront_setting', { setting_key: 'storefront.store' });
+ if (!error && data && typeof data === 'object') mockStoreInfo = { ...mockStoreInfo, ...(data as Partial<StoreInfo>) };
  return this.getInfoSync();
  },
 
@@ -83,7 +83,8 @@ export const StoreService = {
 
  async updateInfo(updates: Partial<StoreInfo>): Promise<StoreInfo> {
  mockStoreInfo = { ...mockStoreInfo, ...updates };
- mockStorage.write('storefront.store', mockStoreInfo);
+ const { error } = await createClient().rpc('update_storefront_setting', { setting_key: 'storefront.store', setting_value: mockStoreInfo });
+ if (error) throw new Error(error.message);
  eventBus.emit('website.changed', { area: 'store' });
  return { ...mockStoreInfo };
  }

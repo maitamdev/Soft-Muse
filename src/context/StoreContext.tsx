@@ -26,7 +26,7 @@ export interface WishlistItem {
 interface StoreContextType {
  cart: CartItem[];
  wishlist: WishlistItem[];
- addToCart: (item: Omit<CartItem, "quantity">) => void;
+ addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
  removeFromCart: (id: string, size?: string, color?: string) => void;
  updateQuantity: (id: string, qty: number, size?: string, color?: string) => void;
  toggleWishlist: (item: WishlistItem) => void;
@@ -50,8 +50,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  const savedCart = localStorage.getItem("soft_muse_cart");
  const savedWishlist = localStorage.getItem("soft_muse_wishlist");
  
- if (savedCart) setCart(JSON.parse(savedCart));
- if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+ try {
+ const parsedCart = savedCart ? JSON.parse(savedCart) : [];
+ const parsedWishlist = savedWishlist ? JSON.parse(savedWishlist) : [];
+ setCart(Array.isArray(parsedCart) ? parsedCart.filter((item) => item?.id && Number(item.quantity) > 0).map((item) => ({ ...item, quantity: Math.min(20, Math.max(1, Math.floor(Number(item.quantity)))) })) : []);
+ setWishlist(Array.isArray(parsedWishlist) ? parsedWishlist.filter((item) => item?.id) : []);
+ } catch {
+ localStorage.removeItem("soft_muse_cart");
+ localStorage.removeItem("soft_muse_wishlist");
+ }
  }, []);
 
  const saveCart = useCallback((newCart: CartItem[]) => {
@@ -63,7 +70,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  saveCart([]);
  }, [saveCart]);
 
- const addToCart = useCallback((item: Omit<CartItem, "quantity">) => {
+ const addToCart = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
+ const safeQuantity = Math.min(20, Math.max(1, Math.floor(quantity)));
  setCart((prevCart) => {
  const existingIndex = prevCart.findIndex(
  (i) => i.id === item.id && i.variantId === item.variantId && i.size === item.size && i.color === item.color
@@ -71,9 +79,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  let newCart;
  if (existingIndex > -1) {
  newCart = [...prevCart];
- newCart[existingIndex].quantity += 1;
+ newCart[existingIndex] = { ...newCart[existingIndex], quantity: Math.min(20, newCart[existingIndex].quantity + safeQuantity) };
  } else {
- newCart = [...prevCart, { ...item, quantity: 1 }];
+ newCart = [...prevCart, { ...item, quantity: safeQuantity }];
  }
  localStorage.setItem("soft_muse_cart", JSON.stringify(newCart));
  return newCart;
@@ -95,8 +103,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
  return;
  }
  setCart((prevCart) => {
+ const safeQuantity = Math.min(20, Math.max(1, Math.floor(qty)));
  const newCart = prevCart.map((i) =>
- i.id === id && i.size === size && i.color === color ? { ...i, quantity: qty } : i
+ i.id === id && i.size === size && i.color === color ? { ...i, quantity: safeQuantity } : i
  );
  localStorage.setItem("soft_muse_cart", JSON.stringify(newCart));
  return newCart;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { IconPlus, IconTrash, IconEdit, IconArchive } from '@tabler/icons-react';
+import { IconPhoto, IconPlus, IconTrash, IconEdit, IconArchive } from '@tabler/icons-react';
 import { CollectionService, Collection } from '@/lib/services/collection.service';
 import { EntityDeleteDialog } from '@/components/admin/crud/EntityDialogs';
 
@@ -71,7 +71,9 @@ export default function CollectionsPage() {
  accessor: 'image',
  type: 'custom',
  render: (_, row) => (
- <div className="w-12 h-12 rounded-[var(--admin-radius-sm)] overflow-hidden border border-[var(--admin-border-light)] bg-[var(--admin-bg-elevated)]"> <img src={row.image || 'https://via.placeholder.com/100'} alt="" className="w-full h-full object-cover" /> </div>
+ <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-[var(--admin-radius-sm)] border border-[var(--admin-border-light)] bg-[var(--admin-bg-elevated)]">
+ {row.image ? <img src={row.image} alt={row.name} className="h-full w-full object-cover" /> : <IconPhoto size={18} className="text-[var(--admin-text-subtle)]" />}
+ </div>
  )
  },
  { header: 'Tên', accessor: 'name', sortable: true },
@@ -81,7 +83,7 @@ export default function CollectionsPage() {
  type: 'custom',
  render: (_, row) => (
  <Badge variant={row.type === 'manual' ? 'primary' : 'info'} size="sm">
- {row.type === 'manual' ? '' : ''}
+ {row.type === 'manual' ? 'Thủ công' : 'Tự động'}
  </Badge>
  )
  },
@@ -101,7 +103,7 @@ export default function CollectionsPage() {
  type: 'custom',
  render: (_, row) => (
  <Badge variant={row.status === 'active' ? 'success' : row.status === 'draft' ? 'warning' : 'neutral'} size="sm" animated>
- {row.status}
+ {row.status === 'active' ? 'Đang hiển thị' : row.status === 'archived' ? 'Đã lưu trữ' : 'Nháp'}
  </Badge>
  )
  },

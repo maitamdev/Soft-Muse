@@ -108,7 +108,7 @@ class SupabaseProductRepository implements IProductRepository {
       target_product_id: productId,
       image_payload: (product.images ?? []).map((url, sortOrder) => ({ url, altText: product.name ?? "", sortOrder })),
       variant_payload: (product.variants ?? []).map((variant) => ({
-        id: variant.id, sku: variant.sku, color: variant.color, size: variant.size, price: variant.price,
+        id: variant.id, sku: variant.sku, color: "", size: variant.size, price: variant.price,
         cost: variant.cost ?? 0, stock: variant.stock, weight: variant.weight ?? 0,
         image: variant.image ?? null, status: variant.status ?? "active",
       })),

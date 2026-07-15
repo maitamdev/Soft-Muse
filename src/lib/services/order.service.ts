@@ -152,7 +152,7 @@ class SupabaseOrderRepository implements IOrderRepository {
           quantity: item.quantity,
           image_url: item.image ?? null,
           size: item.size ?? null,
-          color: item.color ?? null,
+          color: null,
         })),
       },
     });

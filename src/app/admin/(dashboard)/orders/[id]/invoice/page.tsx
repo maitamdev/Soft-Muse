@@ -55,8 +55,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
  <table className="w-full mb-12 text-sm text-left"> <thead> <tr className="border-b-2 border-gray-800 text-gray-800"> <th className="py-3 px-2 font-bold">sản phẩm</th> <th className="py-3 px-2 font-bold text-center">Số lượng</th> <th className="py-3 px-2 font-bold text-center">Giá</th> <th className="py-3 px-2 font-bold text-end">Tổng cộng</th> </tr> </thead> <tbody className="divide-y divide-gray-100">
  {order.items.map(item => (
  <tr key={item.id}> <td className="py-4 px-2"> <p className="font-medium text-gray-800">{item.productName}</p> <p className="text-xs text-gray-500 mt-1">:{item.sku}</p>
- {(item.size || item.color) && (
- <p className="text-xs text-gray-500 mt-0.5">{item.size && `Kích cỡ: ${item.size}`} {item.color && `- :${item.color}`}</p>
+ {item.size && (
+ <p className="text-xs text-gray-500 mt-0.5">{`Kích cỡ: ${item.size}`}</p>
  )}
  </td> <td className="py-4 px-2 text-center text-gray-800">{item.quantity}</td> <td className="py-4 px-2 text-center text-gray-800">{formatCurrency(item.price)}</td> <td className="py-4 px-2 font-medium text-end text-gray-800">{formatCurrency(item.price * item.quantity)}</td> </tr>
  ))}

@@ -519,7 +519,7 @@ export default function Navbar() {
  {item.collection || "Soft Muse"}
  </span> <h4 className="font-sans text-sm font-medium text-text-primary leading-snug">
  {item.title}
- </h4> {(item.color || item.size) && <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2">{item.color && <div>Màu: <span className="text-text-primary font-medium">{item.color}</span></div>}{item.size && <div>Kích cỡ: <span className="text-text-primary font-medium">{item.size}</span></div>}</div>} </div> <div className="flex justify-between items-center mt-2">
+ </h4> {item.size && <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2"><div>Kích cỡ: <span className="text-text-primary font-medium">{item.size}</span></div></div>} </div> <div className="flex justify-between items-center mt-2">
  {/* Quantity control */}
  <div className="flex items-center border border-brand-border bg-background-primary"> <button
  onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}

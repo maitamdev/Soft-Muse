@@ -57,7 +57,6 @@ export function mapProductRow(row: ProductRow): Product {
     image: variant.image_url ? String(variant.image_url) : undefined,
     status: variant.status === "inactive" ? "inactive" : "active",
   }));
-  const colors = Array.from(new Set(variants.map((variant) => variant.color).filter(Boolean)));
   const sizes = Array.from(new Set(variants.map((variant) => variant.size).filter(Boolean)));
   const images = imageRows.map((image) => String(image.url));
 
@@ -98,15 +97,9 @@ export function mapProductRow(row: ProductRow): Product {
     details: (row.details as string[] | null) ?? [],
     fabric: String(row.fabric ?? row.material ?? ""),
     packaging: String(row.packaging ?? ""),
-    colors: ((row.colors as string[] | null) ?? []).length ? (row.colors as string[]) : colors,
+    colors: [],
     sizes: ((row.sizes as string[] | null) ?? []).length ? (row.sizes as string[]) : sizes,
-    colorVariants: colors.map((color) => ({
-      color,
-      value: String(
-        (row.product_variants ?? []).find((variant) => variant.color === color)?.color_value ?? "#D8C8B6",
-      ),
-      images: variants.filter((variant) => variant.color === color && variant.image).map((variant) => variant.image!),
-    })),
+    colorVariants: [],
   };
 }
 
@@ -146,7 +139,7 @@ export function productToRow(product: Partial<Product>) {
     details: product.details ?? [],
     fabric: product.fabric ?? product.material ?? "",
     packaging: product.packaging ?? "",
-    colors: product.colors ?? [],
+    colors: [],
     sizes: product.sizes ?? [],
     costing: product.costing ?? emptyCosting,
     seo: product.seo ?? emptySeo,

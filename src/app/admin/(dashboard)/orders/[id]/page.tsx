@@ -270,7 +270,6 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
  {order.items.map((item) => (
  <div key={item.id} className="p-5 flex items-center gap-4 hover:bg-[var(--admin-bg-elevated)] transition-colors"> <div className="w-16 h-16 bg-[var(--admin-bg-elevated)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-sm)] overflow-hidden flex-shrink-0"> <img src={item.image} alt={item.productName} className="w-full h-full object-cover" /> </div> <div className="flex-1"> <p className="font-semibold text-sm text-[var(--admin-text-base)]">{item.productName}</p> <div className="text-xs text-[var(--admin-text-muted)] mt-1.5 flex gap-3"> <span>:<span className="font-medium text-[var(--admin-text-base)]">{item.sku}</span></span>
  {item.size && <span>Kích cỡ: <span className="font-medium text-[var(--admin-text-base)]">{item.size}</span></span>}
- {item.color && <span>:<span className="font-medium text-[var(--admin-text-base)]">{item.color}</span></span>}
  </div> </div> <div className="text-sm font-medium text-end"> <p className="tabular-nums">{formatCurrency(item.price)}</p> <p className="text-xs text-[var(--admin-text-subtle)] mt-1">Số lượng: {item.quantity}</p> </div> <div className="text-sm font-bold text-end w-24 tabular-nums">
  {formatCurrency(item.price * item.quantity)}
  </div> </div>

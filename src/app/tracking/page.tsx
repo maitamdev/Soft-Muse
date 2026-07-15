@@ -187,7 +187,7 @@ function TrackingContent({ c, supportUrl }: { c: typeof DEFAULT_CONTENT; support
  src={item.image || "/images/products/product_evening_gown.png"}
  alt={item.productName} fill sizes="56px" className="object-cover"
  /> </div> <div className="flex-grow min-w-0"> <h4 className="font-sans text-xs font-semibold text-text-primary truncate">{item.productName}</h4> <span className="text-[10px] text-text-secondary font-light block mt-0.5">
- {item.size ? `Kích cỡ: ${item.size}` : ""}{item.size && item.color ? " | " : ""}{item.color ? `Màu: ${item.color}` : ""}{(item.size || item.color) ? " | " : ""}Số lượng: {item.quantity}
+ {item.size ? `Kích cỡ: ${item.size} | ` : ""}Số lượng: {item.quantity}
  </span> </div> <span className="font-display text-xs font-bold text-accent shrink-0">
  {formatCurrency(item.price * item.quantity)}
  </span> </div>

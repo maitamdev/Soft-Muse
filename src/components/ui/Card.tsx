@@ -34,7 +34,6 @@ export const ProductCard = React.memo(function ProductCard({
  image,
  hoverImage,
  collection,
- variants,
  badge,
  originalPrice,
  stockStatus = "in_stock",
@@ -62,10 +61,7 @@ export const ProductCard = React.memo(function ProductCard({
  router.push(`/product/${id}`);
  };
 
- const activeVariant = variants?.find((v) => v.images[0] === currentImage);
- const cardHoverImage = activeVariant && activeVariant.images.length > 1
- ? activeVariant.images[1]
- : hoverImage;
+ const cardHoverImage = hoverImage;
 
  return (
  <motion.div
@@ -132,7 +128,7 @@ export const ProductCard = React.memo(function ProductCard({
  </Link>
 
  {/* Hover quick add overlay - Solid Background, No Glassmorphism */}
- <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-text-primary flex flex-col gap-2 z-10"> <span className="text-[10px] text-background-secondary font-sans">Xem màu sắc, kích cỡ và chất liệu</span> <button
+ <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-text-primary flex flex-col gap-2 z-10"> <span className="text-[10px] text-background-secondary font-sans">Xem kích cỡ và chất liệu</span> <button
  onClick={handleViewProduct}
  disabled={isOutOfStock}
  className="w-full bg-background-secondary text-text-primary text-[10px] font-sans font-semibold py-2.5 hover:bg-accent hover:text-background-secondary transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background-secondary disabled:hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
@@ -161,32 +157,6 @@ export const ProductCard = React.memo(function ProductCard({
  <span className="font-sans text-[9px] text-accent-dark font-bold uppercase tracking-wide"></span>
  )}
  </span>
- {variants && variants.length > 0 && (
- <div className="flex gap-1.5" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
- {variants.map((v) => (
- <button
- key={v.color}
- onClick={(e) => {
- e.preventDefault();
- e.stopPropagation();
- setCurrentImage(v.images[0]);
- }}
- className="w-3.5 h-3.5 rounded-full border transition-all duration-300 bg-background-primary flex items-center justify-center cursor-pointer"
- style={{
- borderColor: currentImage === v.images[0] ? "var(--color-accent-dark)" : "var(--color-brand-border)",
- borderWidth: currentImage === v.images[0] ? "1.5px" : "1px",
- transform: currentImage === v.images[0] ? "scale(1.08)" : "none",
- }}
- title={v.color}
- aria-label={`Chọn màu ${v.color}`}
- aria-pressed={currentImage === v.images[0]}
- > <span
- className="w-2 h-2 rounded-full border border-black/5"
- style={{ backgroundColor: v.value }}
- /> </button>
- ))}
- </div>
- )}
  </div> </div> </motion.div>
  );
 });

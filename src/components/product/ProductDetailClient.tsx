@@ -35,7 +35,6 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
 
  // States
  const [selectedSize, setSelectedSize] = useState("");
- const [selectedColor, setSelectedColor] = useState("");
  const [activeImage, setActiveImage] = useState(product ? primaryImage(product) : "");
  const [quantity, setQuantity] = useState(1);
  const [isAdded, setIsAdded] = useState(false);
@@ -57,15 +56,8 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  );
  }
 
- const colorOptions = product.colorVariants?.length
- ? product.colorVariants.filter((variant) => variant.color.trim())
- : (product.colors ?? []).filter(Boolean).map((color) => ({ color, value: "#D8C8B6", images: [] }));
  const sizeOptions = (product.sizes ?? []).filter(Boolean);
- const hasColorOptions = colorOptions.length > 0;
  const hasSizeOptions = sizeOptions.length > 0;
-
- // Match only against attributes that this product actually offers.
- const selectedVariant = colorOptions.find((variant) => variant.color === selectedColor);
 
  // Gallery images array (fallback to defaults if no variant is selected)
  const defaultImages = [
@@ -75,41 +67,25 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  "/images/lifestyle/lifestyle_interior.png",
  ];
 
- const galleryImages = selectedVariant && selectedVariant.images && selectedVariant.images.length > 0
- ? selectedVariant.images
- : defaultImages;
-
- const handleColorSelect = (color: string) => {
- setSelectedColor(color);
- const variant = product.colorVariants?.find((v) => v.color === color);
- if (variant && variant.images && variant.images.length > 0) {
- setActiveImage(variant.images[0]);
- }
- };
+ const galleryImages = defaultImages;
 
  const cartVariant = product.variants.find((variant) =>
- (!hasColorOptions || variant.color === selectedColor)
- && (!hasSizeOptions || variant.size === selectedSize)
+ (!hasSizeOptions || variant.size === selectedSize)
  );
- const selectionComplete = (!hasColorOptions || Boolean(selectedColor)) && (!hasSizeOptions || Boolean(selectedSize));
+ const selectionComplete = !hasSizeOptions || Boolean(selectedSize);
  const isOutOfStock = selectionComplete && product.variants.length ? !cartVariant || cartVariant.stock <= 0 : resolveStockStatus(product) === "out_of_stock";
  const displayPrice = cartVariant?.price ?? product.price;
  const displayedStock = cartVariant?.stock ?? product.stock;
 
  const handleAddToBag = () => {
  if (isOutOfStock) return;
- const missingColor = hasColorOptions && !selectedColor;
  const missingSize = hasSizeOptions && !selectedSize;
- if (missingColor || missingSize) {
- const message = missingColor && missingSize
- ? "Vui lòng chọn màu sắc và kích cỡ trước khi thêm vào giỏ hàng."
- : missingColor
- ? "Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng."
- : "Vui lòng chọn kích cỡ trước khi thêm vào giỏ hàng.";
+ if (missingSize) {
+ const message = "Vui lòng chọn kích cỡ trước khi thêm vào giỏ hàng.";
  showNotification(message, "warning");
  return;
  }
- if (product.variants.length && !cartVariant) { showNotification("Phân loại này hiện không tồn tại. Vui lòng chọn màu hoặc kích cỡ khác.", "warning"); return; }
+ if (product.variants.length && !cartVariant) { showNotification("Phân loại này hiện không tồn tại. Vui lòng chọn kích cỡ khác.", "warning"); return; }
  if (cartVariant && cartVariant.stock < quantity) { showNotification(`Phân loại này chỉ còn ${cartVariant.stock} sản phẩm.`, "warning"); return; }
  const sellingPrice = cartVariant?.price ?? product.price;
  addToCart({
@@ -119,11 +95,10 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  price: sellingPrice,
  image: activeImage || primaryImage(product),
  size: selectedSize,
- color: selectedColor,
  collection: product.collection,
  variantImages: galleryImages,
  }, quantity);
- analytics.trackAddToCart(product.id, product.name, sellingPrice, selectedSize, selectedColor, quantity);
+ analytics.trackAddToCart(product.id, product.name, sellingPrice, selectedSize, "", quantity);
  showNotification(
  "Đã thêm sản phẩm vào giỏ hàng.",
  "success"
@@ -206,36 +181,6 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  {product.description}
  </p>
 
- {/* Colors Swatch Choice */}
- {hasColorOptions && (
- <div className="flex flex-col gap-2"> <label className="text-[10px] font-sans font-bold text-text-secondary">
- Màu sắc: {selectedColor || "Chọn màu"}
- </label> <div className="flex gap-3">
- {colorOptions.map((col) => {
- const unavailable = Boolean(product.variants.length && selectedSize && !product.variants.some((variant) => variant.color === col.color && variant.size === selectedSize && variant.stock > 0));
- return (
- <button
- key={col.color}
- onClick={() => handleColorSelect(col.color)}
- className="relative w-8 h-8 rounded-full border transition-all duration-300 bg-background-primary flex items-center justify-center animate-fade-in"
- style={{
- borderColor: selectedColor === col.color ? "var(--color-accent-dark)" : "var(--color-brand-border)",
- borderWidth: selectedColor === col.color ? "2px" : "1px",
- transform: selectedColor === col.color ? "scale(1.05)" : "none",
- }}
- title={col.color}
- aria-label={`Chọn màu ${col.color}`}
- aria-pressed={selectedColor === col.color}
- disabled={unavailable}
- data-unavailable={unavailable || undefined}
- > <span
- className="absolute inset-1 rounded-full border border-black/5 shadow-sm"
- style={{ backgroundColor: col.value }}
- />{unavailable && <span className="absolute h-px w-9 rotate-45 bg-text-secondary/50" />}</button>
- )})}
- </div> </div>
- )}
-
  {/* Sizes Box Choice */}
  {hasSizeOptions && (
  <div className="flex flex-col gap-2"> <div className="flex justify-between items-center text-[10px] font-sans font-bold text-text-secondary w-full"> <span>Kích cỡ: {selectedSize || "Kích cỡ"}</span> <button
@@ -246,7 +191,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  Kích cỡ
  </button> </div> <div className="flex gap-2">
  {sizeOptions.map((sz) => {
- const unavailable = Boolean(product.variants.length && selectedColor && !product.variants.some((variant) => variant.color === selectedColor && variant.size === sz && variant.stock > 0));
+ const unavailable = Boolean(product.variants.length && !product.variants.some((variant) => variant.size === sz && variant.stock > 0));
  return (
  <button
  key={sz}
@@ -398,7 +343,7 @@ export default function ProductDetailClient({ params, initialProduct }: PageProp
  <RecentlyViewed />
 
  {/* STICKY BOTTOM PURCHASE PANEL - Solid Background, No Blur */}
- <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> {(hasSizeOptions || hasColorOptions) && <span className="text-[10px] text-text-secondary font-light">{hasSizeOptions && `Kích cỡ: ${selectedSize || "Chưa chọn"}`}{hasSizeOptions && hasColorOptions && " | "}{hasColorOptions && `Màu: ${selectedColor || "Chưa chọn"}`}</span>} </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{displayPrice.toLocaleString()} đ</span> <Button
+ <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-16 bg-background-secondary border-t border-brand-border z-30 flex items-center shadow-md"> <div className="max-w-[1280px] mx-auto w-full px-6 md:px-12 flex justify-between items-center gap-4"> <div className="flex items-center gap-3"> <div className="relative w-10 h-12 shrink-0 border border-brand-border bg-background-primary"> <Image src={primaryImage(product)} alt="" fill sizes="40px" className="object-cover" /> </div> <div className="hidden sm:block"> <h5 className="font-sans text-xs font-bold truncate max-w-xs">{product.name}</h5> {hasSizeOptions && <span className="text-[10px] text-text-secondary font-light">{`Kích cỡ: ${selectedSize || "Chưa chọn"}`}</span>} </div> </div> <div className="flex items-center gap-4"> <span className="font-display text-sm text-accent font-semibold">{displayPrice.toLocaleString()} đ</span> <Button
  variant="primary"
  onClick={handleAddToBag}
  className="h-10 px-6 text-[10px]"

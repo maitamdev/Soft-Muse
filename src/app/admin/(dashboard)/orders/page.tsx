@@ -135,7 +135,7 @@ export default function OrdersPage() {
  items: lines.map(l => {
  const p = prodList.find(pr => pr.id === l.productId)!;
  const variant = p.variants.find(item => item.id === l.variantId);
- return { productId: p.id, variantId: variant?.id, productName: p.name, sku: variant?.sku ?? p.sku, quantity: l.quantity, price: variant?.price ?? p.price, size: variant?.size, color: variant?.color };
+ return { productId: p.id, variantId: variant?.id, productName: p.name, sku: variant?.sku ?? p.sku, quantity: l.quantity, price: variant?.price ?? p.price, size: variant?.size };
  }),
  };
  const created = await OrderService.createOrder(input);
@@ -360,7 +360,7 @@ export default function OrdersPage() {
  className="h-10 px-3 flex-1 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm outline-none focus:ring-2 focus:ring-[var(--admin-primary)]"
  > <option value="">— sản phẩm —</option>
  {prodList.map(p => <option key={p.id} value={p.id}>{p.name} — {p.price.toLocaleString('vi-VN')} đ — tồn {p.stock}</option>)}
- </select> {prodList.find(product => product.id === line.productId)?.variants.length ? <select value={line.variantId ?? ''} onChange={e => { const lines = [...form.lines]; lines[idx] = { ...lines[idx], variantId: e.target.value || undefined }; setForm({ ...form, lines }); }} className="h-10 px-2 w-40 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm"><option value="">— biến thể —</option>{prodList.find(product => product.id === line.productId)!.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.color}/{variant.size} · tồn {variant.stock}</option>)}</select> : null} <input
+ </select> {prodList.find(product => product.id === line.productId)?.variants.length ? <select value={line.variantId ?? ''} onChange={e => { const lines = [...form.lines]; lines[idx] = { ...lines[idx], variantId: e.target.value || undefined }; setForm({ ...form, lines }); }} className="h-10 px-2 w-40 bg-[var(--admin-bg-base)] border border-[var(--admin-border-base)] rounded-[var(--admin-radius-md)] text-sm"><option value="">— biến thể —</option>{prodList.find(product => product.id === line.productId)!.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.size} · tồn {variant.stock}</option>)}</select> : null} <input
  type="number"
  min={1}
  max={prodList.find(product => product.id === line.productId)?.variants.find(variant => variant.id === line.variantId)?.stock ?? prodList.find(product => product.id === line.productId)?.stock}

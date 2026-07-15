@@ -62,7 +62,7 @@ Kiểm tra sản phẩm, số lượng và tổng đơn trước khi thanh toán
  {item.collection || "Soft Muse"}
  </span> <h4 className="font-sans text-base font-medium text-text-primary leading-snug">
  {item.title}
- </h4> <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2"> <div>Màu: <span className="text-text-primary font-medium">{item.color || "Chưa chọn"}</span></div> <div>Kích cỡ: <span className="text-text-primary font-medium">{item.size || "Chưa chọn"}</span></div> </div> </div> <div className="flex justify-between items-center mt-4">
+ </h4> <div className="font-sans text-xs text-text-secondary flex flex-col gap-1 mt-2"> <div>Kích cỡ: <span className="text-text-primary font-medium">{item.size || "Chưa chọn"}</span></div> </div> </div> <div className="flex justify-between items-center mt-4">
  {/* Quantity Controls */}
  <div className="flex items-center border border-brand-border bg-background-primary"> <button
  onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}

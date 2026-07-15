@@ -17,7 +17,6 @@ import { productsForCollection } from "@/lib/catalog/collection-rules";
 import { discountOriginalPrice, primaryImage, resolveStockStatus } from "@/data/mock/products";
 
 const SIZES = ["XS", "S", "M", "L", "XL", "F"];
-const COLORS = ["Trắng kem", "Đen", "Hồng đất", "Be", "Nâu mocha", "Xám ghi", "Xanh navy", "Xanh sage"];
 const PAGE_SIZE = 12;
 
 function ShopContent() {
@@ -33,7 +32,6 @@ function ShopContent() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(true);
   const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc">("newest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,12 +68,10 @@ function ShopContent() {
       const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
       const matchesSize =
         selectedSizes.length === 0 || Boolean(product.sizes?.some((size) => selectedSizes.includes(size)));
-      const matchesColor =
-        selectedColors.length === 0 || Boolean(product.colors?.some((color) => selectedColors.includes(color)));
 
-      return matchesSearch && matchesCategory && matchesCollection && matchesPrice && matchesSize && matchesColor;
+      return matchesSearch && matchesCategory && matchesCollection && matchesPrice && matchesSize;
     });
-  }, [products, searchQuery, selectedCategory, activeCollection, collectionProductIds, priceRange, selectedSizes, selectedColors]);
+  }, [products, searchQuery, selectedCategory, activeCollection, collectionProductIds, priceRange, selectedSizes]);
 
   const sortedProducts = useMemo(() => {
     if (sortBy === "price_asc") return [...filteredProducts].sort((a, b) => a.price - b.price);
@@ -87,7 +83,7 @@ function ShopContent() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, priceRange, selectedSizes, selectedColors, sortBy]);
+  }, [searchQuery, selectedCategory, priceRange, selectedSizes, sortBy]);
 
   useEffect(() => {
     if (currentPage > pageCount) setCurrentPage(pageCount);
@@ -100,7 +96,6 @@ function ShopContent() {
     setPriceRange({ min: 0, max: 1000000 });
     setSearchQuery("");
     setSelectedSizes([]);
-    setSelectedColors([]);
     if (collectionParam || categoryParam) router.replace("/shop");
   };
 
@@ -195,24 +190,6 @@ function ShopContent() {
                 </div>
               </FilterGroup>
 
-              <FilterGroup title="Màu sắc" onClear={() => setSelectedColors([])} showClear={selectedColors.length > 0}>
-                <div className="flex flex-wrap gap-2">
-                  {COLORS.map((color) => (
-                    <FilterButton
-                      key={color}
-                      selected={selectedColors.includes(color)}
-                      onClick={() =>
-                        setSelectedColors((current) =>
-                          current.includes(color) ? current.filter((item) => item !== color) : [...current, color],
-                        )
-                      }
-                    >
-                      {color}
-                    </FilterButton>
-                  ))}
-                </div>
-              </FilterGroup>
-
               <div>
                 <h3 className="font-sans text-xs font-bold text-text-primary border-b border-brand-border pb-2 mb-3">
                   Giá (đ)
@@ -250,7 +227,7 @@ function ShopContent() {
               <div className="text-center py-20 bg-background-secondary border border-brand-border">
                 <p className="font-sans text-lg font-light text-text-primary">Không tìm thấy sản phẩm phù hợp</p>
                 <p className="text-xs text-text-secondary font-sans font-light mt-1">
-                  Hãy thử đổi danh mục, màu sắc hoặc khoảng giá.
+                  Hãy thử đổi danh mục, kích cỡ hoặc khoảng giá.
                 </p>
               </div>
             ) : (

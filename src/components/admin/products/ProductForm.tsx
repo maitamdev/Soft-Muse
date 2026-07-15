@@ -81,7 +81,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  price: 0, comparePrice: 0, costPrice: 0, stock: 0, lowStockLimit: 5,
  barcode: '', material: '', weight: 0, tags: [],
  status: 'draft', featured: false, bestSeller: false, newArrival: false,
- images: [], variants: [], colors: ['Trắng kem', 'Đen'], sizes: ['XS', 'S', 'M', 'L', 'XL'],
+ images: [], variants: [], colors: [], sizes: ['XS', 'S', 'M', 'L', 'XL'],
  seo: { metaTitle: '', metaDescription: '', keywords: '', canonicalUrl: '', ogTitle: '', ogDescription: '' },
  stats: { views: 0, orders: 0, revenue: 0, wishlistCount: 0, cartCount: 0, reviewsCount: 0 }, ...initialData
  });
@@ -155,7 +155,14 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
 
- const validation = ProductValidator.validate(formData, allProducts);
+ const payload: Partial<Product> = {
+ ...formData,
+ colors: [],
+ colorVariants: [],
+ variants: (formData.variants || []).map((variant) => ({ ...variant, color: '' })),
+ };
+
+ const validation = ProductValidator.validate(payload, allProducts);
  if (!validation.isValid) {
  const firstError = Object.values(validation.errors)[0];
  toast.error(firstError);
@@ -164,11 +171,11 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  setSaving(true);
  try {
- if (isEdit && formData.id) {
- await ProductService.updateProduct(formData.id, formData);
+ if (isEdit && payload.id) {
+ await ProductService.updateProduct(payload.id, payload);
  toast.success('Đã cập nhật sản phẩm thành công');
  } else {
- await ProductService.createProduct(formData as Omit<Product, 'id'>);
+ await ProductService.createProduct(payload as Omit<Product, 'id'>);
  toast.success('Đã thêm sản phẩm thành công');
  }
  router.push('/admin/products');
@@ -293,18 +300,18 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
 
  {/* Variants Tab */}
  {activeTab === 'variants' && (
- <div className="space-y-4"> <div className="flex items-center justify-between mb-4"> <p className="text-sm text-[var(--admin-text-muted)]">Quản lý màu sắc, kích cỡ và tồn kho riêng.</p> <Button type="button" variant="secondary" size="sm" onClick={handleVariantAdd} leftIcon={<IconPlus size={16} />}>
+ <div className="space-y-4"> <div className="flex items-center justify-between mb-4"> <p className="text-sm text-[var(--admin-text-muted)]">Quản lý kích cỡ và tồn kho riêng.</p> <Button type="button" variant="secondary" size="sm" onClick={handleVariantAdd} leftIcon={<IconPlus size={16} />}>
  Thêm biến thể</Button> </div>
 
  {formData.variants && formData.variants.length > 0 ? (
  <div className="border border-[var(--admin-border-base)] rounded-[var(--admin-radius-lg)] overflow-hidden overflow-x-auto">
  <table className="w-full text-sm text-left">
  <thead className="bg-[var(--admin-bg-elevated)] border-b border-[var(--admin-border-base)]">
- <tr><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Màu</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Kích cỡ</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">SKU</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Giá</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Tồn kho</th><th className="px-4 py-3 w-12"></th></tr>
+ <tr><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Kích cỡ</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">SKU</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Giá</th><th className="px-4 py-3 font-semibold text-[var(--admin-text-muted)]">Tồn kho</th><th className="px-4 py-3 w-12"></th></tr>
  </thead>
  <tbody className="divide-y divide-[var(--admin-border-light)]">
  {formData.variants.map((v, idx) => (
- <tr key={v.id} className="bg-transparent"> <td className="p-2"> <input type="text" value={v.color} onChange={(e)=>handleVariantUpdate(idx, 'color', e.target.value)} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" placeholder=":Đen" /> </td> <td className="p-2"> <input type="text" value={v.size} onChange={(e)=>handleVariantUpdate(idx, 'size', e.target.value)} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" placeholder="S, M, L" /> </td> <td className="p-2"> <input type="text" value={v.sku} onChange={(e)=>handleVariantUpdate(idx, 'sku', e.target.value)} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)] dir-ltr text-left" /> </td> <td className="p-2"> <input type="number" value={v.price} onChange={(e)=>handleVariantUpdate(idx, 'price', Number(e.target.value))} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" /> </td> <td className="p-2"> <input type="number" value={v.stock} onChange={(e)=>handleVariantUpdate(idx, 'stock', Number(e.target.value))} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" /> </td> <td className="p-2 text-center"> <button type="button" onClick={()=>handleVariantRemove(idx)} className="text-[var(--admin-danger)] hover:bg-[var(--admin-danger)]/10 p-1.5 rounded transition-colors"> <IconTrash size={16} /> </button> </td> </tr>
+ <tr key={v.id} className="bg-transparent"> <td className="p-2"> <input type="text" value={v.size} onChange={(e)=>handleVariantUpdate(idx, 'size', e.target.value)} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" placeholder="S, M, L" /> </td> <td className="p-2"> <input type="text" value={v.sku} onChange={(e)=>handleVariantUpdate(idx, 'sku', e.target.value)} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)] dir-ltr text-left" /> </td> <td className="p-2"> <input type="number" value={v.price} onChange={(e)=>handleVariantUpdate(idx, 'price', Number(e.target.value))} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" /> </td> <td className="p-2"> <input type="number" value={v.stock} onChange={(e)=>handleVariantUpdate(idx, 'stock', Number(e.target.value))} className="w-full h-8 px-2 border border-[var(--admin-border-base)] rounded bg-transparent outline-none focus:border-[var(--admin-primary)]" /> </td> <td className="p-2 text-center"> <button type="button" onClick={()=>handleVariantRemove(idx)} className="text-[var(--admin-danger)] hover:bg-[var(--admin-danger)]/10 p-1.5 rounded transition-colors"> <IconTrash size={16} /> </button> </td> </tr>
  ))}
  </tbody>
  </table>
